@@ -2,5 +2,5 @@
 - `docker compose up` permet de lancer une base de données
 
 ## Swagger
-- http://localhost:8045/hospital/swagger-ui.html
+- http://localhost:8045/swagger-ui/index.html
 
