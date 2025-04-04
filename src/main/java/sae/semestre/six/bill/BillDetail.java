@@ -1,4 +1,4 @@
-package sae.semestre.six.model;
+package sae.semestre.six.bill;
 
 import jakarta.persistence.*;
 

@@ -1,6 +1,7 @@
-package sae.semestre.six.dao;
+package sae.semestre.six.bill;
 
-import sae.semestre.six.model.Bill;
+import sae.semestre.six.dao.GenericDao;
+
 import java.util.Date;
 import java.util.List;
 

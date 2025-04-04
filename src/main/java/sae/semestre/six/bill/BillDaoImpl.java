@@ -1,7 +1,8 @@
-package sae.semestre.six.dao;
+package sae.semestre.six.bill;
 
-import sae.semestre.six.model.Bill;
 import org.springframework.stereotype.Repository;
+import sae.semestre.six.dao.AbstractHibernateDao;
+
 import java.util.Date;
 import java.util.List;
 

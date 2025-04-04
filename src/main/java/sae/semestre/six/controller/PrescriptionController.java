@@ -4,7 +4,7 @@ import sae.semestre.six.dao.PatientDao;
 import sae.semestre.six.dao.PrescriptionDao;
 import sae.semestre.six.model.Patient;
 import sae.semestre.six.model.Prescription;
-import sae.semestre.six.service.BillingService;
+import sae.semestre.six.bill.BillingService;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;

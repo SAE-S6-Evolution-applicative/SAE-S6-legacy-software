@@ -1,7 +1,10 @@
-package sae.semestre.six.model;
+package sae.semestre.six.bill;
 
 
 import jakarta.persistence.*;
+import sae.semestre.six.model.Doctor;
+import sae.semestre.six.model.Patient;
+import sae.semestre.six.model.PatientHistory;
 
 import java.util.Date;
 import java.util.Set;

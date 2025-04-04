@@ -1,6 +1,8 @@
 package sae.semestre.six.model;
 
 import jakarta.persistence.*;
+import sae.semestre.six.bill.Bill;
+
 import java.util.*;
 
 @Entity

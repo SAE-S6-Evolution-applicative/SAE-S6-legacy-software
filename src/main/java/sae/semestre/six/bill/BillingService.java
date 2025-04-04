@@ -1,4 +1,4 @@
-package sae.semestre.six.service;
+package sae.semestre.six.bill;
 
 import org.springframework.stereotype.Service;
 

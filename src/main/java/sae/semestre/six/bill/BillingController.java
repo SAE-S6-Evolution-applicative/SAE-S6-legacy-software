@@ -1,12 +1,9 @@
-package sae.semestre.six.controller;
+package sae.semestre.six.bill;
 
 import org.springframework.web.bind.annotation.*;
 import org.springframework.beans.factory.annotation.Autowired;
-import sae.semestre.six.dao.BillDao;
 import sae.semestre.six.dao.DoctorDao;
 import sae.semestre.six.dao.PatientDao;
-import sae.semestre.six.model.Bill;
-import sae.semestre.six.model.BillDetail;
 import sae.semestre.six.model.Doctor;
 import sae.semestre.six.model.Patient;
 import sae.semestre.six.service.EmailService;
