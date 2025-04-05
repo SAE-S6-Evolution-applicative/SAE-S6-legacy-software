@@ -23,8 +23,16 @@ public class PriceHistory {
     @Column(name = "change_date")
     @Temporal(TemporalType.TIMESTAMP)
     private Date changeDate = new Date();
-    
-    
+
+    public void setNewPrice(Double newPrice) {
+        this.newPrice = newPrice;
+    }
+
+    public void setOldPrice(Double oldPrice) {
+        this.oldPrice = oldPrice;
+    }
+
+    // TODO change name to getPriceChange
     public Double getPriceIncrease() {
         return newPrice - oldPrice;
     }
