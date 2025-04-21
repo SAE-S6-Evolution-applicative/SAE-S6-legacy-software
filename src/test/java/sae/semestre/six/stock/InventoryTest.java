@@ -58,9 +58,29 @@ class InventoryTest {
         inventory.setReorderLevel(10);
         inventory.setQuantity(11);
 
+        assertFalse(inventory.needsRestock());
         assertFalse(outContent.toString().contains("WARNING: Item") && outContent.toString().contains(" needs restock!"));
+
         inventory.decrementStock(1);
+        assertTrue(inventory.needsRestock());
         assertTrue(outContent.toString().contains("WARNING: Item") && outContent.toString().contains(" needs restock!"));
+
+        originalOut.println(outContent);
+    }
+
+    @Test
+    void testDecrementStockWithoutNeedOfRestock() {
+        Inventory inventory = new Inventory();
+        inventory.setReorderLevel(1);
+        inventory.setQuantity(11);
+
+        assertFalse(inventory.needsRestock());
+        assertFalse(outContent.toString().contains("WARNING: Item") && outContent.toString().contains(" needs restock!"));
+
+        inventory.decrementStock(1);
+        assertFalse(inventory.needsRestock());
+        assertFalse(outContent.toString().contains("WARNING: Item") && outContent.toString().contains(" needs restock!"));
+
         originalOut.println(outContent);
     }
 
@@ -77,5 +97,45 @@ class InventoryTest {
         inventory.decrementStock(1);
         originalOut.println(outContent);
         assertTrue(outContent.toString().contains(LOG_EXPECTED));
+    }
+
+    @Test
+    void testGetAndSetId() {
+        Inventory inventory = new Inventory();
+        Long expectedId = 1L;
+        inventory.setId(expectedId);
+        assertEquals(expectedId, inventory.getId());
+    }
+
+    @Test
+    void testGetAndSetItemCode() {
+        Inventory inventory = new Inventory();
+        String expectedItemCode = "ITEM001";
+        inventory.setItemCode(expectedItemCode);
+        assertEquals(expectedItemCode, inventory.getItemCode());
+    }
+
+    @Test
+    void testGetAndSetName() {
+        Inventory inventory = new Inventory();
+        String expectedName = "Item Name";
+        inventory.setName(expectedName);
+        assertEquals(expectedName, inventory.getName());
+    }
+
+    @Test
+    void testGetAndSetUnitPrice() {
+        Inventory inventory = new Inventory();
+        Double expectedUnitPrice = 10.0;
+        inventory.setUnitPrice(expectedUnitPrice);
+        assertEquals(expectedUnitPrice, inventory.getUnitPrice());
+    }
+
+    @Test
+    void testGetAndSetReorderLevel() {
+        Inventory inventory = new Inventory();
+        Integer expectedReorderLevel = 5;
+        inventory.setReorderLevel(expectedReorderLevel);
+        assertEquals(expectedReorderLevel, inventory.getReorderLevel());
     }
 }
