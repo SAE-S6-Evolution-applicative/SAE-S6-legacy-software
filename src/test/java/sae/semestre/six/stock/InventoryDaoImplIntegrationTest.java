@@ -123,13 +123,13 @@ class InventoryDaoImplIntegrationTest {
         entityManager.flush();
 
         // When we search for item that need restock
-        List<Inventory> foudItems = inventoryDao.findNeedingRestock();
+        List<Inventory> foundItems = inventoryDao.findNeedingRestock();
 
         // Then the list should contain the item
-        assertNotNull(foudItems, "The items should be found");
-        assertEquals(1, foudItems.size(), "There should be one item found");
+        assertNotNull(foundItems, "The items should be found");
+        assertEquals(1, foundItems.size(), "There should be one item found");
 
-        Inventory firstItem = foudItems.getFirst();
+        Inventory firstItem = foundItems.getFirst();
         assertEquals(testItem.getItemCode(), firstItem.getItemCode(), String.format("The item code should match with %s", testItem.getItemCode()));
         assertEquals(testItem.getQuantity(), firstItem.getQuantity(), "The quantity should match");
     }
