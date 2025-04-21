@@ -10,7 +10,7 @@ import static org.junit.jupiter.api.Assertions.*;
 class SupplierInvoiceTest {
 
     @Test
-    void testGetDeatils() {
+    void testGetDetails() {
         SupplierInvoice invoice = new SupplierInvoice();
         SupplierInvoiceDetail detail1 = new SupplierInvoiceDetail();
         SupplierInvoiceDetail detail2 = new SupplierInvoiceDetail();
