@@ -36,13 +36,13 @@ class EmailServiceTest {
 
     @BeforeEach
     void setUp() {
-        // Redirect standard output to capture messages
+        // Rediriger la sortie standard pour capturer les messages
         System.setOut(new PrintStream(outContent));
 
-        // Get the singleton instance
+        // Obtenir l'instance singleton
         emailService = EmailService.getInstance();
 
-        // Inject mock in the singleton instance
+        // Injecter le mock dans l'instance singleton
         ReflectionTestUtils.setField(emailService, "mailSender", mockMailSender);
     }
 
