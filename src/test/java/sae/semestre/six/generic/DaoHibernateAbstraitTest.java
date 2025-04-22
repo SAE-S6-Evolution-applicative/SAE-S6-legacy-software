@@ -7,6 +7,7 @@ package sae.semestre.six.generic;
 
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.TypedQuery;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
@@ -22,14 +23,14 @@ import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.*;
 
 /**
- * Cette classe teste la classe {@link DaoHibernateAbstrait} et {@link DaoGenerique}, la dernière classe citée
- * est testée indirectement via son implémentation
+ * This class test classes {@link DaoHibernateAbstrait} and {@link DaoGenerique}, last class cited
+ * is undirectly tested by its implementation
  */
 class DaoHibernateAbstraitTest {
 
     /**
-     * Classe permettant de tester le DAO, étant donné que le DAO ne prend pas de classe spécifique, on en
-     * crée une ici avec un id seulement pour effectuer des appels
+     * Class to test DAO, given that DAO do not take a specific class,
+     * we create one there with id only to make some calls
      */
     private static class EntiteTest {
         private Long id;
@@ -70,6 +71,11 @@ class DaoHibernateAbstraitTest {
         } catch (Exception e) {
             fail("Impossible d'injecter le gestionnaireEntite: " + e.getMessage());
         }
+    }
+
+    @AfterEach
+    void tearDown() throws Exception {
+        closeable.close();
     }
 
     @Test
