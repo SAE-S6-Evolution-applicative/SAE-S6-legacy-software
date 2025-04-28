@@ -4,9 +4,11 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.test.util.ReflectionTestUtils;
 
+import java.util.Arrays;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static sae.semestre.six.CustomAssertion.assertListNotEquals;
 
 class MedicalBillingProcessorTest {
 
@@ -30,18 +32,18 @@ class MedicalBillingProcessorTest {
         String patientId = "1234";
         String doctorId = "5678";
         String[] treatment = {"CONSULTATION", "XRAY"};
-        List<String> beforeBendingBill = getPendingBills();
+        List<String> beforePendingBill = getPendingBills();
         double beforeTotalRevenue = getTotalRevenue();
+        assertTrue(beforePendingBill.isEmpty());
 
         // When we process the billing
         medicalBillingProcessor.processBilling(patientId, doctorId, treatment);
 
         // Then pendingBills and totalRevenue are updated
-        List<String> afterBendingBill = getPendingBills();
+        List<String> afterPendingBill = getPendingBills();
         double afterTotalRevenue = getTotalRevenue();
-        assertIterableEquals(beforeBendingBill, afterBendingBill, "Pending bills should be updated");
+        assertListNotEquals(beforePendingBill, afterPendingBill, "Pending bills should be updated");
         assertNotEquals(beforeTotalRevenue, afterTotalRevenue, "Total revenue should be updated");
-
     }
 
     private double getTotalRevenue() {
@@ -49,7 +51,7 @@ class MedicalBillingProcessorTest {
     }
 
     private List<String> getPendingBills() {
-        return (List<String>) ReflectionTestUtils.getField(medicalBillingProcessor, "pendingBills");
+        return List.copyOf((List<String>) ReflectionTestUtils.getField(medicalBillingProcessor, "pendingBills"));
     }
 
     @Test
