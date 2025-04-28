@@ -1,8 +1,7 @@
 /*
- * CustomAssertion.java                                  28 avr. 2025
- * IUT de Rodez, pas de droit d'auteur
+ * CustomAssertion.java                                  28 apr. 2025
+ * IUT de Rodez, no author rights
  */
-
 package sae.semestre.six;
 
 import java.util.List;
@@ -42,7 +41,7 @@ public class CustomAssertion {
 
         if (equals) {
             String errorMessage = message;
-            if (errorMessage == null || errorMessage.isBlank()){
+            if (errorMessage == null || errorMessage.isBlank()) {
                 errorMessage = "Lists should not be equal";
             }
             throw new AssertionError(errorMessage);

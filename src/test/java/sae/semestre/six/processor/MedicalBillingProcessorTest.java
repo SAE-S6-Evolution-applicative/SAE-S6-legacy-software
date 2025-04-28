@@ -1,10 +1,14 @@
+/*
+ * MedicalBillingProcessorTest.java                                 28 apr. 2025
+ * IUT de Rodez, no author rights
+ */
+
 package sae.semestre.six.processor;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.test.util.ReflectionTestUtils;
 
-import java.util.Arrays;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -60,9 +64,6 @@ class MedicalBillingProcessorTest {
         assertEquals(0, medicalBillingProcessor.calculateInsurance(0), "Insurance should be 0");
         assertEquals(0, medicalBillingProcessor.calculateInsurance(1), "Insurance should be 0");
     }
-
-
-
 
 
 }
