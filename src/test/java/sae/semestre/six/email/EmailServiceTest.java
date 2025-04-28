@@ -36,13 +36,13 @@ class EmailServiceTest {
 
     @BeforeEach
     void setUp() {
-        // Rediriger la sortie standard pour capturer les messages
+        // Redirect standard output to capture messages
         System.setOut(new PrintStream(outContent));
 
-        // Obtenir l'instance singleton
+        // Get the singleton instance
         emailService = EmailService.getInstance();
 
-        // Injecter le mock dans l'instance singleton
+        // Inject mock inside the singleton instance
         ReflectionTestUtils.setField(emailService, "mailSender", mockMailSender);
     }
 
@@ -98,6 +98,6 @@ class EmailServiceTest {
 
         // Assert
         assertNotNull(instance1);
-        assertSame(instance1, instance2, "getInstance devrait retourner la même instance (pattern Singleton)");
+        assertSame(instance1, instance2, "getInstance should return the same instance (pattern Singleton)");
     }
 }
