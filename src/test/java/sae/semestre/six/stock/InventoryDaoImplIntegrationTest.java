@@ -97,7 +97,7 @@ class InventoryDaoImplIntegrationTest {
         assertNotNull(foundItems, "The items should be found");
         assertEquals(1, foundItems.size(), "There should be one item found");
 
-        Inventory firstItem = foundItems.getFirst();
+        Inventory firstItem = foundItems.get(0);
         assertEquals(testItem.getItemCode(), firstItem.getItemCode(), String.format("The item code should match with %s", testItem.getItemCode()));
         assertEquals(testItem.getQuantity(), firstItem.getQuantity(), "The quantity should match");
 
@@ -129,7 +129,7 @@ class InventoryDaoImplIntegrationTest {
         assertNotNull(foundItems, "The items should be found");
         assertEquals(1, foundItems.size(), "There should be one item found");
 
-        Inventory firstItem = foundItems.getFirst();
+        Inventory firstItem = foundItems.get(0);
         assertEquals(testItem.getItemCode(), firstItem.getItemCode(), String.format("The item code should match with %s", testItem.getItemCode()));
         assertEquals(testItem.getQuantity(), firstItem.getQuantity(), "The quantity should match");
     }
@@ -155,7 +155,7 @@ class InventoryDaoImplIntegrationTest {
         // When we restock the item
         inventoryDao.updateStock(ITEM_CODE, REORDER_LEVEL + 1);
 
-        // Then the item in the DB should be updated
+        // Then the item in the database should be updated
         Inventory updatedItem = inventoryDao.findByItemCode(ITEM_CODE);
         assertNotNull(updatedItem, "The item should be found");
         assertEquals(testItem.getItemCode(), updatedItem.getItemCode(), String.format("The item code should match with %s", testItem.getItemCode()));
@@ -186,7 +186,7 @@ class InventoryDaoImplIntegrationTest {
         final double NEW_UNIT_PRICE = 30.99;
         inventoryDao.updatePrice(ITEM_CODE, NEW_UNIT_PRICE);
 
-        // Then the item in the DB should be updated
+        // Then the item in the database should be updated
         Inventory updatedItem = inventoryDao.findByItemCode(ITEM_CODE);
         assertNotNull(updatedItem, "The item should be found");
         assertEquals(testItem.getItemCode(), updatedItem.getItemCode(), String.format("The item code should match with %s", testItem.getItemCode()));

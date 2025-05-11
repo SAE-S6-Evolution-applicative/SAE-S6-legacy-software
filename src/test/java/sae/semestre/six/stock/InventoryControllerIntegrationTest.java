@@ -119,15 +119,6 @@ class InventoryControllerIntegrationTest {
         return supplierInvoice;
     }
 
-    /**
-     * Convert SupplierInvoice to JSON string
-     * <br>
-     * We use a separate method because we need to control the order of the field `reorderLevel` and `quantity`.
-     * `reorderLevel` should be before `quantity` in the JSON string.
-     *
-     * @param supplierInvoice The supplier invoice to convert
-     * @return The JSON string representation of the supplier invoice
-     */
     private String asJson(SupplierInvoice supplierInvoice) {
         StringBuilder json = new StringBuilder("{\"details\": [");
         for (SupplierInvoiceDetail detail : supplierInvoice.getDetails()) {
@@ -163,7 +154,6 @@ class InventoryControllerIntegrationTest {
                 .andExpect(MockMvcResultMatchers.jsonPath("$").isArray())
                 .andExpect(MockMvcResultMatchers.jsonPath("$.length()").value(2));
 
-        // Verify that the findAll method was called
         verify(inventoryDao).findAll();
     }
 
@@ -178,7 +168,6 @@ class InventoryControllerIntegrationTest {
                 .andExpect(MockMvcResultMatchers.jsonPath("$").isEmpty())
                 .andExpect(MockMvcResultMatchers.jsonPath("$.length()").value(0));
 
-        // Verify that the findAll method was called
         verify(inventoryDao).findAll();
     }
 

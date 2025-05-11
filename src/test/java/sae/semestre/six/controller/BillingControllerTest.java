@@ -8,7 +8,6 @@ import java.io.File;
 
 public class BillingControllerTest {
     
-    
     private BillingController billingController = BillingController.getInstance();
     
     @Test
@@ -23,7 +22,6 @@ public class BillingControllerTest {
             new String[]{"CONSULTATION"}
         );
         
-        
         assertTrue(result.contains("successfully"));
         assertTrue(billingFile.length() > initialFileSize);
     }
@@ -36,14 +34,12 @@ public class BillingControllerTest {
                 .replace("Insurance coverage: $", "")
         );
         
-        
         assertEquals(700.0, result, 0.01);
     }
-    
     
     @Test
     public void testUpdatePrice() {
         billingController.updatePrice("CONSULTATION", 75.0);
         assertEquals(75.0, billingController.getPrices().get("CONSULTATION"), 0.01);
     }
-} 
+}
