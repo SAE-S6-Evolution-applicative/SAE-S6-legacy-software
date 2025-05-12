@@ -9,3 +9,5 @@ services:
     environment:
       MYSQL_ROOT_PASSWORD: root
       MYSQL_DATABASE: hospital_db
+    volumes:
+      - ./init-script/:/docker-entrypoint-initdb.d  # Mounts the 'init' directory to the MySQL initialization directory
