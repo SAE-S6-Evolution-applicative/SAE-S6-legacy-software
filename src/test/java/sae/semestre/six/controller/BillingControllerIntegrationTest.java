@@ -1,0 +1,121 @@
+package sae.semestre.six.controller;
+
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.mockito.InjectMocks;
+import org.mockito.MockitoAnnotations;
+import org.springframework.http.MediaType;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
+import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import sae.semestre.six.appointment.bill.BillingController;
+import sae.semestre.six.appointment.bill.BillDao;
+import sae.semestre.six.appointment.doctor.DoctorDao;
+import sae.semestre.six.appointment.patient.PatientDao;
+import sae.semestre.six.stock.InventoryController;
+
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+
+@WebMvcTest(BillingController.class)
+class BillingControllerIntegrationTest {
+
+    private MockMvc server;
+
+    @MockitoBean
+    private BillDao billDao;
+
+    @MockitoBean
+    private PatientDao patientDao;
+
+    @MockitoBean
+    private DoctorDao doctorDao;
+
+    @InjectMocks
+    private BillingController billingController;
+
+    private AutoCloseable autoCloseable;
+
+    @BeforeEach
+    void setUp() {
+        autoCloseable = MockitoAnnotations.openMocks(this);
+        server = MockMvcBuilders.standaloneSetup(billingController).build();
+    }
+
+    @AfterEach
+    void tearDown() throws Exception {
+        autoCloseable.close();
+    }
+
+    @Test
+    void testProcessBill() throws Exception {
+        server.perform(post("/billing/process")
+                .param("patientId", "1")
+                .param("doctorId", "1")
+                .param("treatments", "CONSULTATION"))
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    void testUpdatePrice() throws Exception {
+        server.perform(put("/billing/price")
+                .param("treatment", "CONSULTATION")
+                .param("price", "75.0"))
+                .andExpect(status().isOk())
+                .andExpect(content().string("Price updated"));
+    }
+
+    @Test
+    void testGetPrices() throws Exception {
+        server.perform(get("/billing/prices"))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(content().json("{\"CONSULTATION\":50.0,\"XRAY\":150.0,\"CHIRURGIE\":1000.0}"));
+    }
+
+    @Test
+    void testCalculateInsurance() throws Exception {
+        server.perform(get("/billing/insurance")
+                .param("amount", "1000"))
+                .andExpect(status().isOk())
+                .andExpect(content().string("Insurance coverage: $1000.0"));
+    }
+
+    @Test
+    void testUpdatePriceWithInvalidTreatment() throws Exception {
+        server.perform(put("/billing/price")
+                        .param("treatment", "INVALID_TREATMENT")
+                        .param("price", "100.0"))
+                .andExpect(status().isOk())
+                .andExpect(content().string("Price updated"));
+    }
+
+    @Test
+    void testGetTotalRevenue() throws Exception {
+        server.perform(get("/billing/revenue"))
+                .andExpect(status().isOk())
+                .andExpect(content().string("Total Revenue: $0.0"));
+    }
+
+    @Test
+    void testGetPendingBills() throws Exception {
+        server.perform(get("/billing/pending"))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(content().json("[]"));
+    }
+
+
+    @Test
+    void testCalculateInsuranceWithZeroAmount() throws Exception {
+        server.perform(get("/billing/insurance")
+                        .param("amount", "0"))
+                .andExpect(status().isOk())
+                .andExpect(content().string("Insurance coverage: $0.0"));
+    }
+
+}

@@ -118,7 +118,6 @@ class InventoryControllerIntegrationTest {
         supplierInvoice.setDetails(details);
         return supplierInvoice;
     }
-
     /**
      * Convert SupplierInvoice to JSON string
      * <br>
@@ -163,7 +162,6 @@ class InventoryControllerIntegrationTest {
                 .andExpect(MockMvcResultMatchers.jsonPath("$").isArray())
                 .andExpect(MockMvcResultMatchers.jsonPath("$.length()").value(2));
 
-        // Verify that the findAll method was called
         verify(inventoryDao).findAll();
     }
 
@@ -178,7 +176,6 @@ class InventoryControllerIntegrationTest {
                 .andExpect(MockMvcResultMatchers.jsonPath("$").isEmpty())
                 .andExpect(MockMvcResultMatchers.jsonPath("$.length()").value(0));
 
-        // Verify that the findAll method was called
         verify(inventoryDao).findAll();
     }
 
