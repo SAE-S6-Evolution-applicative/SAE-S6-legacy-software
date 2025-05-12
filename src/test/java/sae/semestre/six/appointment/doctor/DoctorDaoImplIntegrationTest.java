@@ -26,6 +26,8 @@ class DoctorDaoImplIntegrationTest {
         // Given
         Doctor doctor = new Doctor();
         doctor.setDoctorNumber("DOC001");
+        doctor.setFirstName("John");
+        doctor.setLastName("Smith");
         entityManager.persist(doctor);
         entityManager.flush();
 
@@ -42,6 +44,9 @@ class DoctorDaoImplIntegrationTest {
         // Given
         Doctor doctor = new Doctor();
         doctor.setSpecialization("Cardiology");
+        doctor.setDoctorNumber("testDoctorNumber");
+        doctor.setFirstName("John");
+        doctor.setLastName("Smith");
         entityManager.persist(doctor);
         entityManager.flush();
 

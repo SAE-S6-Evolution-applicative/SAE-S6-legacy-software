@@ -26,6 +26,8 @@ class PatientDaoImplIntegrationTest {
         // Given
         Patient patient = new Patient();
         patient.setPatientNumber("PAT001");
+        patient.setFirstName("John");
+        patient.setLastName("Doe");
         entityManager.persist(patient);
         entityManager.flush();
 
@@ -42,6 +44,8 @@ class PatientDaoImplIntegrationTest {
         // Given
         Patient patient = new Patient();
         patient.setLastName("Smith");
+        patient.setFirstName("John");
+        patient.setPatientNumber("PAT002");
         entityManager.persist(patient);
         entityManager.flush();
 

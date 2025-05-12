@@ -46,6 +46,8 @@ class BillDaoImplIntegrationTest {
         // Given
         Patient patient = new Patient();
         patient.setPatientNumber("PAT001");
+        patient.setFirstName("John");
+        patient.setLastName("Doe");
         entityManager.persist(patient);
         entityManager.flush();
 
