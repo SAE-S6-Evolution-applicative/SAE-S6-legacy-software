@@ -31,11 +31,8 @@ jobs: # Definition of the workflow jobs
       - name: Grant execution permissions to Gradle Wrapper
         run: chmod +x ./gradlew # Allow execution of the gradlew script (required on Linux)
 
-      - name: Build the project with Gradle
-        run: ./gradlew build -x test --no-daemon # Build the project without running tests
-
-      - name: Run unit tests
-        run: ./gradlew test --no-daemon # Run unit tests with Gradle
+      - name: Build and test the project
+        run: ./gradlew build --no-daemon # Build and run all tests
 
       - name: Check code quality
         run: ./gradlew check --no-daemon # Run code quality checks (Linting, static analysis...)
