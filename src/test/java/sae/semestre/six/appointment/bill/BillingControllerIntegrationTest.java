@@ -1,4 +1,4 @@
-package sae.semestre.six.controller;
+package sae.semestre.six.appointment.bill;
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -6,16 +6,12 @@ import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.MockitoAnnotations;
 import org.springframework.http.MediaType;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
-import sae.semestre.six.appointment.bill.BillingController;
-import sae.semestre.six.appointment.bill.BillDao;
 import sae.semestre.six.appointment.doctor.DoctorDao;
 import sae.semestre.six.appointment.patient.PatientDao;
-import sae.semestre.six.stock.InventoryController;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;

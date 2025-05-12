@@ -1,7 +1,6 @@
-package sae.semestre.six.controller;
+package sae.semestre.six.appointment.bill;
 
 import org.junit.Test;
-import sae.semestre.six.appointment.bill.BillingController;
 
 import static org.junit.Assert.*;
 import java.io.File;
