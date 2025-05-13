@@ -34,7 +34,7 @@ public class PrescriptionDaoImplTest {
         patient.setLastName("Doe");
         
         entityManager.persist(patient);
-        
+
         Prescription prescription = new Prescription();
         prescription.setPrescriptionNumber("RX123");
         prescription.setPatient(patient);
