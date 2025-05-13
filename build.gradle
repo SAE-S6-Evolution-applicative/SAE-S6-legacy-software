@@ -8,6 +8,7 @@ plugins {
     id 'maven-publish'
     id 'org.springframework.boot' version '3.4.4'
     id 'org.sonarqube' version '4.4.1.3373'
+    id 'jacoco'
 }
 
 group = 'sae.semestre.six'
@@ -63,8 +64,21 @@ tasks.withType(Javadoc) {
     options.encoding = 'UTF-8'
 }
 
+// Configuration JaCoCo
+jacoco {
+    toolVersion = "0.8.11"
+}
+
+jacocoTestReport {
+    reports {
+        xml.required = true
+        html.required = true
+    }
+}
+
 test {
     useJUnitPlatform()
+    finalizedBy jacocoTestReport
 }
 
 // SonarQube configuration
