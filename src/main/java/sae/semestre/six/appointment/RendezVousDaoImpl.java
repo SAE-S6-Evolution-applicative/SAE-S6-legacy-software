@@ -7,7 +7,7 @@ import java.util.Date;
 import java.util.List;
 
 @Repository
-public class ImplDaoRendezVous extends DaoHibernateAbstrait<Appointment, Long> implements DaoRendezVous {
+public class RendezVousDaoImpl extends DaoHibernateAbstrait<Appointment, Long> implements DaoRendezVous {
     
     @Override
     @SuppressWarnings("unchecked")
@@ -22,7 +22,7 @@ public class ImplDaoRendezVous extends DaoHibernateAbstrait<Appointment, Long> i
     @SuppressWarnings("unchecked")
     public List<Appointment> trouverParIdMedecin(Long idMedecin) {
         return getGestionnaireEntite()
-                .createQuery("FROM Appointment WHERE medecin.id = :idMedecin")
+                .createQuery("FROM Appointment WHERE doctor.id = :idMedecin")
                 .setParameter("idMedecin", idMedecin)
                 .getResultList();
     }
@@ -31,7 +31,7 @@ public class ImplDaoRendezVous extends DaoHibernateAbstrait<Appointment, Long> i
     @SuppressWarnings("unchecked")
     public List<Appointment> trouverParPlageDates(Date dateDebut, Date dateFin) {
         return getGestionnaireEntite()
-                .createQuery("FROM Appointment WHERE dateRendezVous BETWEEN :dateDebut AND :dateFin")
+                .createQuery("FROM Appointment WHERE appointmentDate BETWEEN :dateDebut AND :dateFin")
                 .setParameter("dateDebut", dateDebut)
                 .setParameter("dateFin", dateFin)
                 .getResultList();
