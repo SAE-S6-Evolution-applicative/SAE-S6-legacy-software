@@ -113,5 +113,4 @@ class BillControllerIntegrationTest {
                 .andExpect(status().isOk())
                 .andExpect(content().string("Insurance coverage: $0.0"));
     }
-
 }

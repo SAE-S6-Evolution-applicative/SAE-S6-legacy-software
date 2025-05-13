@@ -21,7 +21,6 @@ import java.util.*;
 @Tag(name = "Billing", description = "Billing management API")
 public class BillingController {
 
-    private static volatile BillController instance;
     private Map<String, Double> priceList = new HashMap<>();
     private double totalRevenue = 0.0;
     private List<String> pendingBills = new ArrayList<>();
@@ -39,26 +38,15 @@ public class BillingController {
     
     private DoctorRepository doctorRepository;
     
-    private BillRepository billRepository;
-    private final EmailService emailService = EmailService.getInstance();
-
     private BillController() {
         priceList.put("CONSULTATION", 50.0);
         priceList.put("XRAY", 150.0);
         priceList.put("CHIRURGIE", 1000.0);
     }
 
-    public static BillController getInstance() {
-        if (instance == null) {
-            synchronized (BillController.class) {
-                if (instance == null) {
-                    instance = new BillController();
-                }
-            }
-        }
-        return instance;
-    }
-    
+    private BillRepository billRepository;
+    private final EmailService emailService = EmailService.getInstance();
+
     @Operation(summary = "Process a bill", description = "Creates and processes a new bill for a patient")
     @ApiResponse(responseCode = "200", description = "Bill processed successfully")
     @ApiResponse(responseCode = "400", description = "Invalid data")
