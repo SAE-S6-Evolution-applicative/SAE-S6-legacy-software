@@ -1,47 +1,94 @@
 package sae.semestre.six.appointment.patient;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import sae.semestre.six.appointment.Appointment;
 
 import java.util.Date;
+import java.util.HashSet;
+import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 class PatientTest {
 
-    @Test
-    void testSetAndGetFirstName() {
-        Patient patient = new Patient();
-        patient.setFirstName("Alice");
-        assertEquals("Alice", patient.getFirstName());
+    Patient patient;
+    @BeforeEach
+    void setUp() {
+        patient = new Patient();
     }
 
     @Test
-    void testSetAndGetLastName() {
-        Patient patient = new Patient();
-        patient.setLastName("Smith");
-        assertEquals("Smith", patient.getLastName());
+    void testSetAndGetId() {
+        Long id = 1L;
+        patient.setId(id);
+        assertEquals(id, patient.getId());
     }
 
     @Test
     void testSetAndGetPatientNumber() {
-        Patient patient = new Patient();
-        patient.setPatientNumber("PAT001");
-        assertEquals("PAT001", patient.getPatientNumber());
+        String patientNumber = "PN123456";
+        patient.setPatientNumber(patientNumber);
+        assertEquals(patientNumber, patient.getPatientNumber());
+    }
+
+    @Test
+    void testSetAndGetFirstName() {
+        String firstName = "John";
+        patient.setFirstName(firstName);
+        assertEquals(firstName, patient.getFirstName());
+    }
+
+    @Test
+    void testSetAndGetLastName() {
+        String lastName = "Doe";
+        patient.setLastName(lastName);
+        assertEquals(lastName, patient.getLastName());
     }
 
     @Test
     void testSetAndGetDateOfBirth() {
-        Patient patient = new Patient();
-        Date dob = new Date();
-        patient.setDateOfBirth(dob);
-        assertEquals(dob, patient.getDateOfBirth());
+        Date dateOfBirth = new Date();
+        patient.setDateOfBirth(dateOfBirth);
+        assertEquals(dateOfBirth, patient.getDateOfBirth());
+    }
+
+    @Test
+    void testSetAndGetGender() {
+        String gender = "Male";
+        patient.setGender(gender);
+        assertEquals(gender, patient.getGender());
+    }
+
+    @Test
+    void testSetAndGetAddress() {
+        String address = "123 Street, City";
+        patient.setAddress(address);
+        assertEquals(address, patient.getAddress());
     }
 
     @Test
     void testSetAndGetPhoneNumber() {
-        Patient patient = new Patient();
-        patient.setPhoneNumber("123-456-7890");
-        assertEquals("123-456-7890", patient.getPhoneNumber());
+        String phoneNumber = "1234567890";
+        patient.setPhoneNumber(phoneNumber);
+        assertEquals(phoneNumber, patient.getPhoneNumber());
     }
 
+    @Test
+    void testSetAndGetAppointments() {
+        Set<Appointment> appointments = new HashSet<>();
+        Appointment appointment1 = new Appointment();
+        Appointment appointment2 = new Appointment();
+        appointments.add(appointment1);
+        appointments.add(appointment2);
+        patient.getAppointments().addAll(appointments);
+
+        assertEquals(appointments.size(), patient.getAppointments().size());
+    }
+
+    @Test
+    void testNoArgsConstructor() {
+        Patient emptyPatient = new Patient();
+        assertNotNull(emptyPatient);
+    }
 }
