@@ -47,7 +47,13 @@ jobs:
           key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle') }}
           restore-keys: ${{ runner.os }}-gradle
 
-      - name: Build and analyze
+      - name: Grant execute permission for gradlew
+        run: chmod +x gradlew
+
+      - name: Build with tests and coverage
+        run: ./gradlew clean build jacocoTestReport
+
+      - name: SonarCloud Analysis
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
         run: ./gradlew build sonar --info
