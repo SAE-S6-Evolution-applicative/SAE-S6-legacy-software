@@ -4,21 +4,18 @@ import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.jdbc.Sql;
 import org.springframework.transaction.annotation.Transactional;
 import sae.semestre.six.appointment.patient.Patient;
 
 import java.util.List;
 
-import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @Transactional
-public class PrescriptionDaoImplTest {
+class PrescriptionDaoImplTest {
 
     @Autowired
     private PrescriptionDaoImpl prescriptionDao;
@@ -32,7 +29,7 @@ public class PrescriptionDaoImplTest {
         patient.setPatientNumber("PAT001");
         patient.setFirstName("John");
         patient.setLastName("Doe");
-        
+
         entityManager.persist(patient);
 
         Prescription prescription = new Prescription();
