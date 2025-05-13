@@ -43,7 +43,10 @@ jobs:
         run: chmod +x gradlew
 
       - name: Build with tests and coverage
-        run: ./gradlew clean build jacocoTestReport
+        run: |
+          ./gradlew clean
+          ./gradlew build
+          ./gradlew jacocoTestReport
 
       - name: SonarCloud Analysis
         env:
@@ -57,4 +60,8 @@ jobs:
             -Dsonar.java.coveragePlugin=jacoco \
             -Dsonar.coverage.jacoco.xmlReportPaths=build/reports/jacoco/test/jacocoTestReport.xml \
             -Dsonar.junit.reportPaths=build/test-results/test \
-            -Dsonar.sourceEncoding=UTF-8
+            -Dsonar.sourceEncoding=UTF-8 \
+            -Dsonar.gradle.skipCompile=true \
+            -Dsonar.scm.provider=git \
+            -Dsonar.scm.forceReloadAll=true \
+            -Dsonar.verbose=true
