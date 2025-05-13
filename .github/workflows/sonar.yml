@@ -51,7 +51,10 @@ jobs:
         run: chmod +x gradlew
 
       - name: Build with tests and coverage
-        run: ./gradlew clean build jacocoTestReport
+        run: |
+          ./gradlew clean
+          ./gradlew build
+          ./gradlew jacocoTestReport
 
       - name: SonarCloud Analysis
         env:
