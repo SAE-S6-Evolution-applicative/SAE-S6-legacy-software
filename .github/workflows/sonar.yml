@@ -50,13 +50,7 @@ jobs:
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
 
-      - name: Build with tests and coverage
-        run: |
-          ./gradlew clean
-          ./gradlew build
-          ./gradlew jacocoTestReport
-
-      - name: SonarCloud Analysis
+      - name: Build and analyze
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
         run: ./gradlew build sonar --info
