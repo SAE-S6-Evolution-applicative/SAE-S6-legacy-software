@@ -151,4 +151,6 @@ public class PatientHistory {
             .mapToDouble(Bill::getTotalAmount)
             .sum();
     }
-} 
+
+
+}
