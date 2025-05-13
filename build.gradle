@@ -7,6 +7,8 @@ plugins {
     id 'java-library'
     id 'maven-publish'
     id 'org.springframework.boot' version '3.4.4'
+    id "org.sonarqube" version "6.0.1.5171"
+    id 'jacoco'
 }
 
 group = 'sae.semestre.six'
@@ -62,6 +64,28 @@ tasks.withType(Javadoc) {
     options.encoding = 'UTF-8'
 }
 
+// Configuration JaCoCo
+jacoco {
+    toolVersion = "0.8.11"
+}
+
+jacocoTestReport {
+    reports {
+        xml.required = true
+        html.required = true
+    }
+}
+
 test {
     useJUnitPlatform()
+    finalizedBy jacocoTestReport
+}
+
+// SonarQube configuration
+sonar {
+    properties {
+        property "sonar.projectKey", "SAE-S6-Evolution-applicative_SAE-S6-legacy-software"
+        property "sonar.organization", "sae-s6-evolution-applicative"
+        property "sonar.host.url", "https://sonarcloud.io"
+    }
 }
