@@ -11,7 +11,7 @@ import static org.junit.jupiter.api.Assertions.*;
 class RoomTest {
 
     @Test
-    void getId() {
+    void testSetAndGetId() {
         Room room = new Room();
         Long id = 1L;
         room.setId(id);
@@ -19,15 +19,7 @@ class RoomTest {
     }
 
     @Test
-    void setId() {
-        Room room = new Room();
-        Long id = 1L;
-        room.setId(id);
-        assertEquals(id, room.getId());
-    }
-
-    @Test
-    void getRoomNumber() {
+    void testSetAndGetRoomNumber() {
         Room room = new Room();
         String roomNumber = "A101";
         room.setRoomNumber(roomNumber);
@@ -35,15 +27,7 @@ class RoomTest {
     }
 
     @Test
-    void setRoomNumber() {
-        Room room = new Room();
-        String roomNumber = "A101";
-        room.setRoomNumber(roomNumber);
-        assertEquals(roomNumber, room.getRoomNumber());
-    }
-
-    @Test
-    void getFloor() {
+    void testSetAndGetFloor() {
         Room room = new Room();
         Integer floor = 1;
         room.setFloor(floor);
@@ -51,15 +35,7 @@ class RoomTest {
     }
 
     @Test
-    void setFloor() {
-        Room room = new Room();
-        Integer floor = 1;
-        room.setFloor(floor);
-        assertEquals(floor, room.getFloor());
-    }
-
-    @Test
-    void getType() {
+    void testSetAndGetType() {
         Room room = new Room();
         String type = "Consultation";
         room.setType(type);
@@ -67,31 +43,16 @@ class RoomTest {
     }
 
     @Test
-    void setType() {
-        Room room = new Room();
-        String type = "Consultation";
-        room.setType(type);
-        assertEquals(type, room.getType());
-    }
-
-    @Test
-    void getCapacity() {
+    void testSetAndGetCapacity() {
         Room room = new Room();
         Integer capacity = 5;
         room.setCapacity(capacity);
         assertEquals(capacity, room.getCapacity());
     }
 
-    @Test
-    void setCapacity() {
-        Room room = new Room();
-        Integer capacity = 5;
-        room.setCapacity(capacity);
-        assertEquals(capacity, room.getCapacity());
-    }
 
     @Test
-    void getIsOccupied() {
+    void testSetAndGetIsOccupied() {
         Room room = new Room();
         Boolean isOccupied = true;
         room.setIsOccupied(isOccupied);
@@ -99,28 +60,13 @@ class RoomTest {
     }
 
     @Test
-    void setIsOccupied() {
-        Room room = new Room();
-        Boolean isOccupied = true;
-        room.setIsOccupied(isOccupied);
-        assertEquals(isOccupied, room.getIsOccupied());
-    }
-
-    @Test
-    void getAppointments() {
+    void testSetAndGetAppointments() {
         Room room = new Room();
         Set<Appointment> appointments = new HashSet<>();
         room.setAppointments(appointments);
         assertEquals(appointments, room.getAppointments());
     }
 
-    @Test
-    void setAppointments() {
-        Room room = new Room();
-        Set<Appointment> appointments = new HashSet<>();
-        room.setAppointments(appointments);
-        assertEquals(appointments, room.getAppointments());
-    }
 
     @Test
     void getAndSetCurrentPatientCount() {
