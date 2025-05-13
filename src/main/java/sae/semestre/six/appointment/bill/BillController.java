@@ -21,13 +21,13 @@ import java.util.*;
 @Tag(name = "Billing", description = "Billing management API")
 public class BillingController {
 
-    private static volatile BillingController instance;
+    private static volatile BillController instance;
     private Map<String, Double> priceList = new HashMap<>();
     private double totalRevenue = 0.0;
     private List<String> pendingBills = new ArrayList<>();
 
     @Autowired
-    public BillingController(BillRepository billRepository, PatientDao patientDao, DoctorDao doctorDao) {
+    public BillController(BillRepository billRepository, PatientDao patientDao, DoctorDao doctorDao) {
         this();
         this.billRepository = billRepository;
         this.patientDao = patientDao;
@@ -42,17 +42,17 @@ public class BillingController {
     private BillRepository billRepository;
     private final EmailService emailService = EmailService.getInstance();
 
-    private BillingController() {
+    private BillController() {
         priceList.put("CONSULTATION", 50.0);
         priceList.put("XRAY", 150.0);
         priceList.put("CHIRURGIE", 1000.0);
     }
 
-    public static BillingController getInstance() {
+    public static BillController getInstance() {
         if (instance == null) {
-            synchronized (BillingController.class) {
+            synchronized (BillController.class) {
                 if (instance == null) {
-                    instance = new BillingController();
+                    instance = new BillController();
                 }
             }
         }

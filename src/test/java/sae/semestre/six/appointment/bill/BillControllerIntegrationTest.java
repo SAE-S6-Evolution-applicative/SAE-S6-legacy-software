@@ -17,8 +17,8 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@WebMvcTest(BillingController.class)
-class BillingControllerIntegrationTest {
+@WebMvcTest(BillController.class)
+class BillControllerIntegrationTest {
 
     private MockMvc server;
 
@@ -32,14 +32,14 @@ class BillingControllerIntegrationTest {
     private DoctorRepository doctorRepository;
 
     @InjectMocks
-    private BillingController billingController;
+    private BillController billController;
 
     private AutoCloseable autoCloseable;
 
     @BeforeEach
     void setUp() {
         autoCloseable = MockitoAnnotations.openMocks(this);
-        server = MockMvcBuilders.standaloneSetup(billingController).build();
+        server = MockMvcBuilders.standaloneSetup(billController).build();
     }
 
     @AfterEach

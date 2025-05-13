@@ -7,9 +7,9 @@ import java.io.File;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
-public class BillingControllerTest {
+public class BillControllerTest {
     
-    private BillingController billingController = BillingController.getInstance();
+    private BillController billController = BillController.getInstance();
     
     @Test
     public void testProcessBill() {
@@ -17,7 +17,7 @@ public class BillingControllerTest {
         File billingFile = new File("C:\\hospital\\billing.txt");
         long initialFileSize = billingFile.length();
         
-        String result = billingController.processBill(
+        String result = billController.processBill(
             "TEST001",
             "DOC001",
             new String[]{"CONSULTATION"}
@@ -31,7 +31,7 @@ public class BillingControllerTest {
     public void testCalculateInsurance() {
         
         double result = Double.parseDouble(
-            billingController.calculateInsurance(1000.0)
+            billController.calculateInsurance(1000.0)
                 .replace("Insurance coverage: $", "")
         );
         
@@ -40,7 +40,7 @@ public class BillingControllerTest {
     
     @Test
     public void testUpdatePrice() {
-        billingController.updatePrice("CONSULTATION", 75.0);
-        assertEquals(75.0, billingController.getPrices().get("CONSULTATION"), 0.01);
+        billController.updatePrice("CONSULTATION", 75.0);
+        assertEquals(75.0, billController.getPrices().get("CONSULTATION"), 0.01);
     }
 }
