@@ -3,6 +3,7 @@ package sae.semestre.six.appointment.patient.history;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
 import java.util.*;
 
 @RestController
@@ -16,14 +17,15 @@ public class PatientHistoryController {
     @GetMapping("/search")
     public List<PatientHistory> searchHistory(
             @RequestParam String keyword,
-            @RequestParam Date startDate,
-            @RequestParam Date endDate) {
+            @RequestParam LocalDate startDate,
+            @RequestParam LocalDate endDate) {
         
         
-        List<PatientHistory> results = patientHistoryDao.searchByMultipleCriteria(
-            keyword, startDate, endDate);
-            
-        return results;
+//        List<PatientHistory> results = patientHistoryDao.searchByMultipleCriteria(
+//            keyword, startDate, endDate);
+//
+//        return results;
+        return  Collections.emptyList();
     }
     
     
