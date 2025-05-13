@@ -60,8 +60,4 @@ jobs:
             -Dsonar.java.coveragePlugin=jacoco \
             -Dsonar.coverage.jacoco.xmlReportPaths=build/reports/jacoco/test/jacocoTestReport.xml \
             -Dsonar.junit.reportPaths=build/test-results/test \
-            -Dsonar.sourceEncoding=UTF-8 \
-            -Dsonar.gradle.skipCompile=true \
-            -Dsonar.scm.provider=git \
-            -Dsonar.scm.forceReloadAll=true \
-            -Dsonar.verbose=true
+            -Dsonar.sourceEncoding=UTF-8
