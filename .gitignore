@@ -14,10 +14,19 @@ target/
 .sts4-cache
 
 ### IntelliJ IDEA ###
-.idea
-*.iws
-*.iml
-*.ipr
+# Ignore all files in .Dea by default
+.idea/*
+
+# Do not ignore the specific configuration files
+!.idea/modules.xml
+!.idea/misc.xml
+!.idea/compiler.xml
+!.idea/encodings.xml
+!.idea/jarRepositories.xml
+!.idea/gradle.xml
+!.idea/sonarlint.xml
+!.idea/vcs.xml
+!.idea/inspectionProfiles/Project_Default.xml
 
 ### NetBeans ###
 /nbproject/private/
