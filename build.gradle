@@ -7,6 +7,7 @@ plugins {
     id 'java-library'
     id 'maven-publish'
     id 'org.springframework.boot' version '3.4.4'
+    id 'org.sonarqube' version '4.4.1.3373'
 }
 
 group = 'sae.semestre.six'
@@ -64,4 +65,18 @@ tasks.withType(Javadoc) {
 
 test {
     useJUnitPlatform()
+}
+
+// SonarQube configuration
+sonar {
+    properties {
+        property "sonar.projectKey", "SAE-S6-Evolution-applicative_SAE-S6-legacy-software"
+        property "sonar.projectName", "sae-s6-evolution-applicative"
+        property "sonar.java.source", "21"
+        property "sonar.sources", "src/main/java"
+        property "sonar.tests", "src/test/java"
+        property "sonar.java.binaries", "build/classes"
+        property "sonar.junit.reportPaths", "build/test-results/test"
+        property "sonar.coverage.jacoco.xmlReportPaths", "build/reports/jacoco/test/jacocoTestReport.xml"
+    }
 }
