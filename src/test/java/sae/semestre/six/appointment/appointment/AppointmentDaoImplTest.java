@@ -3,7 +3,7 @@
  * IUT de Rodez, no author rights
  */
 
-package sae.semestre.six.appointment;
+package sae.semestre.six.appointment.appointment;
 
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
@@ -12,6 +12,8 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
+import sae.semestre.six.appointment.Appointment;
+import sae.semestre.six.appointment.AppointmentDao;
 import sae.semestre.six.appointment.doctor.Doctor;
 import sae.semestre.six.appointment.patient.Patient;
 
