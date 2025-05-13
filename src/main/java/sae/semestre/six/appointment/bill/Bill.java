@@ -2,6 +2,7 @@ package sae.semestre.six.appointment.bill;
 
 
 import jakarta.persistence.*;
+import org.springframework.cglib.core.Local;
 import sae.semestre.six.appointment.doctor.Doctor;
 import sae.semestre.six.appointment.patient.Patient;
 import sae.semestre.six.appointment.patient.history.PatientHistory;
@@ -68,6 +69,9 @@ public class Bill {
 
     public LocalDateTime getBillDate() { return billDate; }
     public void setBillDate(LocalDateTime billDate) { this.billDate = billDate; }
+    
+    public LocalDate getBillDate() { return billDate; }
+    public void setBillDate(LocalDate billDate) { this.billDate = billDate; }
     
     public Double getTotalAmount() { return totalAmount; }
     public void setTotalAmount(Double totalAmount) { this.totalAmount = totalAmount; }

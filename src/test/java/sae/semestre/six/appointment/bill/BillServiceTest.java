@@ -14,10 +14,10 @@ import org.springframework.boot.test.context.SpringBootTest;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 
 @SpringBootTest
-class BillingServiceTest {
+class BillServiceTest {
 
     @InjectMocks
-    private BillingService billingService;
+    private BillService billService;
 
     @BeforeEach
     void setUp() {
@@ -28,7 +28,7 @@ class BillingServiceTest {
     void testProcessBill() {
         // Method is empty, we simply testinf that it does not generate any exception
         assertDoesNotThrow(() -> {
-            billingService.processBill("1", "test", new String[]{"CONSULTATION"});
+            billService.processBill("1", "test", new String[]{"CONSULTATION"});
         });
     }
 
@@ -36,7 +36,7 @@ class BillingServiceTest {
     void testProcessBillWithNullValues() {
         // Verify that the method handle null values correctly
         assertDoesNotThrow(() -> {
-            billingService.processBill(null, null, null);
+            billService.processBill(null, null, null);
         });
     }
 }

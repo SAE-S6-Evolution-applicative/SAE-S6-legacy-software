@@ -12,7 +12,7 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
-import sae.semestre.six.appointment.bill.BillingService;
+import sae.semestre.six.appointment.bill.BillService;
 import sae.semestre.six.appointment.patient.Patient;
 import sae.semestre.six.appointment.patient.PatientRepository;
 
@@ -37,7 +37,7 @@ class PrescriptionControllerInegrationTest {
     private PrescriptionController prescriptionController;
 
     @MockitoBean
-    private BillingService billingService;
+    private BillService billService;
     @MockitoBean
     private PatientRepository patientRepository;
     @MockitoBean

@@ -26,7 +26,7 @@ public class PrescriptionController {
     private static final Map<String, Integer> medicineInventory = new HashMap<>();
     
     @Autowired
-    private BillingService billingService;
+    private BillService billService;
     
     private static final Map<String, Double> medicinePrices = new HashMap<String, Double>() {{
         put("PARACETAMOL", 5.0);
@@ -83,7 +83,7 @@ public class PrescriptionController {
             patientPrescriptions.put(patientId, currentPrescriptions);
             
             
-            billingService.processBill(
+            billService.processBill(
                 patientId,
                 "SYSTEM",
                 new String[]{"PRESCRIPTION_" + prescriptionId}

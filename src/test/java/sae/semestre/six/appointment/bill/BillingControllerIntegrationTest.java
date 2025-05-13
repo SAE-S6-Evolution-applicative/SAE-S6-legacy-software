@@ -23,7 +23,7 @@ class BillingControllerIntegrationTest {
     private MockMvc server;
 
     @MockitoBean
-    private BillDao billDao;
+    private BillRepository billRepository;
 
     @MockitoBean
     private PatientRepository patientRepository;

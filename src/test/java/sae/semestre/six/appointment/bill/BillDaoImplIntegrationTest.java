@@ -18,7 +18,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 class BillDaoImplIntegrationTest {
 
     @Autowired
-    private BillDao billDao;
+    private BillRepository billRepository;
 
     @PersistenceContext
     private EntityManager entityManager;
@@ -34,7 +34,7 @@ class BillDaoImplIntegrationTest {
         entityManager.flush();
 
         // When
-        Bill foundBill = billDao.findByBillNumber("BILL001");
+        Bill foundBill = billRepository.findBillByBillNumber("BILL001");
 
         // Then
         assertNotNull(foundBill);
@@ -57,7 +57,7 @@ class BillDaoImplIntegrationTest {
         entityManager.flush();
 
         // When
-        List<Bill> bills = billDao.findByPatientId(patient.getId());
+        List<Bill> bills = billRepository.findBillsByPatient_Id(patient.getId());
 
         // Then
         assertEquals(1, bills.size());
