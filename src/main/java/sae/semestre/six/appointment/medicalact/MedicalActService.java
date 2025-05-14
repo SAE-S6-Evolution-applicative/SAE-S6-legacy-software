@@ -2,28 +2,37 @@ package sae.semestre.six.appointment.medicalact;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import sae.semestre.six.appointment.bill.Bill;
+import sae.semestre.six.appointment.bill.BillDetail;
+import sae.semestre.six.appointment.bill.BillDetailService;
+import sae.semestre.six.appointment.bill.BillService;
 
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 public class MedicalActService {
 
+    private final BillDetailService billDetailService;
     private MedicalActRepository medicalActRepository;
+
+    private BillService billService;
 
     private static Logger logger = LoggerFactory.getLogger(MedicalActService.class);
 
-
-    public MedicalActService(MedicalActRepository medicalActRepository) {
+    public MedicalActService(MedicalActRepository medicalActRepository, BillService billService, BillDetailService billDetailService) {
         this.medicalActRepository = medicalActRepository;
+        this.billService = billService;
+        this.billDetailService = billDetailService;
     }
 
     /**
      * Finds medical acts by their IDs.
-     *
+     * <p>
      * If some ids are not found, an IllegalArgumentException is thrown.
      *
      * @param medicalActIds the IDs of the medical acts to find
@@ -48,4 +57,21 @@ public class MedicalActService {
 
         return medicalActs;
     }
+
+    public List<MedicalAct> getAllActive() {
+        return medicalActRepository.findAllByActive(true);
+    }
+
+    public void updatePrice(double price, MedicalAct medicalAct) {
+        var newMedicalAct = medicalActRepository.save(medicalAct.updatePrice(price));
+        List<BillDetail> billDetails = billDetailService.updateBillDetail(medicalAct, newMedicalAct);
+        // recalculate Bill
+    }
+
+    //private void recalculateAllPendingBills() throws Exception {
+    //    for (String billId : pendingBills) {
+    //        // TODO : Implement the logic to recalculate the bill
+    //        processBill(billId, "RECALC", new Long[]{0L});
+    //    }
+    //}
 }

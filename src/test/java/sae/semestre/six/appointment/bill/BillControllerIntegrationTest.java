@@ -5,6 +5,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.MockitoAnnotations;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
@@ -37,6 +39,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @WebMvcTest(BillController.class)
 class BillControllerIntegrationTest {
 
+    private static final Logger log = LoggerFactory.getLogger(BillControllerIntegrationTest.class);
     private MockMvc server;
 
     @MockitoBean
@@ -83,8 +86,8 @@ class BillControllerIntegrationTest {
         MedicalAct consultation = new MedicalAct("CONSULTATION", 10.0);
         when(medicalActService.findByIds(new Long[]{1L})).thenReturn(List.of(consultation));
 
-        server.perform(post("/bills")
-                        .param("patientId", 1)
+        server.perform(post("/bills/process")
+                        .param("patientId", "1")
                         .param("doctorId", "1")
                         .param("medicalActId", "1"))
                 .andExpect(status().isOk());
@@ -122,9 +125,12 @@ class BillControllerIntegrationTest {
         List<String> treatments = new ArrayList<>(prices.keySet());
 
         server.perform(get("/bills/prices"))
+                .andDo(result -> {
+                    log.info("Result: {}", result.getResponse().getContentAsString());
+                })
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andExpect(jsonPath("$.prices." + treatments.get(0)).value(prices.get(treatments.get(0))));
+                .andExpect(jsonPath("$.medicalActList." + treatments.get(0)).value(prices.get(treatments.get(0))));
     }
 
     @Test

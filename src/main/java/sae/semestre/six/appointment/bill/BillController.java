@@ -132,32 +132,7 @@ public class BillingController {
 
         return new SuccessfullResponseModel("Bill processed successfully", true);
     }
-    
-    @Operation(summary = "Update treatment price", description = "Modifies the price of a treatment type")
-    @ApiResponse(responseCode = "200", description = "Price updated successfully")
-    @PutMapping("/price")
-    public SuccessfullResponseModel updatePrice(
-            @Parameter(description = "Treatment type") @RequestParam String treatment,
-            @Parameter(description = "New price") @RequestParam double price) throws Exception {
-        priceList.put(treatment, price);
-        recalculateAllPendingBills();
-        return new SuccessfullResponseModel("Price updated", true);
-    }
 
-    private void recalculateAllPendingBills() throws Exception {
-        for (String billId : pendingBills) {
-            // TODO : Implement the logic to recalculate the bill
-            processBill(billId, "RECALC", new Long[]{0L});
-        }
-    }
-    
-    @Operation(summary = "Get price list", description = "Retrieves all treatment prices")
-    @ApiResponse(responseCode = "200", description = "Price list")
-    @GetMapping("/prices")
-    public PricesResponse getPrices() {
-        return new PricesResponse(priceList);
-    }
-    
     @Operation(summary = "Calculate insurance coverage", description = "Calculates insurance coverage for a given amount")
     @ApiResponse(responseCode = "200", description = "Coverage calculated")
     @GetMapping("/insurance-coverage")
@@ -191,9 +166,6 @@ public class BillingController {
     }
 
     public record InsuranceCoverageResponse(double amount) {
-    }
-
-    public record PricesResponse(Map<String, Double> prices) {
     }
 
     public record PendingBillResponse(List<String> pendingBills) {

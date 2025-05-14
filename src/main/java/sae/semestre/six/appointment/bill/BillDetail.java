@@ -3,6 +3,8 @@ package sae.semestre.six.appointment.bill;
 import jakarta.persistence.*;
 import sae.semestre.six.appointment.medicalact.MedicalAct;
 
+import java.util.Objects;
+
 @Entity
 @Table(name = "bill_details")
 public class BillDetail {
@@ -51,6 +53,9 @@ public class BillDetail {
     }
 
     public void setMedicalAct(MedicalAct medicalAct) {
+        if (!medicalAct.isActive()) {
+            throw new IllegalArgumentException("MedicalAct is not active");
+        }
         this.medicalAct = medicalAct;
     }
 
@@ -70,4 +75,4 @@ public class BillDetail {
     public void setLineTotal(Double lineTotal) {
         this.lineTotal = lineTotal;
     }
-} 
+}
