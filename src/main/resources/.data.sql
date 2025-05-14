@@ -58,6 +58,12 @@ INSERT INTO bill_details (bill_id, treatment_name, quantity, unit_price, line_to
 (2, 'Consultation pédiatrique', 1, 80.00, 80.00),
 (3, 'Consultation neurologique', 1, 120.00, 120.00);
 
+-- Insertion des actions medicals
+INSERT INTO medical_act (id, name, price) VALUES
+(1, 'CONSULTATION', 50.0),
+(2, 'XRAY"', 150.0),
+(3, 'CHIRURGIE', 1000.0);
+
 -- Insertion des assurances
 INSERT INTO insurance (policy_number, patient_id, provider, coverage_percentage, max_coverage, expiry_date) VALUES
 ('POL001', 1, 'Assurance Santé Plus', 80.00, 2000.00, '2025-12-31'),
