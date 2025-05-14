@@ -9,6 +9,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import sae.semestre.six.appointment.doctor.Doctor;
 import sae.semestre.six.appointment.doctor.DoctorRepository;
+import sae.semestre.six.appointment.medicalact.MedicalAct;
+import sae.semestre.six.appointment.medicalact.MedicalActService;
 import sae.semestre.six.appointment.patient.Patient;
 import sae.semestre.six.appointment.patient.PatientDao;
 import sae.semestre.six.common.SuccessfullResponseModel;
@@ -17,6 +19,8 @@ import sae.semestre.six.email.EmailService;
 
 import java.io.FileWriter;
 import java.util.*;
+import java.util.concurrent.atomic.AtomicReference;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/bills")
@@ -29,12 +33,17 @@ public class BillingController {
     private BillService billService;
 
     @Autowired
-    public BillController(BillRepository billRepository, PatientDao patientDao, DoctorDao doctorDao, BillService billService) {
+    public BillController(
+            BillRepository billRepository, PatientDao patientDao,
+            DoctorDao doctorDao, BillService billService,
+            MedicalActService medicalActService
+    ) {
         this();
         this.billRepository = billRepository;
         this.patientDao = patientDao;
         this.doctorDao = doctorDao;
         this.billService = billService;
+        this.medicalActService = medicalActService;
     }
 
     
@@ -43,10 +52,9 @@ public class BillingController {
     private DoctorRepository doctorRepository;
     
     private BillController() {
-        priceList.put("CONSULTATION", 50.0);
-        priceList.put("XRAY", 150.0);
-        priceList.put("CHIRURGIE", 1000.0);
     }
+
+    private MedicalActService medicalActService;
 
     private BillRepository billRepository;
     private final EmailService emailService = EmailService.getInstance();
@@ -58,7 +66,9 @@ public class BillingController {
     public SuccessfullResponseModel processBill(
             @Parameter(description = "Patient ID") @RequestParam String patientId,
             @Parameter(description = "Doctor ID") @RequestParam String doctorId,
-            @Parameter(description = "List of treatments") @RequestParam String[] treatments) {
+            @Parameter(description = "List of medical acts id") @RequestParam Long[] medicalActId
+            ) throws Exception {
+
             Patient patient = patientRepository.findById(Long.parseLong(patientId)).orElseThrow(
                     () -> new RuntimeException("Patient not found")
             );
@@ -76,23 +86,32 @@ public class BillingController {
         Hibernate.initialize(bill.getBillDetails());
 
         double total = 0.0;
-        Set<BillDetail> details = new HashSet<>();
 
-        for (String treatment : treatments) {
-            double price = priceList.get(treatment);
-            total += price;
+        List<MedicalAct> medicalActs = medicalActService.findByIds(medicalActId);
 
-            BillDetail detail = new BillDetail();
-            detail.setBill(bill);
-            detail.setTreatmentName(treatment);
-            detail.setUnitPrice(price);
-            details.add(detail);
-
-            Hibernate.initialize(detail);
+        if (medicalActs.isEmpty()) {
+            throw new Exception("No medical acts found");
+        }
+        if (!medicalActs.stream().allMatch(MedicalAct::isActive)) {
+            throw new Exception("Some medical acts are inactive");
         }
 
+        Set<BillDetail> details = medicalActs.stream()
+                .map(medicalAct -> {
+                    BillDetail billDetail = new BillDetail();
+                    billDetail.setBill(bill);
+                    billDetail.setMedicalAct(medicalAct);
+                    billDetail.calculateLineTotal();
+                    Hibernate.initialize(billDetail);
+                    return billDetail;
+                }).collect(Collectors.toSet());
+
+        total = details.stream()
+                .map(BillDetail::getLineTotal)
+                .reduce(total, Double::sum);
+
         if (total > 500) {
-            total = total * 0.9;
+            total *= 0.9;
         }
 
         bill.setTotalAmount(total);
@@ -127,7 +146,8 @@ public class BillingController {
 
     private void recalculateAllPendingBills() throws Exception {
         for (String billId : pendingBills) {
-            processBill(billId, "RECALC", new String[]{"CONSULTATION"});
+            // TODO : Implement the logic to recalculate the bill
+            processBill(billId, "RECALC", new Long[]{0L});
         }
     }
     

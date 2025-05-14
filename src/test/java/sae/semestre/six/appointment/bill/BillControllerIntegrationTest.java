@@ -14,6 +14,8 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import sae.semestre.six.appointment.Appointment;
 import sae.semestre.six.appointment.doctor.Doctor;
 import sae.semestre.six.appointment.doctor.DoctorDao;
+import sae.semestre.six.appointment.medicalact.MedicalAct;
+import sae.semestre.six.appointment.medicalact.MedicalActService;
 import sae.semestre.six.appointment.patient.PatientDao;
 import sae.semestre.six.appointment.doctor.DoctorRepository;
 import sae.semestre.six.appointment.patient.PatientRepository;
@@ -24,6 +26,8 @@ import java.util.Map;
 import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
@@ -46,6 +50,9 @@ class BillControllerIntegrationTest {
 
     @MockitoBean
     private DoctorRepository doctorRepository;
+
+    @MockitoBean
+    private MedicalActService medicalActService;
 
     @InjectMocks
     private BillController billController;
@@ -73,12 +80,21 @@ class BillControllerIntegrationTest {
         doctor.setAppointments(Set.of(appointment));
 
         when(doctorDao.findById(doctor.getId())).thenReturn(doctor);
+        MedicalAct consultation = new MedicalAct("CONSULTATION", 10.0);
+        when(medicalActService.findByIds(new Long[]{1L})).thenReturn(List.of(consultation));
 
         server.perform(post("/bills")
-                        .param("patientId", "1")
+                        .param("patientId", 1)
                         .param("doctorId", "1")
-                        .param("treatments", "CONSULTATION"))
+                        .param("medicalActId", "1"))
                 .andExpect(status().isOk());
+        
+        Bill billCreated = verify(billRepository.save(any(Bill.class)));
+        assertEquals(doctor, billCreated.getDoctor());
+
+        BillDetail billDetail = billCreated.getBillDetails().stream().findAny().get();
+        assertEquals(10, billDetail.getLineTotal());
+        assertEquals(consultation, billDetail.getMedicalAct());
     }
 
     @Test
@@ -99,6 +115,12 @@ class BillControllerIntegrationTest {
 
     @Test
     void testGetPrices() throws Exception {
+
+        @SuppressWarnings("unchecked")
+        Map<String, Double> prices = (Map<String, Double>) ReflectionTestUtils.getField(billController, "priceList");
+        assertNotNull(prices);
+        List<String> treatments = new ArrayList<>(prices.keySet());
+
         server.perform(get("/bills/prices"))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
