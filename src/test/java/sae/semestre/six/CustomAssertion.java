@@ -47,4 +47,10 @@ public class CustomAssertion {
             throw new AssertionError(errorMessage);
         }
     }
+
+    public static void assertIsEmpty(List<?> list) {
+        if (list != null && !list.isEmpty()) {
+            throw new AssertionError("List should be empty");
+        }
+    }
 }
