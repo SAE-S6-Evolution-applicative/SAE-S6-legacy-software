@@ -1,9 +1,11 @@
 package sae.semestre.six.appointment.doctor;
 
+import org.springframework.stereotype.Repository;
 import sae.semestre.six.generic.GenericDao;
 
 import java.util.List;
 
+@Repository
 public interface DoctorDao extends GenericDao<Doctor, Long> {
     Doctor findByDoctorNumber(String doctorNumber);
     List<Doctor> findBySpecialization(String specialization);

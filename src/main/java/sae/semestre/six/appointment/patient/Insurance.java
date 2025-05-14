@@ -1,8 +1,7 @@
 package sae.semestre.six.appointment.patient;
 
 import jakarta.persistence.*;
-
-import java.util.Date;
+import java.time.LocalDate;
 
 @Entity
 @Table(name = "insurance")
@@ -29,8 +28,7 @@ public class Insurance {
     private Double maxCoverage;
     
     @Column(name = "expiry_date")
-    @Temporal(TemporalType.DATE)
-    private Date expiryDate;
+    private LocalDate expiryDate;
     
     
     public Double calculateCoverage(Double billAmount) {
@@ -40,7 +38,7 @@ public class Insurance {
     
     
     public boolean isValid() {
-        return new Date().before(expiryDate);
+        return LocalDate.now().isBefore(expiryDate) || LocalDate.now().isEqual(expiryDate);
     }
 
     public Long getId() {
@@ -91,11 +89,11 @@ public class Insurance {
         this.maxCoverage = maxCoverage;
     }
 
-    public Date getExpiryDate() {
+    public LocalDate getExpiryDate() {
         return expiryDate;
     }
 
-    public void setExpiryDate(Date expiryDate) {
+    public void setExpiryDate(LocalDate expiryDate) {
         this.expiryDate = expiryDate;
     }
 }

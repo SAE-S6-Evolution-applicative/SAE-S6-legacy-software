@@ -4,7 +4,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import sae.semestre.six.appointment.Appointment;
 
-import java.util.Date;
+import java.time.LocalDate;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -47,9 +47,15 @@ class PatientTest {
     }
 
     @Test
-    void testSetAndGetDateOfBirth() {
-        Date dateOfBirth = new Date();
+    public void testSetDateOfBirth() {
+        // Given
+        Patient patient = new Patient();
+        LocalDate dateOfBirth = LocalDate.now();
+        
+        // When
         patient.setDateOfBirth(dateOfBirth);
+        
+        // Then
         assertEquals(dateOfBirth, patient.getDateOfBirth());
     }
 

@@ -1,7 +1,8 @@
 package sae.semestre.six.stock.supplier;
 
 import jakarta.persistence.*;
-import java.util.Date;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.Set;
 import java.util.HashSet;
 
@@ -20,8 +21,7 @@ public class SupplierInvoice {
     private String supplierName;
     
     @Column(name = "invoice_date")
-    @Temporal(TemporalType.TIMESTAMP)
-    private Date invoiceDate = new Date();
+    private LocalDateTime invoiceDate = LocalDateTime.now();
     
     @OneToMany(mappedBy = "supplierInvoice", cascade = CascadeType.ALL)
     private Set<SupplierInvoiceDetail> details = new HashSet<>();

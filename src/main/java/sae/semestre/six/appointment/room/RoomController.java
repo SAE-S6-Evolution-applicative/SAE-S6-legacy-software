@@ -2,7 +2,7 @@ package sae.semestre.six.appointment.room;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
-import sae.semestre.six.appointment.AppointmentDao;
+import sae.semestre.six.appointment.AppointmentRepository;
 import sae.semestre.six.appointment.Appointment;
 
 import java.util.*;
@@ -10,19 +10,25 @@ import java.util.*;
 @RestController
 @RequestMapping("/rooms")
 public class RoomController {
+
+    private final RoomDao roomDao;
     
+    private final AppointmentRepository appointmentRepository;
+
     @Autowired
-    private RoomDao roomDao;
-    
-    @Autowired
-    private AppointmentDao appointmentDao;
-    
-    
+    public RoomController(AppointmentRepository appointmentRepository, RoomDao roomDao) {
+        this.appointmentRepository = appointmentRepository;
+        this.roomDao = roomDao;
+    }
+
+
     @PostMapping("/assign")
     public String assignRoom(@RequestParam Long appointmentId, @RequestParam String roomNumber) {
         try {
             Room room = roomDao.findByRoomNumber(roomNumber);
-            Appointment appointment = appointmentDao.findById(appointmentId);
+            Appointment appointment = appointmentRepository.findById(appointmentId).orElseThrow(
+                    () -> new Exception()
+            );
             
             
             if (room.getType().equals("SURGERY") && 
@@ -40,7 +46,7 @@ public class RoomController {
             appointment.setRoomNumber(roomNumber);
             
             roomDao.update(room);
-            appointmentDao.update(appointment);
+            appointmentRepository.save(appointment);
             
             return "Room assigned successfully";
         } catch (Exception e) {

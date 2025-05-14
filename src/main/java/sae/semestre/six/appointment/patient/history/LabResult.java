@@ -1,8 +1,7 @@
 package sae.semestre.six.appointment.patient.history;
 
 import jakarta.persistence.*;
-
-import java.util.Date;
+import java.time.LocalDate;
 
 @Entity
 @Table(name = "lab_results")
@@ -23,8 +22,7 @@ public class LabResult {
     private String resultValue;
     
     @Column(name = "test_date")
-    @Temporal(TemporalType.TIMESTAMP)
-    private Date testDate;
+    private LocalDate testDate;
     
     @Column(name = "notes", columnDefinition = "TEXT")
     private String notes;
@@ -42,8 +40,8 @@ public class LabResult {
     public String getResultValue() { return resultValue; }
     public void setResultValue(String resultValue) { this.resultValue = resultValue; }
     
-    public Date getTestDate() { return testDate; }
-    public void setTestDate(Date testDate) { this.testDate = testDate; }
+    public LocalDate getTestDate() { return testDate; }
+    public void setTestDate(LocalDate testDate) { this.testDate = testDate; }
     
     public String getNotes() { return notes; }
     public void setNotes(String notes) { this.notes = notes; }

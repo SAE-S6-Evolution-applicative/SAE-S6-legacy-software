@@ -4,7 +4,8 @@ import jakarta.persistence.*;
 import sae.semestre.six.appointment.doctor.Doctor;
 import sae.semestre.six.appointment.patient.Patient;
 
-import java.util.Date;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "medical_records")
@@ -34,8 +35,7 @@ public class MedicalRecord {
     private String notes;
 
     @Column(name = "record_date")
-    @Temporal(TemporalType.TIMESTAMP)
-    private Date recordDate;
+    private LocalDateTime recordDate;
 
     @ManyToOne
     @JoinColumn(name = "doctor_id")
@@ -111,11 +111,11 @@ public class MedicalRecord {
         this.notes = notes;
     }
 
-    public Date getRecordDate() {
+    public LocalDateTime getRecordDate() {
         return recordDate;
     }
 
-    public void setRecordDate(Date recordDate) {
+    public void setRecordDate(LocalDateTime recordDate) {
         this.recordDate = recordDate;
     }
 

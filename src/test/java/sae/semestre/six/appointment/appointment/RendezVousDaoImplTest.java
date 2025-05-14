@@ -17,8 +17,8 @@ import sae.semestre.six.appointment.RendezVousDaoImpl;
 import sae.semestre.six.appointment.doctor.Doctor;
 import sae.semestre.six.appointment.patient.Patient;
 
-import java.util.Calendar;
-import java.util.Date;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -37,27 +37,18 @@ class RendezVousDaoImplTest {
     private Patient patient2;
     private Doctor medecin1;
     private Doctor medecin2;
-    private Date aujourdHui;
-    private Date hier;
-    private Date demain;
-    private Date semaineSuivante;
+    private LocalDateTime aujourdHui;
+    private LocalDateTime hier;
+    private LocalDateTime demain;
+    private LocalDateTime semaineSuivante;
 
     @BeforeEach
     void setUp() {
         // Préparation des dates
-        aujourdHui = new Date();
-
-        Calendar cal = Calendar.getInstance();
-        cal.add(Calendar.DAY_OF_MONTH, -1);
-        hier = cal.getTime();
-
-        cal = Calendar.getInstance();
-        cal.add(Calendar.DAY_OF_MONTH, 1);
-        demain = cal.getTime();
-
-        cal = Calendar.getInstance();
-        cal.add(Calendar.DAY_OF_MONTH, 7);
-        semaineSuivante = cal.getTime();
+        aujourdHui = LocalDateTime.now();
+        hier = aujourdHui.minusDays(1);
+        demain = aujourdHui.plusDays(1);
+        semaineSuivante = aujourdHui.plusDays(7);
 
         // Création des patients
         patient1 = new Patient();
@@ -91,7 +82,7 @@ class RendezVousDaoImplTest {
     /**
      * Méthode utilitaire pour créer un rendez-vous
      */
-    private Appointment creerRendezVous(Patient patient, Doctor medecin, Date date, String numeroRendezVous) {
+    private Appointment creerRendezVous(Patient patient, Doctor medecin, LocalDateTime date, String numeroRendezVous) {
         Appointment appointment = new Appointment();
         appointment.setPatient(patient);
         appointment.setDoctor(medecin);

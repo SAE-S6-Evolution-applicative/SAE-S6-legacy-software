@@ -8,8 +8,8 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
+import java.time.ZoneId;
 import java.time.ZoneOffset;
-import java.util.Date;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -33,7 +33,7 @@ class InventoryDaoImplIntegrationTest {
         testItem.setReorderLevel(10);
         testItem.setQuantity(50);
         testItem.setUnitPrice(25.99);
-        testItem.setLastRestocked(new Date());
+        testItem.setLastRestocked(LocalDate.now());
 
         // Store in the database
         entityManager.persist(testItem);
@@ -58,7 +58,7 @@ class InventoryDaoImplIntegrationTest {
         testItem.setReorderLevel(10);
         testItem.setQuantity(50);
         testItem.setUnitPrice(25.99);
-        testItem.setLastRestocked(new Date());
+        testItem.setLastRestocked(LocalDate.now());
         Inventory anotherInventory = new Inventory();
         anotherInventory.setItemCode("TEST002");
 
@@ -140,7 +140,7 @@ class InventoryDaoImplIntegrationTest {
         Inventory testItem = new Inventory();
         final String ITEM_CODE = "TEST001";
         final int REORDER_LEVEL = 10;
-        final Date yesterday = Date.from(LocalDate.now().minusDays(1).atStartOfDay(ZoneOffset.UTC).toInstant());
+        final LocalDate yesterday = LocalDate.now().minusDays(1);
         testItem.setItemCode(ITEM_CODE);
         testItem.setReorderLevel(REORDER_LEVEL);
         testItem.setQuantity(5);
@@ -164,8 +164,7 @@ class InventoryDaoImplIntegrationTest {
         assertEquals(testItem.getReorderLevel(), updatedItem.getReorderLevel(), "The reorder level should be the same");
 
         assertEquals(REORDER_LEVEL + 1, updatedItem.getQuantity(), "The quantity should be updated");
-        assertTrue(updatedItem.getLastRestocked().after(testItem.getLastRestocked()));
-
+        assertTrue(updatedItem.getLastRestocked().isAfter(testItem.getLastRestocked()));
     }
 
     @Test
@@ -192,6 +191,44 @@ class InventoryDaoImplIntegrationTest {
         assertEquals(testItem.getItemCode(), updatedItem.getItemCode(), String.format("The item code should match with %s", testItem.getItemCode()));
 
         assertEquals(NEW_UNIT_PRICE, updatedItem.getUnitPrice(), "The unit price should be updated");
+    }
+
+    @Test
+    public void testAddAndRetrieveInventoryItem() {
+        // Given
+        String itemCode = "TEST-ITEM-" + System.currentTimeMillis();
+        Inventory testItem = new Inventory();
+        testItem.setItemCode(itemCode);
+        testItem.setName("Test Item");
+        testItem.setQuantity(10);
+        testItem.setUnitPrice(99.99);
+        testItem.setReorderLevel(5);
+        testItem.setLastRestocked(LocalDate.now());
+        
+        // ... existing code ...
+    }
+
+    @Test
+    public void testFindByRestockDateRange() {
+        // Given
+        String itemCode = "RESTOCK-TEST-" + System.currentTimeMillis();
+        Inventory testItem = new Inventory();
+        testItem.setItemCode(itemCode);
+        testItem.setName("Restock Test Item");
+        testItem.setQuantity(10);
+        testItem.setUnitPrice(88.88);
+        testItem.setReorderLevel(5);
+        testItem.setLastRestocked(LocalDate.now());
+        
+        // ... existing code ...
+    }
+
+    @Test
+    public void testFindItemsRestockedYesterday() {
+        // Given
+        final LocalDate yesterday = LocalDate.now().minusDays(1);
+        
+        // ... existing code ...
     }
 
 }

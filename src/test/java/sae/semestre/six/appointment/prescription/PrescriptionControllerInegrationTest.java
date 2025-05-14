@@ -16,7 +16,7 @@ import sae.semestre.six.appointment.bill.BillingService;
 import sae.semestre.six.appointment.patient.Patient;
 import sae.semestre.six.appointment.patient.PatientDao;
 
-import java.util.Date;
+import java.time.LocalDate;
 
 import static org.hamcrest.Matchers.containsString;
 import static org.mockito.ArgumentMatchers.any;
@@ -63,7 +63,7 @@ class PrescriptionControllerInegrationTest {
         patient.setPatientNumber("P12345");
         patient.setPhoneNumber("1234567890");
         patient.setGender("Male");
-        patient.setDateOfBirth(new Date());
+        patient.setDateOfBirth(LocalDate.now());
         patient.setAddress("123 Main St");
         return patient;
     }

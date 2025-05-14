@@ -3,12 +3,13 @@ package sae.semestre.six.appointment.medicalrecord;
 import org.springframework.stereotype.Repository;
 import sae.semestre.six.generic.AbstractHibernateDao;
 
-import java.util.Date;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Repository
 public class MedicalRecordDaoImpl extends AbstractHibernateDao<MedicalRecord, Long> implements MedicalRecordDao {
-    
+
     @Override
     public MedicalRecord findByRecordNumber(String recordNumber) {
         return (MedicalRecord) getEntityManager()
@@ -16,7 +17,7 @@ public class MedicalRecordDaoImpl extends AbstractHibernateDao<MedicalRecord, Lo
                 .setParameter("recordNumber", recordNumber)
                 .getSingleResult();
     }
-    
+
     @Override
     @SuppressWarnings("unchecked")
     public List<MedicalRecord> findByPatientId(Long patientId) {
@@ -37,7 +38,7 @@ public class MedicalRecordDaoImpl extends AbstractHibernateDao<MedicalRecord, Lo
     
     @Override
     @SuppressWarnings("unchecked")
-    public List<MedicalRecord> findByDateRange(Date startDate, Date endDate) {
+    public List<MedicalRecord> findByDateRange(LocalDateTime startDate, LocalDateTime endDate) {
         return getEntityManager()
                 .createQuery("FROM MedicalRecord WHERE recordDate BETWEEN :startDate AND :endDate")
                 .setParameter("startDate", startDate)

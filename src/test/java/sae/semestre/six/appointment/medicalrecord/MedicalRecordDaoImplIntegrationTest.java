@@ -14,8 +14,8 @@ import org.springframework.transaction.annotation.Transactional;
 import sae.semestre.six.appointment.doctor.Doctor;
 import sae.semestre.six.appointment.patient.Patient;
 
-import java.util.Calendar;
-import java.util.Date;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -104,9 +104,9 @@ class MedicalRecordDaoImplIntegrationTest {
     @Test
     void testFindByDateRange() {
         // Given
-        Date yesterday = addDaysToCurrentDate(-1);
-        Date tomorrow = addDaysToCurrentDate(1);
-        Date nextWeek = addDaysToCurrentDate(7);
+        LocalDateTime yesterday = LocalDateTime.now().minusDays(1);
+        LocalDateTime tomorrow = LocalDateTime.now().plusDays(1);
+        LocalDateTime nextWeek = LocalDateTime.now().plusDays(7);
 
         Patient patient = new Patient();
         patient.setPatientNumber("PAT002");
@@ -115,7 +115,7 @@ class MedicalRecordDaoImplIntegrationTest {
         entityManager.persist(patient);
 
         MedicalRecord recordInRange = createTestMedicalRecord("REC004", null, null);
-        recordInRange.setRecordDate(new Date()); // Today
+        recordInRange.setRecordDate(LocalDateTime.now()); // Today
         recordInRange.setPatient(patient);
         entityManager.persist(recordInRange);
 
@@ -202,16 +202,7 @@ class MedicalRecordDaoImplIntegrationTest {
         medicalRecord.setDoctor(doctor);
         medicalRecord.setDiagnosis("Test Diagnosis");
         medicalRecord.setTreatment("Test Treatment");
-        medicalRecord.setRecordDate(new Date());
+        medicalRecord.setRecordDate(LocalDateTime.now());
         return medicalRecord;
-    }
-
-    /**
-     * Helper method to add days to the current date
-     */
-    private Date addDaysToCurrentDate(int days) {
-        Calendar calendar = Calendar.getInstance();
-        calendar.add(Calendar.DAY_OF_MONTH, days);
-        return calendar.getTime();
     }
 }

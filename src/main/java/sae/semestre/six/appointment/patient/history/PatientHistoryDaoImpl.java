@@ -3,7 +3,10 @@ package sae.semestre.six.appointment.patient.history;
 import sae.semestre.six.generic.AbstractHibernateDao;
 import org.springframework.stereotype.Repository;
 import jakarta.persistence.*;
+
+import java.time.LocalDateTime;
 import java.util.*;
+import java.time.LocalDate;
 
 @Repository
 public class PatientHistoryDaoImpl extends AbstractHibernateDao<PatientHistory, Long> implements PatientHistoryDao {
@@ -27,23 +30,16 @@ public class PatientHistoryDaoImpl extends AbstractHibernateDao<PatientHistory, 
     }
     
     @Override
-    @SuppressWarnings("unchecked")
-    public List<PatientHistory> searchByMultipleCriteria(String keyword, Date startDate, Date endDate) {
+    public List<PatientHistory> searchByMultipleCriteria(String keyword, LocalDateTime startDate, LocalDateTime endDate) {
+        String queryString = "SELECT ph FROM PatientHistory ph " +
+                "LEFT JOIN ph.patient p " +
+                "WHERE (UPPER(ph.diagnosis) LIKE :keyword OR UPPER(ph.notes) LIKE :keyword OR UPPER(p.firstName) LIKE :keyword OR UPPER(p.lastName) LIKE :keyword) " +
+                "AND ph.visitDate BETWEEN :startDate AND :endDate";
         
-        String sql = "SELECT ph FROM PatientHistory ph " +
-            "WHERE (LOWER(ph.diagnosis) LIKE :keyword " +
-            "OR LOWER(ph.symptoms) LIKE :keyword " +
-            "OR LOWER(ph.notes) LIKE :keyword " +
-            "OR EXISTS (SELECT 1 FROM ph.treatments t WHERE LOWER(t.name) LIKE :keyword) " +
-            "OR EXISTS (SELECT 1 FROM ph.prescriptions p WHERE LOWER(p.medicines) LIKE :keyword)) " +
-            "AND ph.visitDate BETWEEN :startDate AND :endDate";
-            
-        Query query = getEntityManager().createQuery(sql);
-        query.setParameter("keyword", "%" + keyword.toLowerCase() + "%");
-        query.setParameter("startDate", startDate);
-        query.setParameter("endDate", endDate);
-        
-        
-        return query.getResultList();
+        return getEntityManager().createQuery(queryString, PatientHistory.class)
+                .setParameter("keyword", "%" + keyword.toUpperCase() + "%")
+                .setParameter("startDate", startDate)
+                .setParameter("endDate", endDate)
+                .getResultList();
     }
 } 

@@ -1,7 +1,8 @@
 package sae.semestre.six.stock;
 
 import jakarta.persistence.*;
-import java.util.Date;
+import java.io.Serializable;
+import java.time.LocalDate;
 
 @Entity
 @Table(name = "inventory")
@@ -27,8 +28,7 @@ public class Inventory {
     private Integer reorderLevel;
     
     @Column(name = "last_restocked")
-    @Temporal(TemporalType.TIMESTAMP)
-    private Date lastRestocked;
+    private LocalDate lastRestocked;
     
     
     public Long getId() {
@@ -83,11 +83,11 @@ public class Inventory {
         this.reorderLevel = reorderLevel;
     }
     
-    public Date getLastRestocked() {
+    public LocalDate getLastRestocked() {
         return lastRestocked;
     }
     
-    public void setLastRestocked(Date lastRestocked) {
+    public void setLastRestocked(LocalDate lastRestocked) {
         this.lastRestocked = lastRestocked;
     }
     

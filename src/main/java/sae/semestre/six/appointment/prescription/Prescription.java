@@ -3,7 +3,9 @@ package sae.semestre.six.appointment.prescription;
 import jakarta.persistence.*;
 import sae.semestre.six.appointment.patient.Patient;
 
-import java.util.Date;
+import java.io.Serializable;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "prescriptions")
@@ -12,97 +14,97 @@ public class Prescription {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    
+
     @Column(name = "prescription_number")
-    private String prescriptionNumber; 
-    
+    private String prescriptionNumber;
+
     @ManyToOne
     @JoinColumn(name = "patient_id")
     private Patient patient;
-    
+
     @Column(name = "medicines")
-    private String medicines; 
-    
+    private String medicines;
+
     @Column(name = "notes")
     private String notes;
-    
+
     @Column(name = "total_cost")
-    private Double totalCost; 
-    
+    private Double totalCost;
+
     @Column(name = "is_billed")
-    private Boolean isBilled = false; 
-    
+    private Boolean isBilled = false;
+
     @Column(name = "inventory_updated")
-    private Boolean inventoryUpdated = false; 
-    
-    
+    private Boolean inventoryUpdated = false;
+
+
     @Column(name = "created_date")
-    private Date createdDate = new Date();
-    
+    private LocalDateTime createdDate = LocalDateTime.now();
+
     @Column(name = "last_modified")
-    private Date lastModified = new Date();
-    
-    
+    private LocalDateTime lastModified = LocalDateTime.now();
+
+
     public Prescription() {}
-    
-    
+
+
     public Long getId() {
         return id;
     }
-    
+
     public void setId(Long id) {
         this.id = id;
     }
-    
+
     public String getPrescriptionNumber() {
         return prescriptionNumber;
     }
-    
+
     public void setPrescriptionNumber(String prescriptionNumber) {
         this.prescriptionNumber = prescriptionNumber;
     }
-    
+
     public Patient getPatient() {
         return patient;
     }
-    
+
     public void setPatient(Patient patient) {
         this.patient = patient;
     }
-    
+
     public String getMedicines() {
         return medicines;
     }
-    
+
     public void setMedicines(String medicines) {
         this.medicines = medicines;
     }
-    
+
     public String getNotes() {
         return notes;
     }
-    
+
     public void setNotes(String notes) {
         this.notes = notes;
     }
-    
+
     public Double getTotalCost() {
         return totalCost;
     }
-    
+
     public void setTotalCost(Double totalCost) {
         this.totalCost = totalCost;
     }
-    
+
     public Boolean getBilled() {
         return isBilled;
     }
-    
+
     public void setBilled(Boolean billed) {
         isBilled = billed;
-        lastModified = new Date(); 
+        lastModified = LocalDateTime.now();
     }
-    
+
     public Boolean getInventoryUpdated() {
         return inventoryUpdated;
     }
@@ -111,19 +113,24 @@ public class Prescription {
         this.inventoryUpdated = inventoryUpdated;
     }
     
-    public Date getCreatedDate() {
+    public LocalDateTime getCreatedDate() {
         return createdDate;
     }
     
-    public void setCreatedDate(Date createdDate) {
+    public void setCreatedDate(LocalDateTime createdDate) {
         this.createdDate = createdDate;
     }
     
-    public Date getLastModified() {
+    public LocalDateTime getLastModified() {
         return lastModified;
     }
     
-    public void setLastModified(Date lastModified) {
+    public void setLastModified(LocalDateTime lastModified) {
         this.lastModified = lastModified;
+    }
+
+    @PreUpdate
+    public void preUpdate() {
+        lastModified = LocalDateTime.now();
     }
 } 

@@ -9,6 +9,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.time.LocalDate;
 
 @RestController
 @RequestMapping("/inventory")
@@ -30,7 +31,7 @@ public class InventoryController {
                 
                 inventory.setQuantity(inventory.getQuantity() + detail.getQuantity());
                 inventory.setUnitPrice(detail.getUnitPrice());
-                inventory.setLastRestocked(new Date());
+                inventory.setLastRestocked(LocalDate.now());
                 
                 
                 inventoryDao.update(inventory);

@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import java.util.*;
 import java.io.*;
+import java.time.LocalDate;
 
 @RestController
 @RequestMapping("/prescriptions")
@@ -63,7 +64,7 @@ public class PrescriptionController {
             
             
             new FileWriter(AUDIT_FILE, true)
-                .append(new Date().toString() + " - " + prescriptionId + "\n")
+                .append(LocalDate.now().toString() + " - " + prescriptionId + "\n")
                 .close();
             
             
