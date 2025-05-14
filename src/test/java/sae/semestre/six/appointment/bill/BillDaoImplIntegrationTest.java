@@ -29,7 +29,7 @@ class BillDaoImplIntegrationTest {
         Bill bill = new Bill();
         bill.setBillNumber("BILL001");
         bill.setTotalAmount(100.0);
-        bill.setStatus("PENDING");
+        bill.setStatus(Bill.Status.PENDING);
         entityManager.persist(bill);
         entityManager.flush();
 

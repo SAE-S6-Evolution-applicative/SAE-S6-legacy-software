@@ -2,7 +2,6 @@ package sae.semestre.six.appointment.bill;
 
 
 import jakarta.persistence.*;
-import org.springframework.cglib.core.Local;
 import sae.semestre.six.appointment.doctor.Doctor;
 import sae.semestre.six.appointment.patient.Patient;
 import sae.semestre.six.appointment.patient.history.PatientHistory;
@@ -38,7 +37,8 @@ public class Bill {
     private Double totalAmount = 0.0;
     
     @Column(name = "status")
-    private String status = "PENDING";
+    @Enumerated(EnumType.STRING)
+    private Status status = Status.PENDING;
     
     @OneToMany(mappedBy = "bill", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     private Set<BillDetail> billDetails = new HashSet<>();
@@ -76,12 +76,17 @@ public class Bill {
     public Double getTotalAmount() { return totalAmount; }
     public void setTotalAmount(Double totalAmount) { this.totalAmount = totalAmount; }
     
-    public String getStatus() { return status; }
-    public void setStatus(String status) { 
+    public Status getStatus() { return status; }
+    public void setStatus(Status status) {
         this.status = status;
         this.lastModified = LocalDate.now();
     }
     
     public Set<BillDetail> getBillDetails() { return billDetails; }
     public void setBillDetails(Set<BillDetail> billDetails) { this.billDetails = billDetails; }
+
+    public static enum Status {
+        PENDING,
+        PAID;
+    }
 } 

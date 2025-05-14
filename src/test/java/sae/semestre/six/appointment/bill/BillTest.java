@@ -31,8 +31,8 @@ class BillTest {
         // Given
         Bill bill = new Bill();
         // When
-        bill.setStatus("PAID");
+        bill.setStatus(Bill.Status.PAID);
         // Then
-        assertEquals("PAID", bill.getStatus());
+        assertEquals(Bill.Status.PAID, bill.getStatus());
     }
 }

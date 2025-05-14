@@ -39,6 +39,9 @@ class BillControllerIntegrationTest {
     private BillRepository billRepository;
 
     @MockitoBean
+    private BillService billService;
+
+    @MockitoBean
     private PatientRepository patientRepository;
 
     @MockitoBean
@@ -123,6 +126,7 @@ class BillControllerIntegrationTest {
 
         @SuppressWarnings("unchecked")
         Map<String, Double> prices = (Map<String, Double>) ReflectionTestUtils.getField(billController, "priceList");
+        assertNotNull(prices);
         assertEquals(price, prices.get(newTreatment));
     }
 
@@ -135,10 +139,28 @@ class BillControllerIntegrationTest {
 
     @Test
     void testGetPendingBills() throws Exception {
+        Bill bill1 = new Bill();
+        bill1.setId(1L);
+        bill1.setStatus(Bill.Status.PENDING);
+
+        Bill bill2 = new Bill();
+        bill2.setId(2L);
+        bill2.setStatus(Bill.Status.PAID);
+
+        Bill bill3 = new Bill();
+        bill3.setId(3L);
+        bill3.setStatus(Bill.Status.PENDING);
+
+        List<Bill> pendingBills = List.of(bill1, bill3);
+        when(billService.findPendingBills()).thenReturn(pendingBills);
+
         server.perform(get("/bills/pending"))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andExpect(jsonPath("$.pendingBills").isEmpty());
+                .andExpect(jsonPath("$.pendingBills").isArray())
+                .andExpect(jsonPath("$.pendingBills.length()").value(2))
+                .andExpect(jsonPath("$.pendingBills[0]").value(pendingBills.get(0).getId()))
+                .andExpect(jsonPath("$.pendingBills[1]").value(pendingBills.get(1).getId()));
     }
 
 

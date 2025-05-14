@@ -26,13 +26,15 @@ public class BillingController {
     private Map<String, Double> priceList = new HashMap<>();
     private double totalRevenue = 0.0;
     private List<String> pendingBills = new ArrayList<>();
+    private BillService billService;
 
     @Autowired
-    public BillController(BillRepository billRepository, PatientDao patientDao, DoctorDao doctorDao) {
+    public BillController(BillRepository billRepository, PatientDao patientDao, DoctorDao doctorDao, BillService billService) {
         this();
         this.billRepository = billRepository;
         this.patientDao = patientDao;
         this.doctorDao = doctorDao;
+        this.billService = billService;
     }
 
     
@@ -157,7 +159,12 @@ public class BillingController {
     @ApiResponse(responseCode = "200", description = "List of pending bills")
     @GetMapping("/pending")
     public PendingBillResponse getPendingBills() {
-        return new PendingBillResponse(pendingBills);
+        return new PendingBillResponse(
+                billService.findPendingBills().stream()
+                        .map(Bill::getId)
+                        .map(Objects::toString)
+                        .toList()
+        );
     }
 
     public record RevenueResponse(double totalRevenue) {
