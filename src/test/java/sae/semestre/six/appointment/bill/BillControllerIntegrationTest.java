@@ -8,14 +8,27 @@ import org.mockito.MockitoAnnotations;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
+import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import sae.semestre.six.appointment.Appointment;
+import sae.semestre.six.appointment.doctor.Doctor;
+import sae.semestre.six.appointment.doctor.DoctorDao;
+import sae.semestre.six.appointment.patient.PatientDao;
 import sae.semestre.six.appointment.doctor.DoctorRepository;
 import sae.semestre.six.appointment.patient.PatientRepository;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @WebMvcTest(BillController.class)
 class BillControllerIntegrationTest {
@@ -49,20 +62,36 @@ class BillControllerIntegrationTest {
 
     @Test
     void testProcessBill() throws Exception {
+
+        Appointment appointment = new Appointment();
+
+        Doctor doctor = new Doctor();
+        doctor.setId(1L);
+        doctor.setAppointments(Set.of(appointment));
+
+        when(doctorDao.findById(doctor.getId())).thenReturn(doctor);
+
         server.perform(post("/bills")
-                .param("patientId", "1")
-                .param("doctorId", "1")
-                .param("treatments", "CONSULTATION"))
+                        .param("patientId", "1")
+                        .param("doctorId", "1")
+                        .param("treatments", "CONSULTATION"))
                 .andExpect(status().isOk());
     }
 
     @Test
     void testUpdatePrice() throws Exception {
+        String consultation = "CONSULTATION";
+        String updatedPrice = "75.0";
         server.perform(put("/bills/price")
-                .param("treatment", "CONSULTATION")
-                .param("price", "75.0"))
+                        .param("treatment", consultation)
+                        .param("price", updatedPrice))
                 .andExpect(status().isOk())
-                .andExpect(content().string("Price updated"));
+                .andExpect(jsonPath("$.success").value(true));
+
+        server.perform(get("/billing/prices"))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$.prices." + consultation).value(updatedPrice));
     }
 
     @Test
@@ -70,31 +99,38 @@ class BillControllerIntegrationTest {
         server.perform(get("/bills/prices"))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andExpect(content().json("{\"CONSULTATION\":50.0,\"XRAY\":150.0,\"CHIRURGIE\":1000.0}"));
+                .andExpect(jsonPath("$.prices." + treatments.get(0)).value(prices.get(treatments.get(0))));
     }
 
     @Test
     void testCalculateInsurance() throws Exception {
+        String amount = "1000.0";
         server.perform(get("/bills/insurance-coverage")
-                .param("amount", "1000"))
+                        .param("amount", amount))
                 .andExpect(status().isOk())
-                .andExpect(content().string("Insurance coverage: $1000.0"));
+                .andExpect(jsonPath("$.amount").value(amount));
     }
 
     @Test
-    void testUpdatePriceWithInvalidTreatment() throws Exception {
+    void testUpdatePriceWithNewTreatment() throws Exception {
+        String newTreatment = "NEW_TREATMENT";
+        Double price = 100.0;
         server.perform(put("/bills/price")
-                        .param("treatment", "INVALID_TREATMENT")
-                        .param("price", "100.0"))
+                        .param("treatment", newTreatment)
+                        .param("price", price.toString()))
                 .andExpect(status().isOk())
-                .andExpect(content().string("Price updated"));
+                .andExpect(jsonPath("$.success").value(true));
+
+        @SuppressWarnings("unchecked")
+        Map<String, Double> prices = (Map<String, Double>) ReflectionTestUtils.getField(billController, "priceList");
+        assertEquals(price, prices.get(newTreatment));
     }
 
     @Test
     void testGetTotalRevenue() throws Exception {
         server.perform(get("/bills/revenue"))
                 .andExpect(status().isOk())
-                .andExpect(content().string("Total Revenue: $0.0"));
+                .andExpect(jsonPath("$.totalRevenue").value(0.0));
     }
 
     @Test
@@ -102,15 +138,16 @@ class BillControllerIntegrationTest {
         server.perform(get("/bills/pending"))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andExpect(content().json("[]"));
+                .andExpect(jsonPath("$.pendingBills").isEmpty());
     }
 
 
     @Test
     void testCalculateInsuranceWithZeroAmount() throws Exception {
+        String amount = "0.0";
         server.perform(get("/bills/insurance-coverage")
-                        .param("amount", "0"))
+                        .param("amount", amount))
                 .andExpect(status().isOk())
-                .andExpect(content().string("Insurance coverage: $0.0"));
+                .andExpect(jsonPath("$.amount").value(amount));
     }
 }

@@ -10,6 +10,8 @@ import org.springframework.web.bind.annotation.*;
 import sae.semestre.six.appointment.doctor.Doctor;
 import sae.semestre.six.appointment.doctor.DoctorRepository;
 import sae.semestre.six.appointment.patient.Patient;
+import sae.semestre.six.appointment.patient.PatientDao;
+import sae.semestre.six.common.SuccessfullResponseModel;
 import sae.semestre.six.appointment.patient.PatientRepository;
 import sae.semestre.six.email.EmailService;
 
@@ -51,11 +53,10 @@ public class BillingController {
     @ApiResponse(responseCode = "200", description = "Bill processed successfully")
     @ApiResponse(responseCode = "400", description = "Invalid data")
     @PostMapping
-    public String processBill(
+    public SuccessfullResponseModel processBill(
             @Parameter(description = "Patient ID") @RequestParam String patientId,
             @Parameter(description = "Doctor ID") @RequestParam String doctorId,
             @Parameter(description = "List of treatments") @RequestParam String[] treatments) {
-        try {
             Patient patient = patientRepository.findById(Long.parseLong(patientId)).orElseThrow(
                     () -> new RuntimeException("Patient not found")
             );
@@ -65,67 +66,64 @@ public class BillingController {
             
             Hibernate.initialize(doctor.getAppointments());
 
-            Bill bill = new Bill();
-            bill.setBillNumber("BILL" + System.currentTimeMillis());
-            bill.setPatient(patient);
-            bill.setDoctor(doctor);
+        Bill bill = new Bill();
+        bill.setBillNumber("BILL" + System.currentTimeMillis());
+        bill.setPatient(patient);
+        bill.setDoctor(doctor);
 
-            Hibernate.initialize(bill.getBillDetails());
+        Hibernate.initialize(bill.getBillDetails());
 
-            double total = 0.0;
-            Set<BillDetail> details = new HashSet<>();
+        double total = 0.0;
+        Set<BillDetail> details = new HashSet<>();
 
-            for (String treatment : treatments) {
-                double price = priceList.get(treatment);
-                total += price;
+        for (String treatment : treatments) {
+            double price = priceList.get(treatment);
+            total += price;
 
-                BillDetail detail = new BillDetail();
-                detail.setBill(bill);
-                detail.setTreatmentName(treatment);
-                detail.setUnitPrice(price);
-                details.add(detail);
+            BillDetail detail = new BillDetail();
+            detail.setBill(bill);
+            detail.setTreatmentName(treatment);
+            detail.setUnitPrice(price);
+            details.add(detail);
 
-                Hibernate.initialize(detail);
-            }
-
-            if (total > 500) {
-                total = total * 0.9;
-            }
-
-            bill.setTotalAmount(total);
-            bill.setBillDetails(details);
-
-            try (FileWriter fw = new FileWriter("C:\\hospital\\billing.txt", true)) {
-                fw.write(bill.getBillNumber() + ": $" + total + "\n");
-            }
-
-            totalRevenue += total;
-            billRepository.save(bill);
-
-            emailService.sendEmail(
-                    "admin@hospital.com",
-                    "New Bill Generated",
-                    "Bill Number: " + bill.getBillNumber() + "\nTotal: $" + total
-            );
-
-            return "Bill processed successfully";
-        } catch (Exception e) {
-            return "Error: " + e.getMessage();
+            Hibernate.initialize(detail);
         }
+
+        if (total > 500) {
+            total = total * 0.9;
+        }
+
+        bill.setTotalAmount(total);
+        bill.setBillDetails(details);
+
+        try (FileWriter fw = new FileWriter("C:\\hospital\\billing.txt", true)) {
+            fw.write(bill.getBillNumber() + ": $" + total + "\n");
+        }
+
+        totalRevenue += total;
+        billRepository.save(bill);
+
+        emailService.sendEmail(
+                "admin@hospital.com",
+                "New Bill Generated",
+                "Bill Number: " + bill.getBillNumber() + "\nTotal: $" + total
+        );
+
+        return new SuccessfullResponseModel("Bill processed successfully", true);
     }
     
     @Operation(summary = "Update treatment price", description = "Modifies the price of a treatment type")
     @ApiResponse(responseCode = "200", description = "Price updated successfully")
     @PutMapping("/price")
-    public String updatePrice(
+    public SuccessfullResponseModel updatePrice(
             @Parameter(description = "Treatment type") @RequestParam String treatment,
-            @Parameter(description = "New price") @RequestParam double price) {
+            @Parameter(description = "New price") @RequestParam double price) throws Exception {
         priceList.put(treatment, price);
         recalculateAllPendingBills();
-        return "Price updated";
+        return new SuccessfullResponseModel("Price updated", true);
     }
 
-    private void recalculateAllPendingBills() {
+    private void recalculateAllPendingBills() throws Exception {
         for (String billId : pendingBills) {
             processBill(billId, "RECALC", new String[]{"CONSULTATION"});
         }
@@ -134,30 +132,43 @@ public class BillingController {
     @Operation(summary = "Get price list", description = "Retrieves all treatment prices")
     @ApiResponse(responseCode = "200", description = "Price list")
     @GetMapping("/prices")
-    public Map<String, Double> getPrices() {
-        return priceList;
+    public PricesResponse getPrices() {
+        return new PricesResponse(priceList);
     }
     
     @Operation(summary = "Calculate insurance coverage", description = "Calculates insurance coverage for a given amount")
     @ApiResponse(responseCode = "200", description = "Coverage calculated")
     @GetMapping("/insurance-coverage")
-    public String calculateInsurance(
-            @Parameter(description = "Amount to cover") @RequestParam double amount) {
+    public InsuranceCoverageResponse calculateInsurance(
+            @Parameter(description = "Amount to cover") @RequestParam double amount
+            ) {
         double coverage = amount;
-        return "Insurance coverage: $" + coverage;
+        return new InsuranceCoverageResponse(coverage);
     }
     
     @Operation(summary = "Get total revenue", description = "Retrieves the total system revenue")
     @ApiResponse(responseCode = "200", description = "Total revenue")
     @GetMapping("/revenue")
-    public String getTotalRevenue() {
-        return "Total Revenue: $" + totalRevenue;
+    public RevenueResponse getTotalRevenue() {
+        return new RevenueResponse(totalRevenue);
     }
     
     @Operation(summary = "Get pending bills", description = "Retrieves the list of pending bills")
     @ApiResponse(responseCode = "200", description = "List of pending bills")
     @GetMapping("/pending")
-    public List<String> getPendingBills() {
-        return pendingBills;
+    public PendingBillResponse getPendingBills() {
+        return new PendingBillResponse(pendingBills);
+    }
+
+    public record RevenueResponse(double totalRevenue) {
+    }
+
+    public record InsuranceCoverageResponse(double amount) {
+    }
+
+    public record PricesResponse(Map<String, Double> prices) {
+    }
+
+    public record PendingBillResponse(List<String> pendingBills) {
     }
 } 
