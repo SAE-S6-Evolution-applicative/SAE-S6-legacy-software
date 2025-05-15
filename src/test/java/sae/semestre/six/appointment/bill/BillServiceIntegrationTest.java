@@ -7,17 +7,24 @@ package sae.semestre.six.appointment.bill;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.InjectMocks;
 import org.mockito.MockitoAnnotations;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 
-@SpringBootTest
-class BillServiceTest {
+@SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
+class BillServiceIntegrationTest {
 
-    @InjectMocks
     private BillService billService;
+
+    @Autowired
+    public BillServiceIntegrationTest(
+            BillService billService
+    ) {
+        this.billService = billService;
+    }
 
     @BeforeEach
     void setUp() {
@@ -39,4 +46,6 @@ class BillServiceTest {
             billService.processBill(null, null, null);
         });
     }
+
+
 }

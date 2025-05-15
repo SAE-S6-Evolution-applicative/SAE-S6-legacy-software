@@ -3,11 +3,9 @@ package sae.semestre.six.appointment.medicalact;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
-import sae.semestre.six.appointment.bill.BillService;
 import sae.semestre.six.common.SuccessfullResponseModel;
 
 import java.util.List;
-import java.util.Optional;
 
 @RestController
 @RequestMapping("/medicalAct")
@@ -29,15 +27,25 @@ public class MedicalActController {
         );
     }
 
-    @PutMapping("/price")
+    @PutMapping("/")
     public SuccessfullResponseModel updatePrice(
             @RequestParam Long idMedicalAct,
             @RequestParam double price) throws Exception {
-        MedicalAct medicalAct =  medicalActRepository.findById(idMedicalAct).orElseThrow();
-        medicalActService.updatePrice(price,medicalAct);
+        MedicalAct medicalAct = medicalActRepository.findById(idMedicalAct).orElseThrow();
+        medicalActService.updatePrice(price, medicalAct);
         return new SuccessfullResponseModel("Price updated", true);
     }
 
+    @PostMapping("/")
+    public MedicalActResponse createMedicalAct(
+            @RequestBody MedicalActRequest medicalActRequest) {
+        MedicalAct medicalAct = new MedicalAct(medicalActRequest.getName(), medicalActRequest.getPrice());
+        return new MedicalActResponse(medicalActRepository.save(medicalAct));
+    }
+
     public record PricesResponse(List<MedicalAct> medicalActList) {
+    }
+
+    public record MedicalActResponse(MedicalAct medicalAct) {
     }
 }

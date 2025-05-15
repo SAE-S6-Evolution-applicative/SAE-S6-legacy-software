@@ -1,50 +1,39 @@
 package sae.semestre.six.appointment.medicalact;
 
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.InjectMocks;
-import org.mockito.Mockito;
-import org.mockito.MockitoAnnotations;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.http.MediaType;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
+import org.springframework.test.context.bean.override.mockito.MockitoSpyBean;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
-import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.mockito.Mockito.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-@WebMvcTest(MedicalActController.class)
+@SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
+@Transactional
+@AutoConfigureMockMvc
 class MedicalActControllerIntegrationTest {
 
     private static final Logger log = LoggerFactory.getLogger(MedicalActControllerIntegrationTest.class);
-    private MockMvc server;
 
-    @MockitoBean
+    @Autowired
+    MockMvc server;
+
+    @MockitoSpyBean
     private MedicalActService medicalActService;
 
-    @InjectMocks
-    private MedicalActController medicalActController;
-
-    private AutoCloseable autoCloseable;
-
-    @BeforeEach
-    void setUp() {
-        autoCloseable = MockitoAnnotations.openMocks(this);
-        server = MockMvcBuilders.standaloneSetup(medicalActController).build();
-    }
-
-    @AfterEach
-    void tearDown() throws Exception {
-        autoCloseable.close();
-    }
+    @MockitoSpyBean
+    private MedicalActRepository medicalActRepository;
 
     @Test
     void testGetPrices() throws Exception {
@@ -57,7 +46,7 @@ class MedicalActControllerIntegrationTest {
 
         var acts = List.of(act1, act2, act3, act4, act5, act6);
 
-        when(medicalActService.getAllActive()).thenReturn(acts);
+        medicalActRepository.saveAll(acts);
 
         server.perform(get("/medicalAct/"))
                 .andDo(result -> {
@@ -70,5 +59,41 @@ class MedicalActControllerIntegrationTest {
                 .andExpect(jsonPath("$.medicalActList[0].name").value(act1.getName()))
                 .andExpect(jsonPath("$.medicalActList[0].price").value(act1.getPrice()))
                 .andExpect(jsonPath("$.medicalActList[0].active").value(act1.isActive()));
+    }
+
+    @Test
+    void testUpdatePrice() throws Exception {
+        var act1 = new MedicalAct("ACT1", 10.0);
+        act1 = medicalActRepository.save(act1);
+
+        Double updatedPrice = 75.0;
+
+        server.perform(put("/medicalAct/")
+                        .param("idMedicalAct", act1.getId().toString())
+                        .param("price", updatedPrice.toString()))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.success").value(true));
+
+        assertFalse(medicalActRepository.findById(act1.getId()).orElseThrow().isActive());
+        verify(medicalActService, times(1)).updatePrice(eq(updatedPrice), any(MedicalAct.class));
+    }
+
+    @Test
+    void testCreateMedicalAct() throws Exception {
+        String name = "ACT1";
+        Double price = 100.0;
+        String requestBody = """
+            {
+                "name": "%s",
+                "price": %s
+            }
+            """.formatted(name, price);
+
+        server.perform(post("/medicalAct/")
+                        .contentType("application/json")
+                        .content(requestBody))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.medicalAct.price").value(price))
+                .andExpect(jsonPath("$.medicalAct.name").value(name));
     }
 }
