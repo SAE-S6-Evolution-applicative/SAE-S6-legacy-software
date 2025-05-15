@@ -14,5 +14,6 @@ interface BillRepository extends JpaRepository<Bill, Long> {
 
     List<Bill> findBillsByBillDateBetween(LocalDate startDate, LocalDate endDate);
 
-    List<Bill> findBillsByStatus(String status);
+    List<Bill> findBillsByStatus(Bill.Status status);
+
 }
