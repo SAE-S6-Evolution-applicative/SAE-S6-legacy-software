@@ -111,6 +111,48 @@ class BillControllerIntegrationTest {
     }
 
     @Test
+    void testProcessBill_ButNoneMatch() throws Exception {
+        Patient patient = new Patient();
+        patient.setPatientNumber("PAT001");
+        patient.setFirstName("John");
+        patient.setLastName("Doe");
+        patientDao.save(patient);
+        patient = patientDao.findByPatientNumber(patient.getPatientNumber());
+
+        Doctor doctor = new Doctor();
+        doctor.setDoctorNumber("DOCTOR001");
+        doctor.setFirstName("John");
+        doctor.setLastName("Doe");
+        doctorDao.save(doctor);
+
+        Appointment appointment = new Appointment();
+        appointment.setAppointmentNumber("APPOINTMENT001");
+        appointment.setPatient(patient);
+        appointment.setDoctor(doctor);
+        appointment.setAppointmentDate(new Date());
+        appointmentDaoImpl.save(appointment);
+
+        doctor = doctorDao.findByDoctorNumber(doctor.getDoctorNumber());
+        doctor.setAppointments(Set.of(appointment));
+        doctorDao.save(doctor);
+
+        MedicalAct consultation = medicalActRepository.save(new MedicalAct("CONSULTATION", 10.0));
+
+        server.perform(post("/billing/process")
+                        .param("patientId", patient.getId().toString())
+                        .param("doctorId", doctor.getId().toString())
+                        .param("medicalActId", consultation.getId().toString()))
+                .andExpect(status().isOk());
+
+        Bill billCreated = billRepository.findBillsByDoctor_Id(doctor.getId()).get(0);
+        assertEquals(doctor, billCreated.getDoctor());
+
+        BillDetail billDetail = billCreated.getBillDetails().stream().findAny().get();
+        assertEquals(10, billDetail.getLineTotal());
+        assertEquals(consultation, billDetail.getMedicalAct());
+    }
+
+    @Test
     void testCalculateInsurance() throws Exception {
         String amount = "1000.0";
 

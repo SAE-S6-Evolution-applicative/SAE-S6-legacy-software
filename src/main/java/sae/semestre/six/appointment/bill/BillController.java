@@ -142,7 +142,11 @@ public class BillingController {
     @ApiResponse(responseCode = "200", description = "Total revenue")
     @GetMapping("/revenue")
     public RevenueResponse getTotalRevenue() {
-        return new RevenueResponse(billService.getTotalRevenue());
+        Double totalRevenue = billService.getTotalRevenue();
+        if (totalRevenue == null) {
+            totalRevenue = 0.0;
+        }
+        return new RevenueResponse(totalRevenue);
     }
     
     @Operation(summary = "Get pending bills", description = "Retrieves the list of pending bills")
