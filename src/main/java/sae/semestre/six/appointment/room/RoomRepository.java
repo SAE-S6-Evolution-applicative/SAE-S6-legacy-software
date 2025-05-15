@@ -1,7 +1,7 @@
 package sae.semestre.six.appointment.room;
 
-import sae.semestre.six.generic.GenericDao;
+import org.springframework.data.jpa.repository.JpaRepository;
 
-public interface RoomDao extends GenericDao<Room, Long> {
+public interface RoomRepository extends JpaRepository<Room, Long> {
     Room findByRoomNumber(String roomNumber);
 } 

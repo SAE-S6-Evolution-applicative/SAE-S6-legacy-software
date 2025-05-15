@@ -41,7 +41,7 @@ class PrescriptionControllerInegrationTest {
     @MockitoBean
     private PatientRepository patientRepository;
     @MockitoBean
-    private PrescriptionDao prescriptionDao;
+    private PrescriptionRepository prescriptionRepository;
 
     private AutoCloseable autoCloseable;
 
@@ -86,7 +86,7 @@ class PrescriptionControllerInegrationTest {
                 .andExpect(MockMvcResultMatchers.content().string("Prescription RX" + counter + " created and billed"));
 
         verify(patientRepository).findById(patient.getId());
-        verify(prescriptionDao).save(any(Prescription.class));
+        verify(prescriptionRepository).save(any(Prescription.class));
         verify(billingService).processBill(
                 patient.getId().toString(),
                 "SYSTEM",

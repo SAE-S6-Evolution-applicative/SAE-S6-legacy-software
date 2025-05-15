@@ -36,7 +36,7 @@ public class PrescriptionController {
     private PatientRepository patientRepository;
     
     @Autowired
-    private PrescriptionDao prescriptionDao;
+    private PrescriptionRepository prescriptionRepository;
     
     @PostMapping("/add")
     public String addPrescription(
@@ -62,7 +62,7 @@ public class PrescriptionController {
             prescription.setTotalCost(cost);
             
             
-            prescriptionDao.save(prescription);
+            prescriptionRepository.save(prescription);
             
             
             new FileWriter(AUDIT_FILE, true)

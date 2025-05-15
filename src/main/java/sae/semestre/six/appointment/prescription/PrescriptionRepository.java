@@ -1,9 +1,9 @@
 package sae.semestre.six.appointment.prescription;
 
-import sae.semestre.six.generic.GenericDao;
+import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;
 
-public interface PrescriptionDao extends GenericDao<Prescription, Long> {
-    List<Prescription> findByPatientId(Long patientId);
+public interface PrescriptionRepository extends JpaRepository<Prescription, Long> {
+    List<Prescription> findAllByPatient_Id(Long patientId);
 } 

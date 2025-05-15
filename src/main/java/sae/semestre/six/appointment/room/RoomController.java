@@ -11,21 +11,21 @@ import java.util.*;
 @RequestMapping("/rooms")
 public class RoomController {
 
-    private final RoomDao roomDao;
+    private final RoomRepository roomRepository;
     
     private final AppointmentRepository appointmentRepository;
 
     @Autowired
-    public RoomController(AppointmentRepository appointmentRepository, RoomDao roomDao) {
+    public RoomController(AppointmentRepository appointmentRepository, RoomRepository roomRepository) {
         this.appointmentRepository = appointmentRepository;
-        this.roomDao = roomDao;
+        this.roomRepository = roomRepository;
     }
 
 
     @PostMapping("/assign")
     public String assignRoom(@RequestParam Long appointmentId, @RequestParam String roomNumber) {
         try {
-            Room room = roomDao.findByRoomNumber(roomNumber);
+            Room room = roomRepository.findByRoomNumber(roomNumber);
             Appointment appointment = appointmentRepository.findById(appointmentId).orElseThrow(
                     () -> new Exception()
             );
@@ -45,7 +45,7 @@ public class RoomController {
             room.setCurrentPatientCount(room.getCurrentPatientCount() + 1);
             appointment.setRoomNumber(roomNumber);
             
-            roomDao.update(room);
+            roomRepository.save(room);
             appointmentRepository.save(appointment);
             
             return "Room assigned successfully";
@@ -57,7 +57,7 @@ public class RoomController {
     
     @GetMapping("/availability")
     public Map<String, Object> getRoomAvailability(@RequestParam String roomNumber) {
-        Room room = roomDao.findByRoomNumber(roomNumber);
+        Room room = roomRepository.findByRoomNumber(roomNumber);
         Map<String, Object> result = new HashMap<>();
         
         result.put("roomNumber", room.getRoomNumber());
