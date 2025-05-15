@@ -28,4 +28,8 @@ public class BillService {
     public List<Bill> findPendingBills() {
         return billRepository.findBillsByStatus(Bill.Status.PENDING);
     }
+
+    public Double getTotalRevenue() {
+        return billRepository.findTotalRevenue();
+    }
 }

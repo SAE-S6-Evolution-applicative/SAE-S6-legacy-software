@@ -65,6 +65,8 @@ class BillControllerIntegrationTest {
     private AppointmentDaoImpl appointmentDaoImpl;
     @Autowired
     private MedicalActRepository medicalActRepository;
+    @Autowired
+    private BillDetailRepository billDetailRepository;
 
     @Test
     void testProcessBill() throws Exception {
@@ -150,7 +152,6 @@ class BillControllerIntegrationTest {
                 )));
     }
 
-
     @Test
     void testCalculateInsuranceWithZeroAmount() throws Exception {
         String amount = "0.0";
@@ -158,5 +159,20 @@ class BillControllerIntegrationTest {
                         .param("amount", amount))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.amount").value(amount));
+    }
+
+    @Test
+    void testTotalRevenueWithOneBill() throws Exception {
+        MedicalAct medicalAct = medicalActRepository.save(new MedicalAct("ACT1", 10.0));
+        Bill bill = billRepository.save(new Bill());
+        BillDetail billDetail = billDetailRepository.save(new BillDetail(bill, medicalAct, 2));
+
+        bill = billRepository.save(bill.addBillDetail(billDetail));
+
+        assertEquals(20, bill.getTotalAmount());
+
+        server.perform(get("/billing/revenue"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.totalRevenue").value(20.0));
     }
 }

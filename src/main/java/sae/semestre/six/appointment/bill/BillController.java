@@ -27,7 +27,6 @@ import java.util.stream.Collectors;
 @Tag(name = "Billing", description = "Billing management API")
 public class BillingController {
 
-    private double totalRevenue = 0.0;
     private BillService billService;
 
     @Autowired
@@ -118,8 +117,6 @@ public class BillingController {
         try (FileWriter fw = new FileWriter("C:\\hospital\\billing.txt", true)) {
             fw.write(bill.getBillNumber() + ": $" + total + "\n");
         }
-
-        totalRevenue += total;
         billRepository.save(bill);
 
         emailService.sendEmail(
@@ -145,7 +142,7 @@ public class BillingController {
     @ApiResponse(responseCode = "200", description = "Total revenue")
     @GetMapping("/revenue")
     public RevenueResponse getTotalRevenue() {
-        return new RevenueResponse(totalRevenue);
+        return new RevenueResponse(billService.getTotalRevenue());
     }
     
     @Operation(summary = "Get pending bills", description = "Retrieves the list of pending bills")

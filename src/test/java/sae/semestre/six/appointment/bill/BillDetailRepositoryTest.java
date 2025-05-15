@@ -1,6 +1,5 @@
 package sae.semestre.six.appointment.bill;
 
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -10,7 +9,6 @@ import sae.semestre.six.appointment.medicalact.MedicalAct;
 import sae.semestre.six.appointment.medicalact.MedicalActRepository;
 
 import java.util.List;
-import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.*;
 

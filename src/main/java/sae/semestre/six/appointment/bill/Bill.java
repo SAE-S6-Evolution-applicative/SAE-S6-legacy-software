@@ -14,76 +14,121 @@ import java.util.Set;
 @Entity
 @Table(name = "bills")
 public class Bill {
-    
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    
+
     @Column(name = "bill_number", unique = true)
     private String billNumber;
-    
+
     @ManyToOne
     @JoinColumn(name = "patient_id")
     private Patient patient;
-    
+
     @ManyToOne
     @JoinColumn(name = "doctor_id")
     private Doctor doctor;
-    
+
     @Column(name = "bill_date")
     private LocalDateTime billDate = LocalDateTime.now();
     
     @Column(name = "total_amount")
     private Double totalAmount = 0.0;
-    
+
     @Column(name = "status")
     @Enumerated(EnumType.STRING)
     private Status status = Status.PENDING;
-    
+
     @OneToMany(mappedBy = "bill", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     private Set<BillDetail> billDetails = new HashSet<>();
-    
-    
+
     @Column(name = "created_date")
     private LocalDate createdDate = LocalDate.now();
-    
+
     @Column(name = "last_modified")
     private LocalDate lastModified = LocalDate.now();
 
     @ManyToOne
     private PatientHistory patientHistory;
-    
-    
-    public Long getId() { return id; }
-    public void setId(Long id) { this.id = id; }
-    
-    public String getBillNumber() { return billNumber; }
 
-    public void setBillNumber(String billNumber) { this.billNumber = billNumber; }
-    
-    public Patient getPatient() { return patient; }
-    public void setPatient(Patient patient) { this.patient = patient; }
-    
-    public Doctor getDoctor() { return doctor; }
-    public void setDoctor(Doctor doctor) { this.doctor = doctor; }
+    public Long getId() {
+        return id;
+    }
 
-    public LocalDateTime getBillDate() { return billDate; }
-    public void setBillDate(LocalDateTime billDate) { this.billDate = billDate; }
-    
-    public LocalDate getBillDate() { return billDate; }
-    public void setBillDate(LocalDate billDate) { this.billDate = billDate; }
-    
-    public Double getTotalAmount() { return totalAmount; }
-    public void setTotalAmount(Double totalAmount) { this.totalAmount = totalAmount; }
-    
-    public Status getStatus() { return status; }
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public String getBillNumber() {
+        return billNumber;
+    }
+
+    public void setBillNumber(String billNumber) {
+        this.billNumber = billNumber;
+    }
+
+    public Patient getPatient() {
+        return patient;
+    }
+
+    public void setPatient(Patient patient) {
+        this.patient = patient;
+    }
+
+    public Doctor getDoctor() {
+        return doctor;
+    }
+
+    public void setDoctor(Doctor doctor) {
+        this.doctor = doctor;
+    }
+
+    public LocalDate getBillDate() {
+        return billDate;
+    }
+
+    public void setBillDate(LocalDate billDate) {
+        this.billDate = billDate;
+    }
+
+    public Double getTotalAmount() {
+        return totalAmount;
+    }
+
+    public void setTotalAmount(Double totalAmount) {
+        this.totalAmount = totalAmount;
+    }
+
+    public Status getStatus() {
+        return status;
+    }
+
     public void setStatus(Status status) {
         this.status = status;
         this.lastModified = LocalDate.now();
     }
-    
-    public Set<BillDetail> getBillDetails() { return billDetails; }
-    public void setBillDetails(Set<BillDetail> billDetails) { this.billDetails = billDetails; }
+
+    public Set<BillDetail> getBillDetails() {
+        return billDetails;
+    }
+
+    public void setBillDetails(Set<BillDetail> billDetails) {
+        this.billDetails = billDetails;
+    }
+
+    public Bill addBillDetail(BillDetail billDetail) {
+        this.billDetails.add(billDetail);
+        billDetail.setBill(this);
+        this.lastModified = LocalDate.now();
+        this.totalAmount += billDetail.getLineTotal();
+        return this;
+    }
+
+    public void removeBillDetail(BillDetail billDetail) {
+        this.billDetails.remove(billDetail);
+        billDetail.setBill(null);
+    }
 
     public static enum Status {
         PENDING,

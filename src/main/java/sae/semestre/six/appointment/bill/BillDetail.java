@@ -27,6 +27,16 @@ public class BillDetail {
     @Column(name = "line_total")
     private Double lineTotal = 0.0;
 
+    public BillDetail() {
+    }
+
+    public BillDetail(Bill bill, MedicalAct medicalAct, Integer quantity) {
+        this.bill = bill;
+        this.medicalAct = medicalAct;
+        this.quantity = quantity;
+        calculateLineTotal();
+    }
+
 
     public void calculateLineTotal() {
         this.lineTotal = this.quantity * this.medicalAct.getPrice();

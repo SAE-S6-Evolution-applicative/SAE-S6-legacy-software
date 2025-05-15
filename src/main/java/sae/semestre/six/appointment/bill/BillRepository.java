@@ -1,6 +1,7 @@
 package sae.semestre.six.appointment.bill;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -16,4 +17,8 @@ interface BillRepository extends JpaRepository<Bill, Long> {
 
     List<Bill> findBillsByStatus(Bill.Status status);
 
+    @Query("""
+            SELECT SUM(b.totalAmount) FROM Bill b
+            """)
+    Double findTotalRevenue();
 }
