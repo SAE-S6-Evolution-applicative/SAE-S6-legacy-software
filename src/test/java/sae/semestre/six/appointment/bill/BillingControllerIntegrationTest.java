@@ -11,7 +11,7 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import sae.semestre.six.appointment.doctor.DoctorRepository;
-import sae.semestre.six.appointment.patient.PatientDao;
+import sae.semestre.six.appointment.patient.PatientRepository;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -26,7 +26,7 @@ class BillingControllerIntegrationTest {
     private BillDao billDao;
 
     @MockitoBean
-    private PatientDao patientDao;
+    private PatientRepository patientRepository;
 
     @MockitoBean
     private DoctorRepository doctorRepository;

@@ -3,7 +3,7 @@ package sae.semestre.six.appointment.bill;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import sae.semestre.six.appointment.doctor.DoctorRepository;
-import sae.semestre.six.appointment.patient.PatientDao;
+import sae.semestre.six.appointment.patient.PatientRepository;
 import sae.semestre.six.appointment.doctor.Doctor;
 import sae.semestre.six.appointment.patient.Patient;
 import sae.semestre.six.email.EmailService;
@@ -24,7 +24,7 @@ public class BillingController {
     private BillDao billDao;
     
     @Autowired
-    private PatientDao patientDao;
+    private PatientRepository patientRepository;
     
     @Autowired
     private DoctorRepository doctorRepository;
@@ -54,7 +54,9 @@ public class BillingController {
             @RequestParam String doctorId,
             @RequestParam String[] treatments) {
         try {
-            Patient patient = patientDao.findById(Long.parseLong(patientId));
+            Patient patient = patientRepository.findById(Long.parseLong(patientId)).orElseThrow(
+                    () -> new RuntimeException("Patient not found")
+            );
             Doctor doctor = doctorRepository.findById(Long.parseLong(doctorId)).orElseThrow(
                     () -> new RuntimeException("Doctor not found")
             );

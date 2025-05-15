@@ -14,7 +14,6 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 import java.text.ParseException;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -27,7 +26,7 @@ class PatientHistoryControllerTest {
     private MockMvc server;
 
     @MockitoBean
-    private PatientHistoryDao patientHistoryDao;
+    private PatientHistoryRepository patientHistoryRepository;
 
     @InjectMocks
     private PatientHistoryController patientHistoryController;

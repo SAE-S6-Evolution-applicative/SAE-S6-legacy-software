@@ -1,6 +1,6 @@
 package sae.semestre.six.appointment.prescription;
 
-import sae.semestre.six.appointment.patient.PatientDao;
+import sae.semestre.six.appointment.patient.PatientRepository;
 import sae.semestre.six.appointment.patient.Patient;
 import sae.semestre.six.appointment.bill.BillingService;
 
@@ -33,7 +33,7 @@ public class PrescriptionController {
     
     
     @Autowired
-    private PatientDao patientDao;
+    private PatientRepository patientRepository;
     
     @Autowired
     private PrescriptionDao prescriptionDao;
@@ -50,7 +50,9 @@ public class PrescriptionController {
             Prescription prescription = new Prescription();
             prescription.setPrescriptionNumber(prescriptionId);
             
-            Patient patient = patientDao.findById(Long.parseLong(patientId));
+            Patient patient = patientRepository.findById(Long.parseLong(patientId)).orElseThrow(
+                    () -> new RuntimeException("Patient not found")
+            );
             prescription.setPatient(patient);
             
             prescription.setMedicines(String.join(",", medicines));

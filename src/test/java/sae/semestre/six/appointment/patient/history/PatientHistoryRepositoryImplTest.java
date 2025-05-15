@@ -19,7 +19,6 @@ import sae.semestre.six.appointment.doctor.Doctor;
 import sae.semestre.six.appointment.patient.Patient;
 import sae.semestre.six.appointment.prescription.Prescription;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.*;
 
@@ -27,16 +26,19 @@ import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
 @Transactional
-class PatientHistoryDaoImplTest {
+class PatientHistoryRepositoryImplTest {
 
     @Autowired
-    private PatientHistoryDao patientHistoryDao;
+    private PatientHistoryService patientHistoryService;
+
+    @Autowired
+    private PatientHistoryRepository patientHistoryRepository;
 
     @PersistenceContext
     private EntityManager entityManager;
 
     @Test
-    void testFindCompleteHistoryByPatientId() {
+    void testFindAllByPatientId() {
         // Given
         Patient patient = new Patient();
         patient.setFirstName("John");
@@ -53,7 +55,7 @@ class PatientHistoryDaoImplTest {
         entityManager.clear();
 
         // When
-        List<PatientHistory> histories = patientHistoryDao.findCompleteHistoryByPatientId(patient.getId());
+        List<PatientHistory> histories = patientHistoryRepository.findAllByPatient_Id(patient.getId());
 
         // Then
         assertFalse(histories.isEmpty());
@@ -88,7 +90,7 @@ class PatientHistoryDaoImplTest {
         entityManager.clear();
 
         // When
-        List<PatientHistory> results = patientHistoryDao.searchByMultipleCriteria("Hyper", startDate, endDate);
+        List<PatientHistory> results = patientHistoryService.searchByMultipleCriteria("Hyper", startDate, endDate);
 
         // Then
         assertEquals(1, results.size());

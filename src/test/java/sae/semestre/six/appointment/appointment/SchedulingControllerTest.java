@@ -16,7 +16,8 @@ import sae.semestre.six.appointment.AppointmentRepository;
 import sae.semestre.six.appointment.SchedulingController;
 import sae.semestre.six.appointment.doctor.Doctor;
 import sae.semestre.six.appointment.doctor.DoctorRepository;
-import sae.semestre.six.appointment.patient.PatientDao;
+import sae.semestre.six.appointment.patient.Patient;
+import sae.semestre.six.appointment.patient.PatientRepository;
 import sae.semestre.six.email.EmailService;
 
 import java.time.LocalDateTime;
@@ -36,7 +37,7 @@ class SchedulingControllerTest {
     private DoctorRepository doctorRepository;
 
     @Mock
-    private PatientDao patientDao;
+    private PatientRepository patientRepository;
 
     @Mock
     private EmailService emailService;
@@ -46,7 +47,7 @@ class SchedulingControllerTest {
 
     private Doctor doctor;
     private LocalDate validDate = LocalDate.now();
-    private LocalDate invalidDate = LocalDate.now();
+    private LocalDate invalidDate = LocalDate.now().minusDays(1);
     private List<Appointment> existingAppointments;
 
     @BeforeEach
@@ -60,6 +61,13 @@ class SchedulingControllerTest {
         doctor.setFirstName("Dr.");
         doctor.setLastName("Smith");
 
+        Patient patient = new Patient();
+        patient.setId(1L);
+        patient.setPatientNumber("123456789");
+        patient.setFirstName("Dr.");
+        patient.setLastName("Smith");
+        patientRepository.save(patient);
+
         // Configure existing appointments
         existingAppointments = new ArrayList<>();
         LocalDateTime existingAppointmentDate = LocalDateTime.of(LocalDate.now(), LocalTime.of(10, 0));
@@ -72,14 +80,15 @@ class SchedulingControllerTest {
         ReflectionTestUtils.setField(schedulingController, "emailService", emailService);
 
         // Configure mocks
-        when(doctorRepository.findById(1L)).thenReturn(Optional.ofNullable(doctor));
+        when(doctorRepository.findById(1L)).thenReturn(Optional.of(doctor));
         when(appointmentRepository.findAllByDoctor_Id(1L)).thenReturn(existingAppointments);
+        when(patientRepository.findById(1L)).thenReturn(Optional.of(patient));
     }
 
     @Test
     void testScheduleAppointmentSuccess() {
         // When
-        String result = schedulingController.scheduleAppointment(1L, 2L, validDate.atTime(12, 0) );
+        String result = schedulingController.scheduleAppointment(1L, 1L, validDate.atTime(12, 0) );
 
         // Then
         assertEquals("Appointment scheduled successfully", result);

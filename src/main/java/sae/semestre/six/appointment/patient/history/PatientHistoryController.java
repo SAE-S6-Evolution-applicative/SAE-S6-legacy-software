@@ -11,7 +11,7 @@ import java.util.*;
 public class PatientHistoryController {
     
     @Autowired
-    private PatientHistoryDao patientHistoryDao;
+    private PatientHistoryRepository patientHistoryRepository;
     
     
     @GetMapping("/search")
@@ -31,7 +31,7 @@ public class PatientHistoryController {
     
     @GetMapping("/patient/{patientId}/summary")
     public Map<String, Object> getPatientSummary(@PathVariable Long patientId) {
-        List<PatientHistory> histories = patientHistoryDao.findCompleteHistoryByPatientId(patientId);
+        List<PatientHistory> histories = patientHistoryRepository.findAllByPatient_Id(patientId);
         
         Map<String, Object> summary = new HashMap<>();
         summary.put("visitCount", histories.size());

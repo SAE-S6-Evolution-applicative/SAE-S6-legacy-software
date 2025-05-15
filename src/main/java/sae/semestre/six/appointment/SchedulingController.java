@@ -4,7 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import sae.semestre.six.appointment.doctor.DoctorRepository;
 import sae.semestre.six.appointment.doctor.Doctor;
-import sae.semestre.six.appointment.patient.PatientDao;
+import sae.semestre.six.appointment.patient.PatientRepository;
 import sae.semestre.six.email.EmailService;
 import java.util.*;
 import java.time.LocalDate;
@@ -19,13 +19,13 @@ public class SchedulingController {
 
     DoctorRepository doctorRepository;
 
-    PatientDao patientDao;
+    PatientRepository patientRepository;
 
     @Autowired
-    public SchedulingController(AppointmentRepository appointmentRepository, DoctorRepository doctorRepository, PatientDao patientDao) {
+    public SchedulingController(AppointmentRepository appointmentRepository, DoctorRepository doctorRepository, PatientRepository patientRepository) {
         this.appointmentRepository = appointmentRepository;
         this.doctorRepository = doctorRepository;
-        this.patientDao = patientDao;
+        this.patientRepository = patientRepository;
     }
     
     private final EmailService emailService = EmailService.getInstance();
@@ -61,7 +61,9 @@ public class SchedulingController {
             Appointment appointment = new Appointment();
             appointment.setDoctor(doctor);
             appointment.setAppointmentDate(appointmentDateTime);
-            appointment.setPatient(patientDao.findById(patientId));
+            appointment.setPatient(patientRepository.findById(patientId).orElseThrow(
+                    () -> new RuntimeException("Patient not found")
+            ));
             appointmentRepository.save(appointment);
 
             // Send email notification
