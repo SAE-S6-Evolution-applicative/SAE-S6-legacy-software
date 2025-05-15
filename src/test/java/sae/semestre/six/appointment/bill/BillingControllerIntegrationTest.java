@@ -10,7 +10,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
-import sae.semestre.six.appointment.doctor.DoctorDao;
+import sae.semestre.six.appointment.doctor.DoctorRepository;
 import sae.semestre.six.appointment.patient.PatientDao;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
@@ -29,7 +29,7 @@ class BillingControllerIntegrationTest {
     private PatientDao patientDao;
 
     @MockitoBean
-    private DoctorDao doctorDao;
+    private DoctorRepository doctorRepository;
 
     @InjectMocks
     private BillingController billingController;

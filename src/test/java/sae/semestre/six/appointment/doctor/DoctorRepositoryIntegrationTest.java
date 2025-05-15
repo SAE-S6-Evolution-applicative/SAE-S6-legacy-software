@@ -13,10 +13,10 @@ import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
 @Transactional
-class DoctorDaoImplIntegrationTest {
+class DoctorRepositoryIntegrationTest {
 
     @Autowired
-    private DoctorDao doctorDao;
+    private DoctorRepository doctorRepository;
 
     @PersistenceContext
     private EntityManager entityManager;
@@ -32,7 +32,7 @@ class DoctorDaoImplIntegrationTest {
         entityManager.flush();
 
         // When
-        Doctor foundDoctor = doctorDao.findByDoctorNumber("DOC001");
+        Doctor foundDoctor = doctorRepository.findByDoctorNumber("DOC001");
 
         // Then
         assertNotNull(foundDoctor);
@@ -40,7 +40,7 @@ class DoctorDaoImplIntegrationTest {
     }
 
     @Test
-    void testFindBySpecialization() {
+    void testFindAllBySpecialization() {
         // Given
         Doctor doctor = new Doctor();
         doctor.setSpecialization("Cardiology");
@@ -51,7 +51,7 @@ class DoctorDaoImplIntegrationTest {
         entityManager.flush();
 
         // When
-        List<Doctor> doctors = doctorDao.findBySpecialization("Cardiology");
+        List<Doctor> doctors = doctorRepository.findAllBySpecialization("Cardiology");
 
         // Then
         assertEquals(1, doctors.size());

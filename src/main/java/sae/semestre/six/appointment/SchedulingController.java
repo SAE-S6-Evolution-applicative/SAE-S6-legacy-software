@@ -2,10 +2,9 @@ package sae.semestre.six.appointment;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
-import sae.semestre.six.appointment.doctor.DoctorDao;
+import sae.semestre.six.appointment.doctor.DoctorRepository;
 import sae.semestre.six.appointment.doctor.Doctor;
 import sae.semestre.six.appointment.patient.PatientDao;
-import sae.semestre.six.appointment.patient.PatientDaoImpl;
 import sae.semestre.six.email.EmailService;
 import java.util.*;
 import java.time.LocalDate;
@@ -18,14 +17,14 @@ public class SchedulingController {
 
     AppointmentRepository appointmentRepository;
 
-    DoctorDao doctorDao;
+    DoctorRepository doctorRepository;
 
     PatientDao patientDao;
 
     @Autowired
-    public SchedulingController(AppointmentRepository appointmentRepository, DoctorDao doctorDao, PatientDao patientDao) {
+    public SchedulingController(AppointmentRepository appointmentRepository, DoctorRepository doctorRepository, PatientDao patientDao) {
         this.appointmentRepository = appointmentRepository;
-        this.doctorDao = doctorDao;
+        this.doctorRepository = doctorRepository;
         this.patientDao = patientDao;
     }
     
@@ -38,7 +37,9 @@ public class SchedulingController {
             @RequestParam Long patientId,
             @RequestParam LocalDateTime appointmentDateTime) {
         try {
-            Doctor doctor = doctorDao.findById(doctorId);
+            Doctor doctor = doctorRepository.findById(doctorId).orElseThrow(
+                    () -> new RuntimeException("Doctor not found")
+            );
 
             // Retrieve all appointments for the doctor
             List<Appointment> doctorAppointments = appointmentRepository.findAllByDoctor_Id(doctorId);
