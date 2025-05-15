@@ -6,6 +6,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.util.ReflectionTestUtils;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -17,6 +18,7 @@ import static org.mockito.Mockito.when;
 import static sae.semestre.six.CustomAssertion.assertIsEmpty;
 
 @SpringBootTest
+@Transactional
 class MedicalActServiceTest {
 
     @MockitoBean

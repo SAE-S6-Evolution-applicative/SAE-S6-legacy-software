@@ -27,9 +27,7 @@ import java.util.stream.Collectors;
 @Tag(name = "Billing", description = "Billing management API")
 public class BillingController {
 
-    private Map<String, Double> priceList = new HashMap<>();
     private double totalRevenue = 0.0;
-    private List<String> pendingBills = new ArrayList<>();
     private BillService billService;
 
     @Autowired

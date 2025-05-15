@@ -39,7 +39,7 @@ public class MedicalActController {
     @PostMapping("/")
     public MedicalActResponse createMedicalAct(
             @RequestBody MedicalActRequest medicalActRequest) {
-        MedicalAct medicalAct = new MedicalAct(medicalActRequest.getName(), medicalActRequest.getPrice());
+        MedicalAct medicalAct = new MedicalAct(medicalActRequest.name(), medicalActRequest.price());
         return new MedicalActResponse(medicalActRepository.save(medicalAct));
     }
 

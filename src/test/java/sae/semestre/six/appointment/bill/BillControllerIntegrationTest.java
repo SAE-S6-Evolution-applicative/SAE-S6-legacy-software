@@ -24,6 +24,7 @@ import sae.semestre.six.appointment.patient.PatientRepository;
 import java.util.Date;
 import java.util.Set;
 
+import static org.hamcrest.Matchers.hasItems;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.contains;
@@ -32,6 +33,8 @@ import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -97,7 +100,7 @@ class BillControllerIntegrationTest {
                         .param("medicalActId", consultation.getId().toString()))
                 .andExpect(status().isOk());
 
-        Bill billCreated = verify(billRepository.save(any(Bill.class)));
+        Bill billCreated = billRepository.findBillsByDoctor_Id(doctor.getId()).get(0);
         assertEquals(doctor, billCreated.getDoctor());
 
         BillDetail billDetail = billCreated.getBillDetails().stream().findAny().get();
@@ -130,19 +133,21 @@ class BillControllerIntegrationTest {
 
         Bill bill2 = new Bill();
         bill2.setStatus(Bill.Status.PAID);
-        bill2 = billRepository.save(bill2);
+        billRepository.save(bill2);
 
         Bill bill3 = new Bill();
         bill3.setStatus(Bill.Status.PENDING);
-        billRepository.save(bill3);
+        bill3 = billRepository.save(bill3);
 
         server.perform(get("/bills/pending"))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$.pendingBills").isArray())
                 .andExpect(jsonPath("$.pendingBills.length()").value(2))
-                .andExpect(jsonPath("$.pendingBills").value(contains(bill1.getId().toString())))
-                .andExpect(jsonPath("$.pendingBills").value(contains(bill2.getId().toString())));
+                .andExpect(jsonPath("$.pendingBills").value(hasItems(
+                        bill1.getId().toString(),
+                        bill3.getId().toString()
+                )));
     }
 
 
