@@ -14,7 +14,6 @@ import org.springframework.transaction.annotation.Transactional;
 import sae.semestre.six.appointment.doctor.Doctor;
 import sae.semestre.six.appointment.patient.Patient;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -22,10 +21,10 @@ import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
 @Transactional
-class MedicalRecordDaoImplIntegrationTest {
+class MedicalRecordRepositoryIntegrationTest {
 
     @Autowired
-    private MedicalRecordDao medicalRecordDao;
+    private MedicalRecordRepository medicalRecordRepository;
 
     @PersistenceContext
     private EntityManager entityManager;
@@ -45,7 +44,7 @@ class MedicalRecordDaoImplIntegrationTest {
         entityManager.flush();
 
         // When
-        MedicalRecord foundRecord = medicalRecordDao.findByRecordNumber("REC001");
+        MedicalRecord foundRecord = medicalRecordRepository.findByRecordNumber("REC001");
 
         // Then
         assertNotNull(foundRecord);
@@ -53,7 +52,7 @@ class MedicalRecordDaoImplIntegrationTest {
     }
 
     @Test
-    void testFindByPatientId() {
+    void testFindAllByPatientId() {
         // Given
         Patient patient = new Patient();
         patient.setPatientNumber("PAT002");
@@ -66,7 +65,7 @@ class MedicalRecordDaoImplIntegrationTest {
         entityManager.flush();
 
         // When
-        List<MedicalRecord> records = medicalRecordDao.findByPatientId(patient.getId());
+        List<MedicalRecord> records = medicalRecordRepository.findAllByPatient_Id(patient.getId());
 
         // Then
         assertEquals(1, records.size());
@@ -74,7 +73,7 @@ class MedicalRecordDaoImplIntegrationTest {
     }
 
     @Test
-    void testFindByDoctorId() {
+    void testFindAllByDoctorId() {
         // Given
         Doctor doctor = new Doctor();
         doctor.setFirstName("Dr.");
@@ -94,7 +93,7 @@ class MedicalRecordDaoImplIntegrationTest {
         entityManager.flush();
 
         // When
-        List<MedicalRecord> records = medicalRecordDao.findByDoctorId(doctor.getId());
+        List<MedicalRecord> records = medicalRecordRepository.findAllByDoctor_Id(doctor.getId());
 
         // Then
         assertEquals(1, records.size());
@@ -102,7 +101,7 @@ class MedicalRecordDaoImplIntegrationTest {
     }
 
     @Test
-    void testFindByDateRange() {
+    void testFindAllByRecordDateBetween() {
         // Given
         LocalDateTime yesterday = LocalDateTime.now().minusDays(1);
         LocalDateTime tomorrow = LocalDateTime.now().plusDays(1);
@@ -127,7 +126,7 @@ class MedicalRecordDaoImplIntegrationTest {
         entityManager.flush();
 
         // When
-        List<MedicalRecord> records = medicalRecordDao.findByDateRange(yesterday, tomorrow);
+        List<MedicalRecord> records = medicalRecordRepository.findAllByRecordDateBetween(yesterday, tomorrow);
 
         // Then
         assertEquals(1, records.size());
@@ -135,7 +134,7 @@ class MedicalRecordDaoImplIntegrationTest {
     }
 
     @Test
-    void testFindByDiagnosis() {
+    void testFindAllByDiagnosis() {
         // Given
         Patient patient = new Patient();
         patient.setPatientNumber("PAT002");
@@ -161,7 +160,8 @@ class MedicalRecordDaoImplIntegrationTest {
         entityManager.flush();
 
         // When
-        List<MedicalRecord> records = medicalRecordDao.findByDiagnosis("Hyper");
+        List<MedicalRecord> recordsAll = medicalRecordRepository.findAll();
+        List<MedicalRecord> records = medicalRecordRepository.findAllByDiagnosisContainingIgnoreCase("Hyper");
 
         // Then
         assertEquals(2, records.size());
@@ -170,7 +170,7 @@ class MedicalRecordDaoImplIntegrationTest {
     }
 
     @Test
-    void testFindByDiagnosisNoMatch() {
+    void testFindAllByDiagnosisNoMatch() {
         // Given
         MedicalRecord record = createTestMedicalRecord("REC009", null, null);
         record.setDiagnosis("Migraine");
@@ -186,7 +186,7 @@ class MedicalRecordDaoImplIntegrationTest {
         entityManager.flush();
 
         // When
-        List<MedicalRecord> records = medicalRecordDao.findByDiagnosis("Cancer");
+        List<MedicalRecord> records = medicalRecordRepository.findAllByDiagnosisContainingIgnoreCase("Cancer");
 
         // Then
         assertTrue(records.isEmpty());
