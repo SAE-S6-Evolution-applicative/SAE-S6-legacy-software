@@ -200,6 +200,7 @@ class InventoryDaoImplIntegrationTest {
         Inventory testItem = new Inventory();
         testItem.setItemCode(itemCode);
         testItem.setName("Test Item");
+        testItem.setReorderLevel(5);
         testItem.setQuantity(10);
         testItem.setUnitPrice(99.99);
         testItem.setReorderLevel(5);
@@ -215,6 +216,7 @@ class InventoryDaoImplIntegrationTest {
         Inventory testItem = new Inventory();
         testItem.setItemCode(itemCode);
         testItem.setName("Restock Test Item");
+        testItem.setReorderLevel(5);
         testItem.setQuantity(10);
         testItem.setUnitPrice(88.88);
         testItem.setReorderLevel(5);
