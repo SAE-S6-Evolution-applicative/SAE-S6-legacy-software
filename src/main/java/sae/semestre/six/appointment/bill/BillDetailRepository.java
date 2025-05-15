@@ -9,10 +9,5 @@ import java.util.List;
 
 @Repository
 public interface BillDetailRepository extends JpaRepository<BillDetail, Long> {
-    @Query("""
-            SELECT bd FROM BillDetail bd
-            WHERE bd.bill.status = sae.semestre.six.appointment.bill.Bill.Status.PENDING
-            AND bd.medicalAct = :medicalAct
-            """)
-    List<BillDetail> findAllByPendingBillAndMedicalAct(MedicalAct medicalAct);
+    List<BillDetail> findAllByBill_StatusAndMedicalAct(Bill.Status status, MedicalAct medicalAct);
 }

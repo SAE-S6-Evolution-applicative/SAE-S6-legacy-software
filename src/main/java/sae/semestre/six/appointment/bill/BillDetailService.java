@@ -16,7 +16,7 @@ public class BillDetailService {
     }
 
     public List<BillDetail> updateBillDetail(MedicalAct old, MedicalAct newMedicalAct) {
-        List<BillDetail> billDetails = billDetailRepository.findAllByPendingBillAndMedicalAct(old);
+        List<BillDetail> billDetails = billDetailRepository.findAllByBill_StatusAndMedicalAct(Bill.Status.PENDING, old);
 
         List<BillDetail> updatedBillDetails = billDetails.stream()
                 .peek(billDetail -> {
