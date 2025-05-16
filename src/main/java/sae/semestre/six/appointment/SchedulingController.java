@@ -17,6 +17,10 @@ import java.util.List;
 @RequestMapping("/scheduling")
 public class SchedulingController {
 
+    public static final int SCHEDULE_START_HOUR = 9;
+
+    public static final int SCHEDULE_STOP_HOUR = 17;
+
     AppointmentRepository appointmentRepository;
 
     DoctorRepository doctorRepository;
@@ -55,7 +59,7 @@ public class SchedulingController {
 
             // Check if the appointment is within working hours
             int hour = appointmentDateTime.getHour();
-            if (hour < 9 || hour > 17) {
+            if (hour < SCHEDULE_START_HOUR || hour > SCHEDULE_STOP_HOUR) {
                 return "Appointments only available between 9 AM and 5 PM";
             }
 
@@ -94,7 +98,7 @@ public class SchedulingController {
         List<Appointment> appointments = appointmentRepository.findAllByDoctor_Id(doctorId);
 
         // Iterate through hours from 9 AM to 5 PM
-        for (int hour = 9; hour <= 17; hour++) {
+        for (int hour = SCHEDULE_START_HOUR; hour <= SCHEDULE_STOP_HOUR; hour++) {
             LocalDateTime slot = LocalDateTime.of(date, LocalTime.of(hour, 0));
 
             // Check if this slot conflicts with any existing appointment
