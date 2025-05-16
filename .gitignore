@@ -45,3 +45,5 @@ logs/
 .gradle/
 
 .env
+
+*.log

@@ -80,9 +80,7 @@ public class BillingController {
 
         Bill bill = billService.processBill(patient, doctor, medicalActs);
 
-        try (FileWriter fw = new FileWriter("C:\\hospital\\billing.txt", true)) {
-            fw.write(bill.getBillNumber() + ": $" + bill.getTotalAmount() + "\n");
-        }
+        logger.info("{}: ${}", bill.getBillNumber(), bill.getTotalAmount());
 
         emailService.sendEmail(
                 "admin@hospital.com",
