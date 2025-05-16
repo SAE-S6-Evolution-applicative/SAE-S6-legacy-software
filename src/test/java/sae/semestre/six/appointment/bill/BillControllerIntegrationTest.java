@@ -24,6 +24,7 @@ import sae.semestre.six.appointment.patient.PatientRepository;
 import java.util.Date;
 import java.util.Set;
 
+import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.hasItems;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
@@ -111,7 +112,7 @@ class BillControllerIntegrationTest {
     }
 
     @Test
-    void testProcessBill_ButNoneMatch() throws Exception {
+    void testProcessBill_ButOneDontMatch() throws Exception {
         Patient patient = new Patient();
         patient.setPatientNumber("PAT001");
         patient.setFirstName("John");
@@ -137,19 +138,89 @@ class BillControllerIntegrationTest {
         doctorDao.save(doctor);
 
         MedicalAct consultation = medicalActRepository.save(new MedicalAct("CONSULTATION", 10.0));
+        Long invalidId = 999L;
+
+        server.perform(post("/billing/process")
+                        .param("patientId", patient.getId().toString())
+                        .param("doctorId", doctor.getId().toString())
+                        .param("medicalActId", consultation.getId().toString(), invalidId.toString()))
+                .andExpect(status().is5xxServerError())
+                .andExpect(jsonPath("$.detail").value(containsString("Some medical act are not found: [999]")))
+                .andExpect(jsonPath("$.detail").value(containsString(invalidId.toString())));
+    }
+
+    @Test
+    void testProcessBill_ButNoneDontMatch() throws Exception {
+        Patient patient = new Patient();
+        patient.setPatientNumber("PAT001");
+        patient.setFirstName("John");
+        patient.setLastName("Doe");
+        patientDao.save(patient);
+        patient = patientDao.findByPatientNumber(patient.getPatientNumber());
+
+        Doctor doctor = new Doctor();
+        doctor.setDoctorNumber("DOCTOR001");
+        doctor.setFirstName("John");
+        doctor.setLastName("Doe");
+        doctorDao.save(doctor);
+
+        Appointment appointment = new Appointment();
+        appointment.setAppointmentNumber("APPOINTMENT001");
+        appointment.setPatient(patient);
+        appointment.setDoctor(doctor);
+        appointment.setAppointmentDate(new Date());
+        appointmentDaoImpl.save(appointment);
+
+        doctor = doctorDao.findByDoctorNumber(doctor.getDoctorNumber());
+        doctor.setAppointments(Set.of(appointment));
+        doctorDao.save(doctor);
+
+        Long invalidId = 999L;
+
+        server.perform(post("/billing/process")
+                        .param("patientId", patient.getId().toString())
+                        .param("doctorId", doctor.getId().toString())
+                        .param("medicalActId", invalidId.toString()))
+                .andExpect(status().is5xxServerError())
+                .andExpect(jsonPath("$.detail").value(containsString("Some medical act are not found: [999]")));
+    }
+
+    @Test
+    void testProcessBill_ButOneIsInactive() throws Exception {
+        Patient patient = new Patient();
+        patient.setPatientNumber("PAT001");
+        patient.setFirstName("John");
+        patient.setLastName("Doe");
+        patientDao.save(patient);
+        patient = patientDao.findByPatientNumber(patient.getPatientNumber());
+
+        Doctor doctor = new Doctor();
+        doctor.setDoctorNumber("DOCTOR001");
+        doctor.setFirstName("John");
+        doctor.setLastName("Doe");
+        doctorDao.save(doctor);
+
+        Appointment appointment = new Appointment();
+        appointment.setAppointmentNumber("APPOINTMENT001");
+        appointment.setPatient(patient);
+        appointment.setDoctor(doctor);
+        appointment.setAppointmentDate(new Date());
+        appointmentDaoImpl.save(appointment);
+
+        doctor = doctorDao.findByDoctorNumber(doctor.getDoctorNumber());
+        doctor.setAppointments(Set.of(appointment));
+        doctorDao.save(doctor);
+
+        MedicalAct consultation = new MedicalAct("CONSULTATION", 10.0);
+        consultation.setActive(false);
+        consultation = medicalActRepository.save(consultation);
 
         server.perform(post("/billing/process")
                         .param("patientId", patient.getId().toString())
                         .param("doctorId", doctor.getId().toString())
                         .param("medicalActId", consultation.getId().toString()))
-                .andExpect(status().isOk());
-
-        Bill billCreated = billRepository.findBillsByDoctor_Id(doctor.getId()).get(0);
-        assertEquals(doctor, billCreated.getDoctor());
-
-        BillDetail billDetail = billCreated.getBillDetails().stream().findAny().get();
-        assertEquals(10, billDetail.getLineTotal());
-        assertEquals(consultation, billDetail.getMedicalAct());
+                .andExpect(status().is5xxServerError())
+                .andExpect(jsonPath("$.detail").value(containsString("Some medical acts are inactive")));
     }
 
     @Test
