@@ -6,9 +6,10 @@ import sae.semestre.six.appointment.doctor.Doctor;
 import sae.semestre.six.appointment.patient.Patient;
 import sae.semestre.six.appointment.patient.history.PatientHistory;
 
-import java.util.Date;
-import java.util.Set;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.HashSet;
+import java.util.Set;
 
 @Entity
 @Table(name = "bills")
@@ -30,8 +31,7 @@ public class Bill {
     private Doctor doctor;
     
     @Column(name = "bill_date")
-    @Temporal(TemporalType.TIMESTAMP)
-    private Date billDate = new Date();
+    private LocalDateTime billDate = LocalDateTime.now();
     
     @Column(name = "total_amount")
     private Double totalAmount = 0.0;
@@ -44,10 +44,10 @@ public class Bill {
     
     
     @Column(name = "created_date")
-    private Date createdDate = new Date();
+    private LocalDate createdDate = LocalDate.now();
     
     @Column(name = "last_modified")
-    private Date lastModified = new Date();
+    private LocalDate lastModified = LocalDate.now();
 
     @ManyToOne
     private PatientHistory patientHistory;
@@ -65,9 +65,9 @@ public class Bill {
     
     public Doctor getDoctor() { return doctor; }
     public void setDoctor(Doctor doctor) { this.doctor = doctor; }
-    
-    public Date getBillDate() { return billDate; }
-    public void setBillDate(Date billDate) { this.billDate = billDate; }
+
+    public LocalDateTime getBillDate() { return billDate; }
+    public void setBillDate(LocalDateTime billDate) { this.billDate = billDate; }
     
     public Double getTotalAmount() { return totalAmount; }
     public void setTotalAmount(Double totalAmount) { this.totalAmount = totalAmount; }
@@ -75,7 +75,7 @@ public class Bill {
     public String getStatus() { return status; }
     public void setStatus(String status) { 
         this.status = status;
-        this.lastModified = new Date(); 
+        this.lastModified = LocalDate.now();
     }
     
     public Set<BillDetail> getBillDetails() { return billDetails; }

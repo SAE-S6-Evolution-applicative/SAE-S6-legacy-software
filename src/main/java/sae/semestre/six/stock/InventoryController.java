@@ -2,20 +2,25 @@ package sae.semestre.six.stock;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+import sae.semestre.six.email.EmailService;
 import sae.semestre.six.stock.supplier.SupplierInvoice;
 import sae.semestre.six.stock.supplier.SupplierInvoiceDetail;
-import sae.semestre.six.email.EmailService;
-import java.util.*;
-import java.util.stream.Collectors;
+
 import java.io.FileWriter;
 import java.io.IOException;
+import java.time.LocalDate;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/inventory")
 public class InventoryController {
     
     @Autowired
-    private InventoryDao inventoryDao;
+    private InventoryService inventoryService;
+
+    @Autowired
+    private InventoryRepository inventoryRepository;
     
     private final EmailService emailService = EmailService.getInstance();
     
@@ -30,10 +35,10 @@ public class InventoryController {
                 
                 inventory.setQuantity(inventory.getQuantity() + detail.getQuantity());
                 inventory.setUnitPrice(detail.getUnitPrice());
-                inventory.setLastRestocked(new Date());
+                inventory.setLastRestocked(LocalDate.now());
                 
                 
-                inventoryDao.update(inventory);
+                inventoryRepository.save(inventory);
             }
             
             return "Supplier invoice processed successfully";
@@ -46,7 +51,7 @@ public class InventoryController {
     
     @GetMapping("/low-stock")
     public List<Inventory> getLowStockItems() {
-        return inventoryDao.findAll().stream()
+        return inventoryService.findAll().stream()
             .filter(Inventory::needsRestock)
             .collect(Collectors.toList());
     }
@@ -54,7 +59,7 @@ public class InventoryController {
     
     @PostMapping("/reorder")
     public String reorderItems() {
-        List<Inventory> lowStockItems = inventoryDao.findNeedingRestock();
+        List<Inventory> lowStockItems = inventoryService.findNeedingRestock();
         
         for (Inventory item : lowStockItems) {
             

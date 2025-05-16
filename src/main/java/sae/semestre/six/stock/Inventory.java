@@ -1,7 +1,8 @@
 package sae.semestre.six.stock;
 
 import jakarta.persistence.*;
-import java.util.Date;
+
+import java.time.LocalDate;
 
 @Entity
 @Table(name = "inventory")
@@ -27,8 +28,7 @@ public class Inventory {
     private Integer reorderLevel;
     
     @Column(name = "last_restocked")
-    @Temporal(TemporalType.TIMESTAMP)
-    private Date lastRestocked;
+    private LocalDate lastRestocked;
     
     
     public Long getId() {
@@ -83,11 +83,11 @@ public class Inventory {
         this.reorderLevel = reorderLevel;
     }
     
-    public Date getLastRestocked() {
+    public LocalDate getLastRestocked() {
         return lastRestocked;
     }
     
-    public void setLastRestocked(Date lastRestocked) {
+    public void setLastRestocked(LocalDate lastRestocked) {
         this.lastRestocked = lastRestocked;
     }
     
@@ -103,4 +103,16 @@ public class Inventory {
             System.out.println("WARNING: Item " + itemCode + " needs restock!");
         }
     }
-} 
+
+    /**
+     * Updates the current inventory item by setting its quantity and marking the
+     * date of the last restocking. The quantity remains the same as the current
+     * value while the last restocked date is updated to the current date.
+     *
+     * @param quantity quantity to restock.
+     */
+    public void restock(Integer quantity) {
+        this.setQuantity(quantity);
+        this.setLastRestocked(LocalDate.now());
+    }
+}

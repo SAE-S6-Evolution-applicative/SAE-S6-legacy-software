@@ -14,18 +14,17 @@ import org.springframework.transaction.annotation.Transactional;
 import sae.semestre.six.appointment.doctor.Doctor;
 import sae.semestre.six.appointment.patient.Patient;
 
-import java.util.Calendar;
-import java.util.Date;
+import java.time.LocalDateTime;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
 @Transactional
-class MedicalRecordDaoImplIntegrationTest {
+class MedicalRecordRepositoryIntegrationTest {
 
     @Autowired
-    private MedicalRecordDao medicalRecordDao;
+    private MedicalRecordRepository medicalRecordRepository;
 
     @PersistenceContext
     private EntityManager entityManager;
@@ -45,7 +44,7 @@ class MedicalRecordDaoImplIntegrationTest {
         entityManager.flush();
 
         // When
-        MedicalRecord foundRecord = medicalRecordDao.findByRecordNumber("REC001");
+        MedicalRecord foundRecord = medicalRecordRepository.findByRecordNumber("REC001");
 
         // Then
         assertNotNull(foundRecord);
@@ -53,7 +52,7 @@ class MedicalRecordDaoImplIntegrationTest {
     }
 
     @Test
-    void testFindByPatientId() {
+    void testFindAllByPatientId() {
         // Given
         Patient patient = new Patient();
         patient.setPatientNumber("PAT002");
@@ -66,7 +65,7 @@ class MedicalRecordDaoImplIntegrationTest {
         entityManager.flush();
 
         // When
-        List<MedicalRecord> records = medicalRecordDao.findByPatientId(patient.getId());
+        List<MedicalRecord> records = medicalRecordRepository.findAllByPatient_Id(patient.getId());
 
         // Then
         assertEquals(1, records.size());
@@ -74,7 +73,7 @@ class MedicalRecordDaoImplIntegrationTest {
     }
 
     @Test
-    void testFindByDoctorId() {
+    void testFindAllByDoctorId() {
         // Given
         Doctor doctor = new Doctor();
         doctor.setFirstName("Dr.");
@@ -94,7 +93,7 @@ class MedicalRecordDaoImplIntegrationTest {
         entityManager.flush();
 
         // When
-        List<MedicalRecord> records = medicalRecordDao.findByDoctorId(doctor.getId());
+        List<MedicalRecord> records = medicalRecordRepository.findAllByDoctor_Id(doctor.getId());
 
         // Then
         assertEquals(1, records.size());
@@ -102,11 +101,11 @@ class MedicalRecordDaoImplIntegrationTest {
     }
 
     @Test
-    void testFindByDateRange() {
+    void testFindAllByRecordDateBetween() {
         // Given
-        Date yesterday = addDaysToCurrentDate(-1);
-        Date tomorrow = addDaysToCurrentDate(1);
-        Date nextWeek = addDaysToCurrentDate(7);
+        LocalDateTime yesterday = LocalDateTime.now().minusDays(1);
+        LocalDateTime tomorrow = LocalDateTime.now().plusDays(1);
+        LocalDateTime nextWeek = LocalDateTime.now().plusDays(7);
 
         Patient patient = new Patient();
         patient.setPatientNumber("PAT002");
@@ -115,7 +114,7 @@ class MedicalRecordDaoImplIntegrationTest {
         entityManager.persist(patient);
 
         MedicalRecord recordInRange = createTestMedicalRecord("REC004", null, null);
-        recordInRange.setRecordDate(new Date()); // Today
+        recordInRange.setRecordDate(LocalDateTime.now()); // Today
         recordInRange.setPatient(patient);
         entityManager.persist(recordInRange);
 
@@ -127,7 +126,7 @@ class MedicalRecordDaoImplIntegrationTest {
         entityManager.flush();
 
         // When
-        List<MedicalRecord> records = medicalRecordDao.findByDateRange(yesterday, tomorrow);
+        List<MedicalRecord> records = medicalRecordRepository.findAllByRecordDateBetween(yesterday, tomorrow);
 
         // Then
         assertEquals(1, records.size());
@@ -135,7 +134,7 @@ class MedicalRecordDaoImplIntegrationTest {
     }
 
     @Test
-    void testFindByDiagnosis() {
+    void testFindAllByDiagnosis() {
         // Given
         Patient patient = new Patient();
         patient.setPatientNumber("PAT002");
@@ -161,7 +160,8 @@ class MedicalRecordDaoImplIntegrationTest {
         entityManager.flush();
 
         // When
-        List<MedicalRecord> records = medicalRecordDao.findByDiagnosis("Hyper");
+        List<MedicalRecord> recordsAll = medicalRecordRepository.findAll();
+        List<MedicalRecord> records = medicalRecordRepository.findAllByDiagnosisContainingIgnoreCase("Hyper");
 
         // Then
         assertEquals(2, records.size());
@@ -170,7 +170,7 @@ class MedicalRecordDaoImplIntegrationTest {
     }
 
     @Test
-    void testFindByDiagnosisNoMatch() {
+    void testFindAllByDiagnosisNoMatch() {
         // Given
         MedicalRecord record = createTestMedicalRecord("REC009", null, null);
         record.setDiagnosis("Migraine");
@@ -186,7 +186,7 @@ class MedicalRecordDaoImplIntegrationTest {
         entityManager.flush();
 
         // When
-        List<MedicalRecord> records = medicalRecordDao.findByDiagnosis("Cancer");
+        List<MedicalRecord> records = medicalRecordRepository.findAllByDiagnosisContainingIgnoreCase("Cancer");
 
         // Then
         assertTrue(records.isEmpty());
@@ -202,16 +202,7 @@ class MedicalRecordDaoImplIntegrationTest {
         medicalRecord.setDoctor(doctor);
         medicalRecord.setDiagnosis("Test Diagnosis");
         medicalRecord.setTreatment("Test Treatment");
-        medicalRecord.setRecordDate(new Date());
+        medicalRecord.setRecordDate(LocalDateTime.now());
         return medicalRecord;
-    }
-
-    /**
-     * Helper method to add days to the current date
-     */
-    private Date addDaysToCurrentDate(int days) {
-        Calendar calendar = Calendar.getInstance();
-        calendar.add(Calendar.DAY_OF_MONTH, days);
-        return calendar.getTime();
     }
 }

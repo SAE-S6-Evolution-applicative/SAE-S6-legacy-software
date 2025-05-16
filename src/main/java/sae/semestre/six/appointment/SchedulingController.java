@@ -2,89 +2,119 @@ package sae.semestre.six.appointment;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
-import sae.semestre.six.appointment.doctor.DoctorDao;
 import sae.semestre.six.appointment.doctor.Doctor;
+import sae.semestre.six.appointment.doctor.DoctorRepository;
+import sae.semestre.six.appointment.patient.PatientRepository;
 import sae.semestre.six.email.EmailService;
-import java.util.*;
+
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @RestController
 @RequestMapping("/scheduling")
 public class SchedulingController {
-    
+
+    public static final int SCHEDULE_START_HOUR = 9;
+
+    public static final int SCHEDULE_STOP_HOUR = 17;
+
+    AppointmentRepository appointmentRepository;
+
+    DoctorRepository doctorRepository;
+
+    PatientRepository patientRepository;
+
     @Autowired
-    private AppointmentDao appointmentDao;
-    
-    @Autowired
-    private DoctorDao doctorDao;
+    public SchedulingController(AppointmentRepository appointmentRepository, DoctorRepository doctorRepository, PatientRepository patientRepository) {
+        this.appointmentRepository = appointmentRepository;
+        this.doctorRepository = doctorRepository;
+        this.patientRepository = patientRepository;
+    }
     
     private final EmailService emailService = EmailService.getInstance();
-    
-    
+
+
     @PostMapping("/appointment")
     public String scheduleAppointment(
             @RequestParam Long doctorId,
             @RequestParam Long patientId,
-            @RequestParam Date appointmentDate) {
+            @RequestParam LocalDateTime appointmentDateTime) {
         try {
-            Doctor doctor = doctorDao.findById(doctorId);
-            
-            
-            List<Appointment> doctorAppointments = appointmentDao.findByDoctorId(doctorId);
-            for (Appointment existing : doctorAppointments) {
-                
-                if (existing.getAppointmentDate().equals(appointmentDate)) {
-                    return "Doctor is not available at this time";
-                }
+            Doctor doctor = doctorRepository.findById(doctorId).orElseThrow(
+                    () -> new RuntimeException("Doctor not found")
+            );
+
+            // Retrieve all appointments for the doctor
+            List<Appointment> doctorAppointments = appointmentRepository.findAllByDoctor_Id(doctorId);
+
+            // Check for time conflict
+            boolean conflict = doctorAppointments.stream().anyMatch(existing -> existing.getAppointmentDate().equals(appointmentDateTime));
+
+            if (conflict) {
+                return "Doctor is not available at this time";
             }
-            
-            
-            Calendar cal = Calendar.getInstance();
-            cal.setTime(appointmentDate);
-            int hour = cal.get(Calendar.HOUR_OF_DAY);
-            if (hour < 9 || hour > 17) {
+
+            // Check if the appointment is within working hours
+            int hour = appointmentDateTime.getHour();
+            if (hour < SCHEDULE_START_HOUR || hour > SCHEDULE_STOP_HOUR) {
                 return "Appointments only available between 9 AM and 5 PM";
             }
-            
-            
+
+            // schedule appointment
+            Appointment appointment = new Appointment();
+            appointment.setDoctor(doctor);
+            appointment.setAppointmentDate(appointmentDateTime);
+            appointment.setPatient(patientRepository.findById(patientId).orElseThrow(
+                    () -> new RuntimeException("Patient not found")
+            ));
+            appointmentRepository.save(appointment);
+
+            // Send email notification
             emailService.sendEmail(
-                doctor.getEmail(),
-                "New Appointment Scheduled",
-                "You have a new appointment on " + appointmentDate
+                    doctor.getEmail(),
+                    "New Appointment Scheduled",
+                    "You have a new appointment on " + appointmentDateTime
             );
-            
+
             return "Appointment scheduled successfully";
         } catch (Exception e) {
             return "Error: " + e.getMessage();
         }
     }
-    
-    
+
+
+
     @GetMapping("/available-slots")
-    public List<Date> getAvailableSlots(@RequestParam Long doctorId, @RequestParam Date date) {
-        List<Date> availableSlots = new ArrayList<>();
-        Calendar cal = Calendar.getInstance();
-        cal.setTime(date);
-        
-        
-        for (int hour = 9; hour <= 17; hour++) {
-            cal.set(Calendar.HOUR_OF_DAY, hour);
-            cal.set(Calendar.MINUTE, 0);
-            
-            boolean slotAvailable = true;
-            for (Appointment app : appointmentDao.findByDoctorId(doctorId)) {
-                Calendar appCal = Calendar.getInstance();
-                appCal.setTime(app.getAppointmentDate());
-                if (appCal.get(Calendar.HOUR_OF_DAY) == hour) {
-                    slotAvailable = false;
-                    break;
-                }
-            }
-            
-            if (slotAvailable) {
-                availableSlots.add(cal.getTime());
+    public List<LocalDateTime> getAvailableSlots(
+            @RequestParam Long doctorId,
+            @RequestParam LocalDate date) {
+
+        List<LocalDateTime> availableSlots = new ArrayList<>();
+
+        // Retrieve all appointments for the doctor
+        List<Appointment> appointments = appointmentRepository.findAllByDoctor_Id(doctorId);
+
+        // Iterate through hours from 9 AM to 5 PM
+        for (int hour = SCHEDULE_START_HOUR; hour <= SCHEDULE_STOP_HOUR; hour++) {
+            LocalDateTime slot = LocalDateTime.of(date, LocalTime.of(hour, 0));
+
+            // Check if this slot conflicts with any existing appointment
+            boolean isTaken = appointments.stream().anyMatch(app -> {
+                LocalDateTime appDateTime = app.getAppointmentDate();
+                return appDateTime.getYear() == slot.getYear()
+                        && appDateTime.getDayOfYear() == slot.getDayOfYear()
+                        && appDateTime.getHour() == slot.getHour();
+            });
+
+            if (!isTaken) {
+                availableSlots.add(slot);
             }
         }
-        
+
         return availableSlots;
     }
+
 } 

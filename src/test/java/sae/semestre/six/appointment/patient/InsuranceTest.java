@@ -6,8 +6,8 @@
 package sae.semestre.six.appointment.patient;
 
 import org.junit.jupiter.api.Test;
-import java.util.Calendar;
-import java.util.Date;
+
+import java.time.LocalDate;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -42,35 +42,39 @@ class InsuranceTest {
     }
 
     @Test
-    void testIsValidWithFutureExpiryDate() {
+    public void testIsValid_WithFutureDate() {
         // Given
         Insurance insurance = new Insurance();
-        Calendar calendar = Calendar.getInstance();
-        calendar.add(Calendar.MONTH, 3); // Future date
-        Date futureDate = calendar.getTime();
+        LocalDate futureDate = LocalDate.now().plusDays(30);
         insurance.setExpiryDate(futureDate);
-
+        
         // When
-        boolean valid = insurance.isValid();
-
+        boolean isValid = insurance.isValid();
+        
         // Then
-        assertTrue(valid);
+        assertTrue(isValid);
+    }
+    
+    @Test
+    public void testIsValid_WithPastDate() {
+        // Given
+        Insurance insurance = new Insurance();
+        LocalDate pastDate = LocalDate.now().minusDays(30);
+        insurance.setExpiryDate(pastDate);
+        
+        // When
+        boolean isValid = insurance.isValid();
+        
+        // Then
+        assertFalse(isValid);
     }
 
     @Test
-    void testIsValidWithPastExpiryDate() {
-        // Given
+    void testSetAndGetExpiryDate() {
+        LocalDate expiryDate = LocalDate.now();
         Insurance insurance = new Insurance();
-        Calendar calendar = Calendar.getInstance();
-        calendar.add(Calendar.MONTH, -3); // Past date
-        Date pastDate = calendar.getTime();
-        insurance.setExpiryDate(pastDate);
-
-        // When
-        boolean valid = insurance.isValid();
-
-        // Then
-        assertFalse(valid);
+        insurance.setExpiryDate(expiryDate);
+        assertEquals(expiryDate, insurance.getExpiryDate());
     }
 
     @Test
@@ -78,7 +82,7 @@ class InsuranceTest {
         // Given
         Insurance insurance = new Insurance();
         Patient patient = new Patient();
-        Date expiryDate = new Date();
+        LocalDate expiryDate = LocalDate.now();
 
         // When
         insurance.setId(1L);

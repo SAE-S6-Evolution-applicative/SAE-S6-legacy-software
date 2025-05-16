@@ -9,12 +9,15 @@ import org.mockito.MockitoAnnotations;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
+import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import sae.semestre.six.appointment.Appointment;
-import sae.semestre.six.appointment.AppointmentDao;
+import sae.semestre.six.appointment.AppointmentRepository;
 import sae.semestre.six.appointment.doctor.Doctor;
+
+import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -30,10 +33,10 @@ class RoomControllerIntegrationTest {
     private MockMvc server;
 
     @MockitoBean
-    private RoomDao roomDao;
+    private RoomRepository roomRepository;
 
     @MockitoBean
-    private AppointmentDao appointmentDao;
+    private AppointmentRepository appointmentRepository;
 
     @InjectMocks
     private RoomController roomController;
@@ -44,6 +47,9 @@ class RoomControllerIntegrationTest {
     void setUp() {
         autoCloseable = MockitoAnnotations.openMocks(this);
         server = MockMvcBuilders.standaloneSetup(roomController).build();
+
+        ReflectionTestUtils.setField(roomController, "roomRepository", roomRepository);
+        ReflectionTestUtils.setField(roomController, "appointmentRepository", appointmentRepository);
     }
 
     @AfterEach
@@ -66,8 +72,8 @@ class RoomControllerIntegrationTest {
         appointment.setId(1L);
         appointment.setDoctor(generalDoctor);
 
-        when(roomDao.findByRoomNumber(room.getRoomNumber())).thenReturn(room);
-        when(appointmentDao.findById(appointment.getId())).thenReturn(appointment);
+        when(roomRepository.findByRoomNumber(room.getRoomNumber())).thenReturn(room);
+        when(appointmentRepository.findById(appointment.getId())).thenReturn(Optional.of(appointment));
 
         server.perform(post("/rooms/assign")
                         .param("appointmentId", String.valueOf(appointment.getId()))
@@ -75,8 +81,8 @@ class RoomControllerIntegrationTest {
                 .andExpect(status().isOk())
                 .andExpect(MockMvcResultMatchers.content().string("Room assigned successfully"));
 
-        verify(roomDao, times(1)).update(any(Room.class));
-        verify(appointmentDao, times(1)).update(any(Appointment.class));
+        verify(roomRepository, times(1)).save(any(Room.class));
+        verify(appointmentRepository, times(1)).save(any(Appointment.class));
     }
 
     @Test
@@ -94,8 +100,8 @@ class RoomControllerIntegrationTest {
         appointment.setId(1L);
         appointment.setDoctor(generalDoctor);
 
-        when(roomDao.findByRoomNumber(room.getRoomNumber())).thenReturn(room);
-        when(appointmentDao.findById(appointment.getId())).thenReturn(appointment);
+        when(roomRepository.findByRoomNumber(room.getRoomNumber())).thenReturn(room);
+        when(appointmentRepository.findById(appointment.getId())).thenReturn(Optional.of(appointment));
 
         server.perform(post("/rooms/assign")
                         .param("appointmentId", String.valueOf(appointment.getId()))
@@ -119,8 +125,8 @@ class RoomControllerIntegrationTest {
         appointment.setId(1L);
         appointment.setDoctor(generalDoctor);
 
-        when(roomDao.findByRoomNumber(room.getRoomNumber())).thenReturn(room);
-        when(appointmentDao.findById(appointment.getId())).thenReturn(appointment);
+        when(roomRepository.findByRoomNumber(room.getRoomNumber())).thenReturn(room);
+        when(appointmentRepository.findById(appointment.getId())).thenReturn(Optional.of(appointment));
 
         server.perform(post("/rooms/assign")
                         .param("appointmentId", String.valueOf(appointment.getId()))
@@ -144,8 +150,8 @@ class RoomControllerIntegrationTest {
         appointment.setId(1L);
         appointment.setDoctor(generalDoctor);
 
-        when(roomDao.findByRoomNumber(room.getRoomNumber())).thenThrow(new RuntimeException("Room not found"));
-        when(appointmentDao.findById(appointment.getId())).thenReturn(appointment);
+        when(roomRepository.findByRoomNumber(room.getRoomNumber())).thenThrow(new RuntimeException("Room not found"));
+        when(appointmentRepository.findById(appointment.getId())).thenReturn(Optional.of(appointment));
 
         server.perform(post("/rooms/assign")
                         .param("appointmentId", String.valueOf(appointment.getId()))
@@ -162,7 +168,7 @@ class RoomControllerIntegrationTest {
         room.setCurrentPatientCount(0);
         room.setType("Consultation");
 
-        when(roomDao.findByRoomNumber(room.getRoomNumber())).thenReturn(room);
+        when(roomRepository.findByRoomNumber(room.getRoomNumber())).thenReturn(room);
 
         server.perform(get("/rooms/availability")
                         .param("roomNumber", room.getRoomNumber()))
@@ -177,7 +183,7 @@ class RoomControllerIntegrationTest {
     void testGetRoomAvailabilityRoomNotFound() {
         String roomNumber = "A101";
 
-        when(roomDao.findByRoomNumber(roomNumber)).thenThrow(new RuntimeException("Room not found"));
+        when(roomRepository.findByRoomNumber(roomNumber)).thenThrow(new RuntimeException("Room not found"));
 
         assertThrows(RuntimeException.class,
                 () -> roomController.getRoomAvailability(roomNumber),

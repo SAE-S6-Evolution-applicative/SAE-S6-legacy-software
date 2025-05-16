@@ -4,14 +4,17 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
-import java.util.*;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/patient-history")
 public class PatientHistoryController {
     
     @Autowired
-    private PatientHistoryDao patientHistoryDao;
+    private PatientHistoryRepository patientHistoryRepository;
     
     
     @GetMapping("/search")
@@ -31,7 +34,7 @@ public class PatientHistoryController {
     
     @GetMapping("/patient/{patientId}/summary")
     public Map<String, Object> getPatientSummary(@PathVariable Long patientId) {
-        List<PatientHistory> histories = patientHistoryDao.findCompleteHistoryByPatientId(patientId);
+        List<PatientHistory> histories = patientHistoryRepository.findAllByPatient_Id(patientId);
         
         Map<String, Object> summary = new HashMap<>();
         summary.put("visitCount", histories.size());

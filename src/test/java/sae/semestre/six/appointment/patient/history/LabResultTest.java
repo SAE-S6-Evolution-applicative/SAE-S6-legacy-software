@@ -8,9 +8,9 @@ package sae.semestre.six.appointment.patient.history;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import java.util.Date;
+import java.time.LocalDate;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class LabResultTest {
 
@@ -72,7 +72,7 @@ class LabResultTest {
     @Test
     void testSetAndGetTestDate() {
         // Given
-        Date testDate = new Date();
+        LocalDate testDate = LocalDate.now();
 
         // When
         labResult.setTestDate(testDate);

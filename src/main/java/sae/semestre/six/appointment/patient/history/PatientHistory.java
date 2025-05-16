@@ -6,6 +6,7 @@ import sae.semestre.six.appointment.bill.Bill;
 import sae.semestre.six.appointment.patient.Patient;
 import sae.semestre.six.appointment.prescription.Prescription;
 
+import java.time.LocalDateTime;
 import java.util.*;
 
 @Entity
@@ -36,8 +37,7 @@ public class PatientHistory {
     private Set<LabResult> labResults = new HashSet<>();
     
     @Column(name = "visit_date")
-    @Temporal(TemporalType.TIMESTAMP)
-    private Date visitDate;
+    private LocalDateTime visitDate;
     
     @Column(columnDefinition = "TEXT")
     private String diagnosis;
@@ -97,11 +97,11 @@ public class PatientHistory {
         this.labResults = labResults;
     }
 
-    public Date getVisitDate() {
+    public LocalDateTime getVisitDate() {
         return visitDate;
     }
 
-    public void setVisitDate(Date visitDate) {
+    public void setVisitDate(LocalDateTime visitDate) {
         this.visitDate = visitDate;
     }
 

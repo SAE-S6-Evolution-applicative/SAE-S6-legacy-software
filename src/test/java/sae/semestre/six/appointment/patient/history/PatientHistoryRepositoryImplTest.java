@@ -19,22 +19,29 @@ import sae.semestre.six.appointment.doctor.Doctor;
 import sae.semestre.six.appointment.patient.Patient;
 import sae.semestre.six.appointment.prescription.Prescription;
 
-import java.util.*;
+import java.time.LocalDateTime;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 
 @SpringBootTest
 @Transactional
-class PatientHistoryDaoImplTest {
+class PatientHistoryRepositoryImplTest {
 
     @Autowired
-    private PatientHistoryDao patientHistoryDao;
+    private PatientHistoryService patientHistoryService;
+
+    @Autowired
+    private PatientHistoryRepository patientHistoryRepository;
 
     @PersistenceContext
     private EntityManager entityManager;
 
     @Test
-    void testFindCompleteHistoryByPatientId() {
+    void testFindAllByPatientId() {
         // Given
         Patient patient = new Patient();
         patient.setFirstName("John");
@@ -44,14 +51,14 @@ class PatientHistoryDaoImplTest {
 
         // Create doctor, appointment etc. needed for the patient history
 
-        PatientHistory history1 = createPatientHistory(patient, new Date(), "Fever");
-        PatientHistory history2 = createPatientHistory(patient, new Date(), "Headache");
+        PatientHistory history1 = createPatientHistory(patient, LocalDateTime.now(), "Fever");
+        PatientHistory history2 = createPatientHistory(patient, LocalDateTime.now(), "Headache");
 
         entityManager.flush();
         entityManager.clear();
 
         // When
-        List<PatientHistory> histories = patientHistoryDao.findCompleteHistoryByPatientId(patient.getId());
+        List<PatientHistory> histories = patientHistoryRepository.findAllByPatient_Id(patient.getId());
 
         // Then
         assertFalse(histories.isEmpty());
@@ -67,15 +74,9 @@ class PatientHistoryDaoImplTest {
         patient.setPatientNumber("123456");
         entityManager.persist(patient);
 
-        Calendar cal = Calendar.getInstance();
-        cal.add(Calendar.DAY_OF_MONTH, -10);
-        Date startDate = cal.getTime();
-
-        cal.add(Calendar.DAY_OF_MONTH, 20);
-        Date endDate = cal.getTime();
-
-        cal.add(Calendar.DAY_OF_MONTH, -15);
-        Date inRangeDate = cal.getTime();
+        LocalDateTime startDate = LocalDateTime.now().minusDays(10);
+        LocalDateTime endDate = LocalDateTime.now().plusDays(10);
+        LocalDateTime inRangeDate = LocalDateTime.now().minusDays(5);
 
         PatientHistory history1 = createPatientHistory(patient, inRangeDate, "Hypertension");
 
@@ -92,7 +93,7 @@ class PatientHistoryDaoImplTest {
         entityManager.clear();
 
         // When
-        List<PatientHistory> results = patientHistoryDao.searchByMultipleCriteria("hyper", startDate, endDate);
+        List<PatientHistory> results = patientHistoryService.searchByMultipleCriteria("Hyper", startDate, endDate);
 
         // Then
         assertEquals(1, results.size());
@@ -103,7 +104,7 @@ class PatientHistoryDaoImplTest {
         return (Long) ReflectionTestUtils.getField(history, "id");
     }
 
-    private PatientHistory createPatientHistory(Patient patient, Date visitDate, String diagnosis) {
+    private PatientHistory createPatientHistory(Patient patient, LocalDateTime visitDate, String diagnosis) {
         PatientHistory history = new PatientHistory();
         ReflectionTestUtils.setField(history, "patient", patient);
         ReflectionTestUtils.setField(history, "visitDate", visitDate);
@@ -148,7 +149,7 @@ class PatientHistoryDaoImplTest {
 
         Bill bill = new Bill();
         bill.setTotalAmount(100.0);
-        bill.setBillDate(new Date());
+        bill.setBillDate(LocalDateTime.now());
         entityManager.persist(bill);
 
         Set<Bill> bills = (Set<Bill>) ReflectionTestUtils.getField(history, "bills");

@@ -2,11 +2,11 @@ package sae.semestre.six.appointment;
 
 import jakarta.persistence.*;
 import sae.semestre.six.appointment.doctor.Doctor;
-import sae.semestre.six.appointment.room.Room;
 import sae.semestre.six.appointment.patient.Patient;
 import sae.semestre.six.appointment.patient.history.PatientHistory;
+import sae.semestre.six.appointment.room.Room;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "appointments")
@@ -34,8 +34,7 @@ public class Appointment {
     private PatientHistory patientHistory;
 
     @Column(name = "appointment_date", nullable = false)
-    @Temporal(TemporalType.TIMESTAMP)
-    private Date appointmentDate;
+    private LocalDateTime appointmentDate;
 
 
     @Column(name = "status")
@@ -84,11 +83,11 @@ public class Appointment {
         this.doctor = doctor;
     }
 
-    public Date getAppointmentDate() {
+    public LocalDateTime getAppointmentDate() {
         return appointmentDate;
     }
 
-    public void setAppointmentDate(Date appointmentDate) {
+    public void setAppointmentDate(LocalDateTime appointmentDate) {
         this.appointmentDate = appointmentDate;
     }
 

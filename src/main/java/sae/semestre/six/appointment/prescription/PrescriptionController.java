@@ -1,13 +1,17 @@
 package sae.semestre.six.appointment.prescription;
 
-import sae.semestre.six.appointment.patient.PatientDao;
-import sae.semestre.six.appointment.patient.Patient;
-import sae.semestre.six.appointment.bill.BillingService;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
-import java.util.*;
-import java.io.*;
+import sae.semestre.six.appointment.bill.BillingService;
+import sae.semestre.six.appointment.patient.Patient;
+import sae.semestre.six.appointment.patient.PatientRepository;
+
+import java.io.FileWriter;
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/prescriptions")
@@ -32,10 +36,10 @@ public class PrescriptionController {
     
     
     @Autowired
-    private PatientDao patientDao;
+    private PatientRepository patientRepository;
     
     @Autowired
-    private PrescriptionDao prescriptionDao;
+    private PrescriptionRepository prescriptionRepository;
     
     @PostMapping("/add")
     public String addPrescription(
@@ -49,7 +53,9 @@ public class PrescriptionController {
             Prescription prescription = new Prescription();
             prescription.setPrescriptionNumber(prescriptionId);
             
-            Patient patient = patientDao.findById(Long.parseLong(patientId));
+            Patient patient = patientRepository.findById(Long.parseLong(patientId)).orElseThrow(
+                    () -> new RuntimeException("Patient not found")
+            );
             prescription.setPatient(patient);
             
             prescription.setMedicines(String.join(",", medicines));
@@ -59,11 +65,11 @@ public class PrescriptionController {
             prescription.setTotalCost(cost);
             
             
-            prescriptionDao.save(prescription);
+            prescriptionRepository.save(prescription);
             
             
             new FileWriter(AUDIT_FILE, true)
-                .append(new Date().toString() + " - " + prescriptionId + "\n")
+                .append(LocalDate.now().toString() + " - " + prescriptionId + "\n")
                 .close();
             
             

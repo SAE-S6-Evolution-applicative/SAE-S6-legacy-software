@@ -2,7 +2,7 @@ package sae.semestre.six.appointment.prescription;
 
 import org.junit.jupiter.api.Test;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 import java.util.concurrent.TimeUnit;
 
 import static org.awaitility.Awaitility.await;
@@ -30,7 +30,7 @@ class PrescriptionTest {
         // Arrange
         Prescription prescription = new Prescription();
         prescription.setBilled(true); // Set to true to verify toggle back to false
-        Date lastModifiedBefore = prescription.getLastModified();
+        LocalDateTime lastModifiedBefore = prescription.getLastModified();
 
         // Simulate some time passing
         await().atMost(200, TimeUnit.MILLISECONDS).until(() -> {
@@ -49,7 +49,7 @@ class PrescriptionTest {
     void testSetBilledUpdatesLastModifiedDate() {
         // Arrange
         Prescription prescription = new Prescription();
-        Date initialLastModified = prescription.getLastModified();
+        LocalDateTime initialLastModified = prescription.getLastModified();
 
         // Simulate some time passing
         await().atMost(200, TimeUnit.MILLISECONDS).until(() -> {
@@ -61,5 +61,45 @@ class PrescriptionTest {
         // Assert
         assertNotNull(prescription.getLastModified(), "LastModified date should not be null");
         assertNotEquals(initialLastModified, prescription.getLastModified(), "LastModified date should be updated");
+    }
+
+    @Test
+    void testUpdatesLastModifiedOnSetBilled() {
+        // Given
+        Prescription prescription = new Prescription();
+        LocalDateTime lastModifiedBefore = prescription.getLastModified();
+        
+        // Pause to ensure timestamps are different
+        try {
+            Thread.sleep(10);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        
+        // When
+        prescription.setBilled(true);
+        
+        // Then
+        assertNotEquals(lastModifiedBefore, prescription.getLastModified());
+    }
+
+    @Test
+    void testPreUpdateMethodUpdatesLastModified() {
+        // Given
+        Prescription prescription = new Prescription();
+        LocalDateTime initialLastModified = prescription.getLastModified();
+
+        // Pause to ensure timestamps are different
+        try {
+            Thread.sleep(10);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
+        // When
+        prescription.preUpdate();
+        
+        // Then
+        assertNotEquals(initialLastModified, prescription.getLastModified());
     }
 }

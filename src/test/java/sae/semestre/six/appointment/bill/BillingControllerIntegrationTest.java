@@ -5,17 +5,17 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.MockitoAnnotations;
-import org.springframework.http.MediaType;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.http.MediaType;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
-import sae.semestre.six.appointment.doctor.DoctorDao;
-import sae.semestre.six.appointment.patient.PatientDao;
+import sae.semestre.six.appointment.doctor.DoctorRepository;
+import sae.semestre.six.appointment.patient.PatientRepository;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(BillingController.class)
 class BillingControllerIntegrationTest {
@@ -26,10 +26,10 @@ class BillingControllerIntegrationTest {
     private BillDao billDao;
 
     @MockitoBean
-    private PatientDao patientDao;
+    private PatientRepository patientRepository;
 
     @MockitoBean
-    private DoctorDao doctorDao;
+    private DoctorRepository doctorRepository;
 
     @InjectMocks
     private BillingController billingController;

@@ -12,25 +12,37 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.test.util.ReflectionTestUtils;
 import sae.semestre.six.appointment.Appointment;
-import sae.semestre.six.appointment.AppointmentDao;
+import sae.semestre.six.appointment.AppointmentRepository;
 import sae.semestre.six.appointment.SchedulingController;
 import sae.semestre.six.appointment.doctor.Doctor;
-import sae.semestre.six.appointment.doctor.DoctorDao;
+import sae.semestre.six.appointment.doctor.DoctorRepository;
+import sae.semestre.six.appointment.patient.Patient;
+import sae.semestre.six.appointment.patient.PatientRepository;
 import sae.semestre.six.email.EmailService;
 
-import java.util.*;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 
 class SchedulingControllerTest {
 
     @Mock
-    private AppointmentDao appointmentDao;
+    private AppointmentRepository appointmentRepository;
 
     @Mock
-    private DoctorDao doctorDao;
+    private DoctorRepository doctorRepository;
+
+    @Mock
+    private PatientRepository patientRepository;
 
     @Mock
     private EmailService emailService;
@@ -39,8 +51,8 @@ class SchedulingControllerTest {
     private SchedulingController schedulingController;
 
     private Doctor doctor;
-    private Date validDate;
-    private Date invalidDate;
+    private LocalDate validDate = LocalDate.now();
+    private LocalDate invalidDate = LocalDate.now().minusDays(1);
     private List<Appointment> existingAppointments;
 
     @BeforeEach
@@ -54,20 +66,16 @@ class SchedulingControllerTest {
         doctor.setFirstName("Dr.");
         doctor.setLastName("Smith");
 
-        // Configure a valid date (10 AM)
-        Calendar cal = Calendar.getInstance();
-        cal.set(Calendar.HOUR_OF_DAY, 10);
-        cal.set(Calendar.MINUTE, 0);
-        validDate = cal.getTime();
-
-        // Configure an invalid date (8 PM)
-        cal.set(Calendar.HOUR_OF_DAY, 20);
-        invalidDate = cal.getTime();
+        Patient patient = new Patient();
+        patient.setId(1L);
+        patient.setPatientNumber("123456789");
+        patient.setFirstName("Dr.");
+        patient.setLastName("Smith");
+        patientRepository.save(patient);
 
         // Configure existing appointments
         existingAppointments = new ArrayList<>();
-        cal.set(Calendar.HOUR_OF_DAY, 11);
-        Date existingAppointmentDate = cal.getTime();
+        LocalDateTime existingAppointmentDate = LocalDateTime.of(LocalDate.now(), LocalTime.of(10, 0));
 
         Appointment existingAppointment = new Appointment();
         existingAppointment.setAppointmentDate(existingAppointmentDate);
@@ -77,14 +85,15 @@ class SchedulingControllerTest {
         ReflectionTestUtils.setField(schedulingController, "emailService", emailService);
 
         // Configure mocks
-        when(doctorDao.findById(1L)).thenReturn(doctor);
-        when(appointmentDao.findByDoctorId(1L)).thenReturn(existingAppointments);
+        when(doctorRepository.findById(1L)).thenReturn(Optional.of(doctor));
+        when(appointmentRepository.findAllByDoctor_Id(1L)).thenReturn(existingAppointments);
+        when(patientRepository.findById(1L)).thenReturn(Optional.of(patient));
     }
 
     @Test
     void testScheduleAppointmentSuccess() {
         // When
-        String result = schedulingController.scheduleAppointment(1L, 2L, validDate);
+        String result = schedulingController.scheduleAppointment(1L, 1L, validDate.atTime(12, 0) );
 
         // Then
         assertEquals("Appointment scheduled successfully", result);
@@ -98,7 +107,7 @@ class SchedulingControllerTest {
     @Test
     void testScheduleAppointmentOutOfHours() {
         // When
-        String result = schedulingController.scheduleAppointment(1L, 2L, invalidDate);
+        String result = schedulingController.scheduleAppointment(1L, 2L, validDate.atTime(2, 0));
 
         // Then
         assertEquals("Appointments only available between 9 AM and 5 PM", result);
@@ -108,12 +117,12 @@ class SchedulingControllerTest {
     @Test
     void testScheduleAppointmentConflict() {
         // Given
-        when(appointmentDao.findByDoctorId(1L)).thenReturn(Collections.singletonList(
-                createAppointment(validDate)
+        when(appointmentRepository.findAllByDoctor_Id(1L)).thenReturn(Collections.singletonList(
+                createAppointment(validDate.atTime(10, 0))
         ));
 
         // When
-        String result = schedulingController.scheduleAppointment(1L, 2L, validDate);
+        String result = schedulingController.scheduleAppointment(1L, 2L, validDate.atTime(10, 0));
 
         // Then
         assertEquals("Doctor is not available at this time", result);
@@ -123,27 +132,25 @@ class SchedulingControllerTest {
     @Test
     void testGetAvailableSlots() {
         // When
-        List<Date> availableSlots = schedulingController.getAvailableSlots(1L, validDate);
+        List<LocalDateTime> availableSlots = schedulingController.getAvailableSlots(1L, validDate);
 
         // Then
-        assertEquals(8, availableSlots.size()); // 9 AM-5 PM minus the 11 AM appointment = 8 slots
+        assertEquals(8, availableSlots.size());
 
-        // Verify that the 11 AM slot is not available
-        Calendar cal = Calendar.getInstance();
-        boolean has11AMSlot = false;
+        // Verify that the 10 AM slot is not available
+        boolean has10AMSlot = false;
 
-        for (Date slot : availableSlots) {
-            cal.setTime(slot);
-            if (cal.get(Calendar.HOUR_OF_DAY) == 11) {
-                has11AMSlot = true;
+        for (LocalDateTime slot : availableSlots) {
+            if (slot.getHour() == 10) {
+                has10AMSlot = true;
                 break;
             }
         }
 
-        assertFalse(has11AMSlot);
+        assertFalse(has10AMSlot);
     }
 
-    private Appointment createAppointment(Date date) {
+    private Appointment createAppointment(LocalDateTime date) {
         Appointment appointment = new Appointment();
         appointment.setAppointmentDate(date);
         return appointment;

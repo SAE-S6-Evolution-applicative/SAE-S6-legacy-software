@@ -14,9 +14,10 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import sae.semestre.six.appointment.bill.BillingService;
 import sae.semestre.six.appointment.patient.Patient;
-import sae.semestre.six.appointment.patient.PatientDao;
+import sae.semestre.six.appointment.patient.PatientRepository;
 
-import java.util.Date;
+import java.time.LocalDate;
+import java.util.Optional;
 
 import static org.hamcrest.Matchers.containsString;
 import static org.mockito.ArgumentMatchers.any;
@@ -38,9 +39,9 @@ class PrescriptionControllerInegrationTest {
     @MockitoBean
     private BillingService billingService;
     @MockitoBean
-    private PatientDao patientDao;
+    private PatientRepository patientRepository;
     @MockitoBean
-    private PrescriptionDao prescriptionDao;
+    private PrescriptionRepository prescriptionRepository;
 
     private AutoCloseable autoCloseable;
 
@@ -63,7 +64,7 @@ class PrescriptionControllerInegrationTest {
         patient.setPatientNumber("P12345");
         patient.setPhoneNumber("1234567890");
         patient.setGender("Male");
-        patient.setDateOfBirth(new Date());
+        patient.setDateOfBirth(LocalDate.now());
         patient.setAddress("123 Main St");
         return patient;
     }
@@ -75,7 +76,7 @@ class PrescriptionControllerInegrationTest {
         String[] medicines = {"PARACETAMOL", "ANTIBIOTICS"};
         String notes = "Take with food";
 
-        when(patientDao.findById(1L)).thenReturn(patient);
+        when(patientRepository.findById(1L)).thenReturn(Optional.of(patient));
 
         server.perform(post("/prescriptions/add")
                         .param("patientId", patient.getId().toString())
@@ -84,8 +85,8 @@ class PrescriptionControllerInegrationTest {
                 .andExpect(status().isOk())
                 .andExpect(MockMvcResultMatchers.content().string("Prescription RX" + counter + " created and billed"));
 
-        verify(patientDao).findById(patient.getId());
-        verify(prescriptionDao).save(any(Prescription.class));
+        verify(patientRepository).findById(patient.getId());
+        verify(prescriptionRepository).save(any(Prescription.class));
         verify(billingService).processBill(
                 patient.getId().toString(),
                 "SYSTEM",
@@ -99,7 +100,7 @@ class PrescriptionControllerInegrationTest {
         String[] medicines = {"PARACETAMOL", "ANTIBIOTICS"};
         String notes = "Take with food";
 
-        when(patientDao.findById(nonExistentPatientId)).thenThrow(new RuntimeException("Patient not found"));
+        when(patientRepository.findById(nonExistentPatientId)).thenThrow(new RuntimeException("Patient not found"));
 
         server.perform(post("/prescriptions/add")
                         .param("patientId", String.valueOf(nonExistentPatientId))
@@ -114,7 +115,7 @@ class PrescriptionControllerInegrationTest {
         // Arrange
         String patientId = "1";
         Patient patient = createTestPatient();
-        when(patientDao.findById(Long.parseLong(patientId))).thenReturn(patient);
+        when(patientRepository.findById(Long.parseLong(patientId))).thenReturn(Optional.of(patient));
 
         // Act
         server.perform(get("/prescriptions/patient/" + patientId))

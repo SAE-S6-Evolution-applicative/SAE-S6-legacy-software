@@ -1,7 +1,8 @@
 package sae.semestre.six.stock;
 
 import jakarta.persistence.*;
-import java.util.Date;
+
+import java.time.LocalDate;
 
 @Entity
 @Table(name = "price_history")
@@ -21,8 +22,7 @@ public class PriceHistory {
     private Double newPrice;
     
     @Column(name = "change_date")
-    @Temporal(TemporalType.TIMESTAMP)
-    private Date changeDate = new Date();
+    private LocalDate changeDate = LocalDate.now();
 
     public void setNewPrice(Double newPrice) {
         this.newPrice = newPrice;

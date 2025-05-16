@@ -38,7 +38,10 @@ class InventoryControllerIntegrationTest {
     private MockMvc server;
 
     @MockitoBean
-    private InventoryDao inventoryDao;
+    private InventoryRepository inventoryRepository;
+
+    @MockitoBean
+    private InventoryService inventoryService;
 
     @MockitoBean
     private EmailService emailService;
@@ -77,7 +80,7 @@ class InventoryControllerIntegrationTest {
                 .andExpect(MockMvcResultMatchers.content().string("Supplier invoice processed successfully"));
 
         ArgumentCaptor<Inventory> inventoryCaptor = ArgumentCaptor.forClass(Inventory.class);
-        verify(inventoryDao).update(inventoryCaptor.capture());
+        verify(inventoryRepository).save(inventoryCaptor.capture());
 
         Inventory updatedInventory = inventoryCaptor.getValue();
         assertEquals(inventory.getQuantity() + addedQuantity, updatedInventory.getQuantity());
@@ -96,7 +99,7 @@ class InventoryControllerIntegrationTest {
         SupplierInvoice supplierInvoice = createSupplierInvoice(inventory, addedQuantity, unitPrice);
 
         String errorMessage = "Database error";
-        doThrow(new RuntimeException(errorMessage)).when(inventoryDao).update(any());
+        doThrow(new RuntimeException(errorMessage)).when(inventoryRepository).save(any());
 
         server.perform(post("/inventory/supplier-invoice")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -118,6 +121,7 @@ class InventoryControllerIntegrationTest {
         supplierInvoice.setDetails(details);
         return supplierInvoice;
     }
+
     /**
      * Convert SupplierInvoice to JSON string
      * <br>
@@ -154,7 +158,7 @@ class InventoryControllerIntegrationTest {
                 createInventoryItem("ITEM002", 8, 15),
                 createInventoryItem("ITEM003", 22, 10)
         );
-        when(inventoryDao.findAll()).thenReturn(mockItems);
+        when(inventoryService.findAll()).thenReturn(mockItems);
 
         server.perform(get("/inventory/low-stock"))
                 .andDo(print())
@@ -162,12 +166,12 @@ class InventoryControllerIntegrationTest {
                 .andExpect(MockMvcResultMatchers.jsonPath("$").isArray())
                 .andExpect(MockMvcResultMatchers.jsonPath("$.length()").value(2));
 
-        verify(inventoryDao).findAll();
+        verify(inventoryService).findAll();
     }
 
     @Test
     void testGetLowStockItemsButEmptyListIsReturned() throws Exception {
-        when(inventoryDao.findAll()).thenReturn(Collections.emptyList());
+        when(inventoryService.findAll()).thenReturn(Collections.emptyList());
 
         server.perform(get("/inventory/low-stock"))
                 .andDo(print())
@@ -176,7 +180,7 @@ class InventoryControllerIntegrationTest {
                 .andExpect(MockMvcResultMatchers.jsonPath("$").isEmpty())
                 .andExpect(MockMvcResultMatchers.jsonPath("$.length()").value(0));
 
-        verify(inventoryDao).findAll();
+        verify(inventoryService).findAll();
     }
 
     @Test
@@ -186,7 +190,7 @@ class InventoryControllerIntegrationTest {
         );
         String expectedResponse = "Reorder requests sent for " + lowStockItems.size() + " items";
 
-        when(inventoryDao.findNeedingRestock()).thenReturn(lowStockItems);
+        when(inventoryService.findNeedingRestock()).thenReturn(lowStockItems);
         doNothing().when(emailService).sendEmail(anyString(), anyString(), anyString());
         createIfNotExist("C:\\hospital\\orders.txt");
 
@@ -195,7 +199,7 @@ class InventoryControllerIntegrationTest {
                 .andExpect(status().isOk())
                 .andExpect(MockMvcResultMatchers.content().string(expectedResponse));
 
-        verify(inventoryDao).findNeedingRestock();
+        verify(inventoryService).findNeedingRestock();
     }
 
     private void createIfNotExist(String filePath) {

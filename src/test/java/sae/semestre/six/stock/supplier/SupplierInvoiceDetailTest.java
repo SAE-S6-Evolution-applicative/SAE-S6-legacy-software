@@ -3,7 +3,7 @@ package sae.semestre.six.stock.supplier;
 import org.junit.jupiter.api.Test;
 import sae.semestre.six.stock.Inventory;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class SupplierInvoiceDetailTest {
 

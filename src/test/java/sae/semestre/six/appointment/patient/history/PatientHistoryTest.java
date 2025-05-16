@@ -1,4 +1,5 @@
 package sae.semestre.six.appointment.patient.history;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
@@ -7,10 +8,11 @@ import sae.semestre.six.appointment.Appointment;
 import sae.semestre.six.appointment.bill.Bill;
 import sae.semestre.six.appointment.patient.Patient;
 
-import java.util.*;
+import java.time.LocalDateTime;
+import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.Mockito.when;
 
 class PatientHistoryTest {
 
@@ -40,8 +42,8 @@ class PatientHistoryTest {
     @Test
     void testGetBillsSortedShouldReturnBillsInDescendingOrderOfDate() {
         // Arrange
-        Date date1 = new GregorianCalendar(2023, Calendar.JANUARY, 1).getTime();
-        Date date2 = new GregorianCalendar(2023, Calendar.FEBRUARY, 1).getTime();
+        LocalDateTime date1 = LocalDateTime.of(2023, 1, 1, 1, 1);
+        LocalDateTime date2 = LocalDateTime.of(2023, 2, 1, 1, 1);
         when(bill1.getBillDate()).thenReturn(date1);
         when(bill2.getBillDate()).thenReturn(date2);
 
@@ -85,7 +87,7 @@ class PatientHistoryTest {
     @Test
     void testSetAndGetVisitDate() {
         // Arrange
-        Date visitDate = new Date();
+        LocalDateTime visitDate = LocalDateTime .now();
 
         // Act
         patientHistory.setVisitDate(visitDate);
