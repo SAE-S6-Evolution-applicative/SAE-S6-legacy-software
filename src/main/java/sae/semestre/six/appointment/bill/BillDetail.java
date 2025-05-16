@@ -3,8 +3,6 @@ package sae.semestre.six.appointment.bill;
 import jakarta.persistence.*;
 import sae.semestre.six.appointment.medicalact.MedicalAct;
 
-import java.util.Objects;
-
 @Entity
 @Table(name = "bill_details")
 public class BillDetail {

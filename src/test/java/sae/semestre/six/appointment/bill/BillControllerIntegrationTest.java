@@ -10,30 +10,20 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
 import sae.semestre.six.appointment.Appointment;
-import sae.semestre.six.appointment.AppointmentDaoImpl;
+import sae.semestre.six.appointment.AppointmentRepository;
 import sae.semestre.six.appointment.doctor.Doctor;
-import sae.semestre.six.appointment.doctor.DoctorDao;
+import sae.semestre.six.appointment.doctor.DoctorRepository;
 import sae.semestre.six.appointment.medicalact.MedicalAct;
 import sae.semestre.six.appointment.medicalact.MedicalActRepository;
 import sae.semestre.six.appointment.medicalact.MedicalActService;
 import sae.semestre.six.appointment.patient.Patient;
-import sae.semestre.six.appointment.patient.PatientDao;
-import sae.semestre.six.appointment.doctor.DoctorRepository;
 import sae.semestre.six.appointment.patient.PatientRepository;
 
-import java.util.Date;
-import java.util.Set;
+import java.time.LocalDateTime;
 
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.hasItems;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.contains;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
@@ -54,20 +44,21 @@ class BillControllerIntegrationTest {
     @Autowired
     private BillService billService;
 
-    @MockitoBean
+    @Autowired
     private PatientRepository patientRepository;
 
-    @MockitoBean
+    @Autowired
     private DoctorRepository doctorRepository;
 
     @Autowired
     private MedicalActService medicalActService;
-    @Autowired
-    private AppointmentDaoImpl appointmentDaoImpl;
+    
     @Autowired
     private MedicalActRepository medicalActRepository;
     @Autowired
     private BillDetailRepository billDetailRepository;
+    @Autowired
+    private AppointmentRepository appointmentRepository;
 
     @Test
     void testProcessBill() throws Exception {
@@ -75,25 +66,25 @@ class BillControllerIntegrationTest {
         patient.setPatientNumber("PAT001");
         patient.setFirstName("John");
         patient.setLastName("Doe");
-        patientDao.save(patient);
-        patient = patientDao.findByPatientNumber(patient.getPatientNumber());
+        patientRepository.save(patient);
+        patient = patientRepository.findByPatientNumber(patient.getPatientNumber());
 
         Doctor doctor = new Doctor();
         doctor.setDoctorNumber("DOCTOR001");
         doctor.setFirstName("John");
         doctor.setLastName("Doe");
-        doctorDao.save(doctor);
+        doctorRepository.save(doctor);
 
         Appointment appointment = new Appointment();
         appointment.setAppointmentNumber("APPOINTMENT001");
         appointment.setPatient(patient);
         appointment.setDoctor(doctor);
-        appointment.setAppointmentDate(new Date());
-        appointmentDaoImpl.save(appointment);
+        appointment.setAppointmentDate(LocalDateTime.now());
+        appointment = appointmentRepository.save(appointment);
 
-        doctor = doctorDao.findByDoctorNumber(doctor.getDoctorNumber());
-        doctor.setAppointments(Set.of(appointment));
-        doctorDao.save(doctor);
+        doctor = doctorRepository.findByDoctorNumber(doctor.getDoctorNumber());
+        doctor.addAppointment(appointment);
+        doctorRepository.save(doctor);
 
         MedicalAct consultation = medicalActRepository.save(new MedicalAct("CONSULTATION", 10.0));
 
@@ -117,25 +108,25 @@ class BillControllerIntegrationTest {
         patient.setPatientNumber("PAT001");
         patient.setFirstName("John");
         patient.setLastName("Doe");
-        patientDao.save(patient);
-        patient = patientDao.findByPatientNumber(patient.getPatientNumber());
+        patientRepository.save(patient);
+        patient = patientRepository.findByPatientNumber(patient.getPatientNumber());
 
         Doctor doctor = new Doctor();
         doctor.setDoctorNumber("DOCTOR001");
         doctor.setFirstName("John");
         doctor.setLastName("Doe");
-        doctorDao.save(doctor);
+        doctorRepository.save(doctor);
 
         Appointment appointment = new Appointment();
         appointment.setAppointmentNumber("APPOINTMENT001");
         appointment.setPatient(patient);
         appointment.setDoctor(doctor);
-        appointment.setAppointmentDate(new Date());
-        appointmentDaoImpl.save(appointment);
+        appointment.setAppointmentDate(LocalDateTime.now());
+        appointment = appointmentRepository.save(appointment);
 
-        doctor = doctorDao.findByDoctorNumber(doctor.getDoctorNumber());
-        doctor.setAppointments(Set.of(appointment));
-        doctorDao.save(doctor);
+        doctor = doctorRepository.findByDoctorNumber(doctor.getDoctorNumber());
+        doctor.addAppointment(appointment);
+        doctorRepository.save(doctor);
 
         MedicalAct consultation = medicalActRepository.save(new MedicalAct("CONSULTATION", 10.0));
         Long invalidId = 999L;
@@ -155,25 +146,25 @@ class BillControllerIntegrationTest {
         patient.setPatientNumber("PAT001");
         patient.setFirstName("John");
         patient.setLastName("Doe");
-        patientDao.save(patient);
-        patient = patientDao.findByPatientNumber(patient.getPatientNumber());
+        patientRepository.save(patient);
+        patient = patientRepository.findByPatientNumber(patient.getPatientNumber());
 
         Doctor doctor = new Doctor();
         doctor.setDoctorNumber("DOCTOR001");
         doctor.setFirstName("John");
         doctor.setLastName("Doe");
-        doctorDao.save(doctor);
+        doctorRepository.save(doctor);
 
         Appointment appointment = new Appointment();
         appointment.setAppointmentNumber("APPOINTMENT001");
         appointment.setPatient(patient);
         appointment.setDoctor(doctor);
-        appointment.setAppointmentDate(new Date());
-        appointmentDaoImpl.save(appointment);
+        appointment.setAppointmentDate(LocalDateTime.now());
+        appointment = appointmentRepository.save(appointment);
 
-        doctor = doctorDao.findByDoctorNumber(doctor.getDoctorNumber());
-        doctor.setAppointments(Set.of(appointment));
-        doctorDao.save(doctor);
+        doctor = doctorRepository.findByDoctorNumber(doctor.getDoctorNumber());
+        doctor.addAppointment(appointment);
+        doctorRepository.save(doctor);
 
         Long invalidId = 999L;
 
@@ -191,25 +182,25 @@ class BillControllerIntegrationTest {
         patient.setPatientNumber("PAT001");
         patient.setFirstName("John");
         patient.setLastName("Doe");
-        patientDao.save(patient);
-        patient = patientDao.findByPatientNumber(patient.getPatientNumber());
+        patientRepository.save(patient);
+        patient = patientRepository.findByPatientNumber(patient.getPatientNumber());
 
         Doctor doctor = new Doctor();
         doctor.setDoctorNumber("DOCTOR001");
         doctor.setFirstName("John");
         doctor.setLastName("Doe");
-        doctorDao.save(doctor);
+        doctorRepository.save(doctor);
 
         Appointment appointment = new Appointment();
         appointment.setAppointmentNumber("APPOINTMENT001");
         appointment.setPatient(patient);
         appointment.setDoctor(doctor);
-        appointment.setAppointmentDate(new Date());
-        appointmentDaoImpl.save(appointment);
+        appointment.setAppointmentDate(LocalDateTime.now());
+        appointment = appointmentRepository.save(appointment);
 
-        doctor = doctorDao.findByDoctorNumber(doctor.getDoctorNumber());
-        doctor.setAppointments(Set.of(appointment));
-        doctorDao.save(doctor);
+        doctor = doctorRepository.findByDoctorNumber(doctor.getDoctorNumber());
+        doctor.addAppointment(appointment);
+        doctorRepository.save(doctor);
 
         MedicalAct consultation = new MedicalAct("CONSULTATION", 10.0);
         consultation.setActive(false);

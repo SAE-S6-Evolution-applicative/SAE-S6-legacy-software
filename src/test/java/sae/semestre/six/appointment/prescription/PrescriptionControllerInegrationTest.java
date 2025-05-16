@@ -87,7 +87,7 @@ class PrescriptionControllerInegrationTest {
 
         verify(patientRepository).findById(patient.getId());
         verify(prescriptionRepository).save(any(Prescription.class));
-        verify(billingService).processBill(
+        verify(billService).processBill(
                 patient.getId().toString(),
                 "SYSTEM",
                 new String[]{"PRESCRIPTION_RX" + counter}

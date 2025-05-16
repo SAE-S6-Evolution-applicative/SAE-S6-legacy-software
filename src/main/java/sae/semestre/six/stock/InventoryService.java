@@ -13,7 +13,7 @@ import java.util.List;
 @Service
 public class InventoryService {
 
-    private InventoryRepository inventoryRepository;
+    private final InventoryRepository inventoryRepository;
 
     @Autowired
     private InventoryService(InventoryRepository inventoryRepository) {

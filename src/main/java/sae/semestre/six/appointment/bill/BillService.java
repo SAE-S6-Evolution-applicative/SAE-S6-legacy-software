@@ -1,6 +1,5 @@
 package sae.semestre.six.appointment.bill;
 
-import org.hibernate.Hibernate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import sae.semestre.six.appointment.doctor.Doctor;
@@ -18,9 +17,9 @@ public class BillService {
         this.billDetailRepository = billDetailRepository;
     }
 
-    private BillDetailRepository billDetailRepository;
+    private final BillDetailRepository billDetailRepository;
 
-    private BillRepository billRepository;
+    private final BillRepository billRepository;
 
 
     public List<Bill> findPendingBills() {

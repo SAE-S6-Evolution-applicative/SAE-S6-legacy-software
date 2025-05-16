@@ -3,7 +3,6 @@ package sae.semestre.six.appointment.medicalact;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
-import sae.semestre.six.appointment.bill.Bill;
 import sae.semestre.six.appointment.bill.BillDetail;
 import sae.semestre.six.appointment.bill.BillDetailService;
 import sae.semestre.six.appointment.bill.BillService;
@@ -11,18 +10,16 @@ import sae.semestre.six.appointment.bill.BillService;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 @Service
 public class MedicalActService {
 
     private final BillDetailService billDetailService;
-    private MedicalActRepository medicalActRepository;
+    private final MedicalActRepository medicalActRepository;
 
-    private BillService billService;
+    private final BillService billService;
 
-    private static Logger logger = LoggerFactory.getLogger(MedicalActService.class);
+    private static final Logger logger = LoggerFactory.getLogger(MedicalActService.class);
 
     public MedicalActService(MedicalActRepository medicalActRepository, BillService billService, BillDetailService billDetailService) {
         this.medicalActRepository = medicalActRepository;

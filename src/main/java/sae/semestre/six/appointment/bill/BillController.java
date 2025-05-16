@@ -13,12 +13,10 @@ import sae.semestre.six.appointment.doctor.DoctorRepository;
 import sae.semestre.six.appointment.medicalact.MedicalAct;
 import sae.semestre.six.appointment.medicalact.MedicalActService;
 import sae.semestre.six.appointment.patient.Patient;
-import sae.semestre.six.appointment.patient.PatientDao;
-import sae.semestre.six.common.SuccessfullResponseModel;
 import sae.semestre.six.appointment.patient.PatientRepository;
+import sae.semestre.six.common.SuccessfullResponseModel;
 import sae.semestre.six.email.EmailService;
 
-import java.io.FileWriter;
 import java.util.List;
 import java.util.Objects;
 
@@ -33,27 +31,22 @@ public class BillingController {
 
     private MedicalActService medicalActService;
 
-    private PatientDao patientDao;
+    private PatientRepository patientRepository;
 
-    private DoctorDao doctorDao;
+    private DoctorRepository doctorRepository;
 
     private final EmailService emailService = EmailService.getInstance();
 
     @Autowired
     public BillController(
-            PatientDao patientDao, DoctorDao doctorDao, BillService billService, MedicalActService medicalActService
+            DoctorRepository doctorRepository, PatientRepository patientRepository, BillService billService, MedicalActService medicalActService
     ) {
-        this.patientDao = patientDao;
-        this.doctorDao = doctorDao;
+        this.doctorRepository = doctorRepository;
+        this.patientRepository = patientRepository;
         this.billService = billService;
         this.medicalActService = medicalActService;
     }
 
-    
-    private PatientRepository patientRepository;
-    
-    private DoctorRepository doctorRepository;
-    
     private BillController() {
     }
 
@@ -75,7 +68,6 @@ public class BillingController {
                     () -> new RuntimeException("Doctor not found")
             );
             
-            Hibernate.initialize(doctor.getAppointments());
         List<MedicalAct> medicalActs = medicalActService.findByIds(medicalActId);
 
         Bill bill = billService.processBill(patient, doctor, medicalActs);

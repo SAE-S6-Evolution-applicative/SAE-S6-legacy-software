@@ -11,8 +11,8 @@ import java.util.List;
 @RequestMapping("/medicalAct")
 public class MedicalActController {
 
-    private MedicalActService medicalActService;
-    private MedicalActRepository medicalActRepository;
+    private final MedicalActService medicalActService;
+    private final MedicalActRepository medicalActRepository;
 
     @Autowired
     public MedicalActController(MedicalActService medicalActService, MedicalActRepository medicalActRepository) {

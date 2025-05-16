@@ -11,8 +11,8 @@ public class MedicalBillingProcessor {
     private static volatile MedicalBillingProcessor instance;
     private static final String BILLING_FILE = "C:\\hospital\\billing.txt";
 
-    private Map<String, Double> priceList = new HashMap<>();
-    private List<String> pendingBills = new ArrayList<>();
+    private final Map<String, Double> priceList = new HashMap<>();
+    private final List<String> pendingBills = new ArrayList<>();
     private double totalRevenue = 0.0;
 
     private MedicalBillingProcessor() {

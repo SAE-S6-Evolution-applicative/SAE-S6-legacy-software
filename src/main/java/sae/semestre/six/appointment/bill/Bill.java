@@ -90,11 +90,11 @@ public class Bill {
         this.doctor = doctor;
     }
 
-    public LocalDate getBillDate() {
+    public LocalDateTime getBillDate() {
         return billDate;
     }
 
-    public void setBillDate(LocalDate billDate) {
+    public void setBillDate(LocalDateTime billDate) {
         this.billDate = billDate;
     }
 
@@ -144,6 +144,6 @@ public class Bill {
 
     public enum Status {
         PENDING,
-        PAID;
+        PAID
     }
 }

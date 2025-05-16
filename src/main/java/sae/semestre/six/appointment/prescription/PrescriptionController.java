@@ -6,7 +6,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
-import sae.semestre.six.appointment.bill.BillingService;
+import sae.semestre.six.appointment.bill.BillService;
 import sae.semestre.six.appointment.patient.Patient;
 import sae.semestre.six.appointment.patient.PatientRepository;
 
@@ -21,13 +21,10 @@ import java.util.Map;
 @RequestMapping("/prescriptions")
 @Tag(name = "Prescriptions", description = "Prescription management API")
 public class PrescriptionController {
-    
+
     private static final Map<String, List<String>> patientPrescriptions = new HashMap<>();
     private static final Map<String, Integer> medicineInventory = new HashMap<>();
-    
-    @Autowired
-    private BillService billService;
-    
+
     private static final Map<String, Double> medicinePrices = new HashMap<String, Double>() {{
         put("PARACETAMOL", 5.0);
         put("ANTIBIOTICS", 25.0);
@@ -37,6 +34,9 @@ public class PrescriptionController {
     private static int prescriptionCounter = 0;
     private static final String AUDIT_FILE = "C:\\hospital\\prescriptions.log";
     
+    @Autowired
+    private BillService billService;
+
     @Autowired
     private PatientRepository patientRepository;
     
@@ -74,7 +74,7 @@ public class PrescriptionController {
             
             
             new FileWriter(AUDIT_FILE, true)
-                .append(LocalDate.now().toString() + " - " + prescriptionId + "\n")
+                .append(LocalDate.now() + " - " + prescriptionId + "\n")
                 .close();
             
             
@@ -98,7 +98,7 @@ public class PrescriptionController {
             return "Prescription " + prescriptionId + " created and billed";
         } catch (Exception e) {
             e.printStackTrace();
-            return "Failed: " + e.toString();
+            return "Failed: " + e;
         }
     }
     
