@@ -82,7 +82,7 @@ public class PrescriptionController {
             currentPrescriptions.add(prescriptionId);
             patientPrescriptions.put(patientId, currentPrescriptions);
             
-            
+
             billService.processBill(
                 patientId,
                 "SYSTEM",

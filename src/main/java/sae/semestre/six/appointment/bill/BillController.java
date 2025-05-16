@@ -4,7 +4,8 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import org.hibernate.Hibernate;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import sae.semestre.six.appointment.doctor.Doctor;
@@ -18,25 +19,30 @@ import sae.semestre.six.appointment.patient.PatientRepository;
 import sae.semestre.six.email.EmailService;
 
 import java.io.FileWriter;
-import java.util.*;
-import java.util.concurrent.atomic.AtomicReference;
-import java.util.stream.Collectors;
+import java.util.List;
+import java.util.Objects;
 
 @RestController
 @RequestMapping("/bills")
 @Tag(name = "Billing", description = "Billing management API")
 public class BillingController {
 
+    private static final Logger logger = LoggerFactory.getLogger(BillController.class);
+
     private BillService billService;
+
+    private MedicalActService medicalActService;
+
+    private PatientDao patientDao;
+
+    private DoctorDao doctorDao;
+
+    private final EmailService emailService = EmailService.getInstance();
 
     @Autowired
     public BillController(
-            BillRepository billRepository, PatientDao patientDao,
-            DoctorDao doctorDao, BillService billService,
-            MedicalActService medicalActService
+            PatientDao patientDao, DoctorDao doctorDao, BillService billService, MedicalActService medicalActService
     ) {
-        this();
-        this.billRepository = billRepository;
         this.patientDao = patientDao;
         this.doctorDao = doctorDao;
         this.billService = billService;
@@ -51,10 +57,6 @@ public class BillingController {
     private BillController() {
     }
 
-    private MedicalActService medicalActService;
-
-    private BillRepository billRepository;
-    private final EmailService emailService = EmailService.getInstance();
 
     @Operation(summary = "Process a bill", description = "Creates and processes a new bill for a patient")
     @ApiResponse(responseCode = "200", description = "Bill processed successfully")
@@ -74,55 +76,18 @@ public class BillingController {
             );
             
             Hibernate.initialize(doctor.getAppointments());
-
-        Bill bill = new Bill();
-        bill.setBillNumber("BILL" + System.currentTimeMillis());
-        bill.setPatient(patient);
-        bill.setDoctor(doctor);
-
-        Hibernate.initialize(bill.getBillDetails());
-
-        double total = 0.0;
-
         List<MedicalAct> medicalActs = medicalActService.findByIds(medicalActId);
 
-        if (medicalActs.isEmpty()) {
-            throw new Exception("No medical acts found");
-        }
-        if (!medicalActs.stream().allMatch(MedicalAct::isActive)) {
-            throw new Exception("Some medical acts are inactive");
-        }
-
-        Set<BillDetail> details = medicalActs.stream()
-                .map(medicalAct -> {
-                    BillDetail billDetail = new BillDetail();
-                    billDetail.setBill(bill);
-                    billDetail.setMedicalAct(medicalAct);
-                    billDetail.calculateLineTotal();
-                    Hibernate.initialize(billDetail);
-                    return billDetail;
-                }).collect(Collectors.toSet());
-
-        total = details.stream()
-                .map(BillDetail::getLineTotal)
-                .reduce(total, Double::sum);
-
-        if (total > 500) {
-            total *= 0.9;
-        }
-
-        bill.setTotalAmount(total);
-        bill.setBillDetails(details);
+        Bill bill = billService.processBill(patient, doctor, medicalActs);
 
         try (FileWriter fw = new FileWriter("C:\\hospital\\billing.txt", true)) {
-            fw.write(bill.getBillNumber() + ": $" + total + "\n");
+            fw.write(bill.getBillNumber() + ": $" + bill.getTotalAmount() + "\n");
         }
-        billRepository.save(bill);
 
         emailService.sendEmail(
                 "admin@hospital.com",
                 "New Bill Generated",
-                "Bill Number: " + bill.getBillNumber() + "\nTotal: $" + total
+                "Bill Number: " + bill.getBillNumber() + "\nTotal: $" + bill.getTotalAmount()
         );
 
         return new SuccessfullResponseModel("Bill processed successfully", true);

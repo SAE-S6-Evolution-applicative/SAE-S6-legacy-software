@@ -37,7 +37,6 @@ public class BillDetail {
         calculateLineTotal();
     }
 
-
     public void calculateLineTotal() {
         this.lineTotal = this.quantity * this.medicalAct.getPrice();
     }

@@ -52,6 +52,12 @@ public class Bill {
     @ManyToOne
     private PatientHistory patientHistory;
 
+    @Column(name = "total_brut")
+    private Double totalBrut = 0.0;
+
+    private final static double REDUCTION_TRESHOLD = 500.0;
+    private final static double REDUCTION_PERCENTAGE = 0.9;
+
     public Long getId() {
         return id;
     }
@@ -113,25 +119,31 @@ public class Bill {
         return billDetails;
     }
 
-    public void setBillDetails(Set<BillDetail> billDetails) {
-        this.billDetails = billDetails;
-    }
-
     public Bill addBillDetail(BillDetail billDetail) {
         this.billDetails.add(billDetail);
         billDetail.setBill(this);
         this.lastModified = LocalDate.now();
-        this.totalAmount += billDetail.getLineTotal();
+        this.totalBrut += billDetail.getLineTotal();
+        this.totalAmount = computeTotalAmountWithReduction(totalBrut);
         return this;
     }
 
-    public void removeBillDetail(BillDetail billDetail) {
-        this.billDetails.remove(billDetail);
-        billDetail.setBill(null);
+    /**
+     * Compute the reduction base of the totalBrut
+     *
+     * @param totalBrut the sum of all billDetail
+     * @return total amount with reduction applied
+     */
+    public static double computeTotalAmountWithReduction(double totalBrut) {
+        double totalAmount = totalBrut;
+        if (totalBrut > REDUCTION_TRESHOLD) {
+            totalAmount = totalBrut * REDUCTION_PERCENTAGE;
+        }
+        return totalAmount;
     }
 
-    public static enum Status {
+    public enum Status {
         PENDING,
         PAID;
     }
-} 
+}

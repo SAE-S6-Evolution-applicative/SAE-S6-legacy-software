@@ -35,7 +35,7 @@ class BillServiceIntegrationTest {
 
     @Test
     void testProcessBill() {
-        // Method is empty, we simply testinf that it does not generate any exception
+        // Method is empty, we simply test if that it does not generate any exception
         assertDoesNotThrow(() -> {
             billService.processBill("1", "test", new String[]{"CONSULTATION"});
         });
@@ -45,7 +45,7 @@ class BillServiceIntegrationTest {
     void testProcessBillWithNullValues() {
         // Verify that the method handle null values correctly
         assertDoesNotThrow(() -> {
-            billService.processBill(null, null, null);
+            billService.processBill((String) null, null, null);
         });
     }
 
