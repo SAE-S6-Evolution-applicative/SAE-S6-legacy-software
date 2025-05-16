@@ -3,8 +3,6 @@ package sae.semestre.six.appointment.prescription;
 import jakarta.persistence.*;
 import sae.semestre.six.appointment.patient.Patient;
 
-import java.io.Serializable;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Entity

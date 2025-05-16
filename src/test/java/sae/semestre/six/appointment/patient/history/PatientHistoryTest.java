@@ -1,4 +1,5 @@
 package sae.semestre.six.appointment.patient.history;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
@@ -7,12 +8,11 @@ import sae.semestre.six.appointment.Appointment;
 import sae.semestre.six.appointment.bill.Bill;
 import sae.semestre.six.appointment.patient.Patient;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.*;
+import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.Mockito.when;
 
 class PatientHistoryTest {
 

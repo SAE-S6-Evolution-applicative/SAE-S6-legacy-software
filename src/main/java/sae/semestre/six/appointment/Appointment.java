@@ -2,11 +2,10 @@ package sae.semestre.six.appointment;
 
 import jakarta.persistence.*;
 import sae.semestre.six.appointment.doctor.Doctor;
-import sae.semestre.six.appointment.room.Room;
 import sae.semestre.six.appointment.patient.Patient;
 import sae.semestre.six.appointment.patient.history.PatientHistory;
+import sae.semestre.six.appointment.room.Room;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Entity

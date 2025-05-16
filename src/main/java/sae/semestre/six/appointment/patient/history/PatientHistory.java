@@ -8,7 +8,6 @@ import sae.semestre.six.appointment.prescription.Prescription;
 
 import java.time.LocalDateTime;
 import java.util.*;
-import java.time.LocalDate;
 
 @Entity
 @Table(name = "patient_history")

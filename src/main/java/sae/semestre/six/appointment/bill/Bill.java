@@ -8,9 +8,8 @@ import sae.semestre.six.appointment.patient.history.PatientHistory;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.Date;
-import java.util.Set;
 import java.util.HashSet;
+import java.util.Set;
 
 @Entity
 @Table(name = "bills")

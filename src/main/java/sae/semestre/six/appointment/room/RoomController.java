@@ -2,10 +2,11 @@ package sae.semestre.six.appointment.room;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
-import sae.semestre.six.appointment.AppointmentRepository;
 import sae.semestre.six.appointment.Appointment;
+import sae.semestre.six.appointment.AppointmentRepository;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/rooms")

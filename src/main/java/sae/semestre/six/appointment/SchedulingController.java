@@ -2,14 +2,16 @@ package sae.semestre.six.appointment;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
-import sae.semestre.six.appointment.doctor.DoctorRepository;
 import sae.semestre.six.appointment.doctor.Doctor;
+import sae.semestre.six.appointment.doctor.DoctorRepository;
 import sae.semestre.six.appointment.patient.PatientRepository;
 import sae.semestre.six.email.EmailService;
-import java.util.*;
+
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @RestController
 @RequestMapping("/scheduling")

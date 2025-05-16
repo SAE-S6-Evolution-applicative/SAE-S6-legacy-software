@@ -5,9 +5,7 @@ import sae.semestre.six.appointment.Appointment;
 import sae.semestre.six.appointment.doctor.Doctor;
 import sae.semestre.six.appointment.patient.Patient;
 
-import static org.junit.jupiter.api.Assertions.*;
-
-import java.util.Date;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class AppointmentTest {
 

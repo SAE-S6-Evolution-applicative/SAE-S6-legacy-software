@@ -1,14 +1,17 @@
 package sae.semestre.six.appointment.prescription;
 
-import sae.semestre.six.appointment.patient.PatientRepository;
-import sae.semestre.six.appointment.patient.Patient;
-import sae.semestre.six.appointment.bill.BillingService;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
-import java.util.*;
-import java.io.*;
+import sae.semestre.six.appointment.bill.BillingService;
+import sae.semestre.six.appointment.patient.Patient;
+import sae.semestre.six.appointment.patient.PatientRepository;
+
+import java.io.FileWriter;
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/prescriptions")

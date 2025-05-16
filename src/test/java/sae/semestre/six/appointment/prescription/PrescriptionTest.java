@@ -2,7 +2,6 @@ package sae.semestre.six.appointment.prescription;
 
 import org.junit.jupiter.api.Test;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.concurrent.TimeUnit;
 

@@ -4,7 +4,6 @@ import jakarta.persistence.*;
 import sae.semestre.six.appointment.doctor.Doctor;
 import sae.semestre.six.appointment.patient.Patient;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Entity

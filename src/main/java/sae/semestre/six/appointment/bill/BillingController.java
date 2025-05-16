@@ -1,15 +1,16 @@
 package sae.semestre.six.appointment.bill;
 
-import org.springframework.web.bind.annotation.*;
-import org.springframework.beans.factory.annotation.Autowired;
-import sae.semestre.six.appointment.doctor.DoctorRepository;
-import sae.semestre.six.appointment.patient.PatientRepository;
-import sae.semestre.six.appointment.doctor.Doctor;
-import sae.semestre.six.appointment.patient.Patient;
-import sae.semestre.six.email.EmailService;
-import java.util.*;
-import java.io.*;
 import org.hibernate.Hibernate;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.*;
+import sae.semestre.six.appointment.doctor.Doctor;
+import sae.semestre.six.appointment.doctor.DoctorRepository;
+import sae.semestre.six.appointment.patient.Patient;
+import sae.semestre.six.appointment.patient.PatientRepository;
+import sae.semestre.six.email.EmailService;
+
+import java.io.FileWriter;
+import java.util.*;
 
 @RestController
 @RequestMapping("/billing")

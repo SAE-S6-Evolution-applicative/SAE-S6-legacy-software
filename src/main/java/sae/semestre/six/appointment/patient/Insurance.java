@@ -1,6 +1,7 @@
 package sae.semestre.six.appointment.patient;
 
 import jakarta.persistence.*;
+
 import java.time.LocalDate;
 
 @Entity

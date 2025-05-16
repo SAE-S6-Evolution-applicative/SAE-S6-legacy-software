@@ -1,7 +1,7 @@
 package sae.semestre.six.stock;
 
 import jakarta.persistence.*;
-import java.io.Serializable;
+
 import java.time.LocalDate;
 
 @Entity
@@ -103,4 +103,16 @@ public class Inventory {
             System.out.println("WARNING: Item " + itemCode + " needs restock!");
         }
     }
-} 
+
+    /**
+     * Updates the current inventory item by setting its quantity and marking the
+     * date of the last restocking. The quantity remains the same as the current
+     * value while the last restocked date is updated to the current date.
+     *
+     * @param quantity quantity to restock.
+     */
+    public void restock(Integer quantity) {
+        this.setQuantity(quantity);
+        this.setLastRestocked(LocalDate.now());
+    }
+}
