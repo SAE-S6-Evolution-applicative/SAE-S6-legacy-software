@@ -138,6 +138,15 @@ public class Bill {
         return billDetails;
     }
 
+    /**
+     * Adds a BillDetail to this bill.
+     * Updates the billDetails set, sets the Bill reference in BillDetail,
+     * updates the lastModified date, increments the totalBrut,
+     * and recalculates the totalAmount with any applicable reduction.
+     *
+     * @param billDetail the BillDetail to add
+     * @return this Bill instance
+     */
     public Bill addBillDetail(BillDetail billDetail) {
         this.billDetails.add(billDetail);
         billDetail.setBill(this);
@@ -149,6 +158,7 @@ public class Bill {
 
     /**
      * Recalculate the total amount of the bill.
+     *
      * @return the recalculated bill
      */
     public Bill recalculate() {
@@ -163,6 +173,9 @@ public class Bill {
         return this;
     }
 
+    /**
+     * Status of a Bill
+     */
     public enum Status {
         PENDING,
         PAID
