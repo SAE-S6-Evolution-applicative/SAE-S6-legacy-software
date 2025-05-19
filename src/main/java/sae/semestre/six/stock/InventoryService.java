@@ -41,7 +41,7 @@ public class InventoryService {
      * The new price is saved in the repository after being set.
      *
      * @param itemCode the unique code identifying the inventory item whose price is to be updated.
-     * @param price the new price to set for the specified inventory item.
+     * @param price    the new price to set for the specified inventory item.
      */
     public void updatePrice(String itemCode, Double price) {
         Inventory inventory = inventoryRepository.findByItemCode(itemCode);
@@ -54,7 +54,7 @@ public class InventoryService {
      *
      * @param itemCode the unique code of the inventory item to be retrieved.
      * @return the {@code Inventory} object corresponding to the specified item code,
-     *         or {@code null} if no such item exists.
+     * or {@code null} if no such item exists.
      */
     public Inventory findByItemCode(String itemCode) {
         return inventoryRepository.findByItemCode(itemCode);

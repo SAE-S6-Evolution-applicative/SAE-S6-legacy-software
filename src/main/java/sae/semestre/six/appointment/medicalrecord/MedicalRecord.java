@@ -49,11 +49,11 @@ public class MedicalRecord {
     @Column(name = "weight")
     private Float weight;
 
-    
+
     public MedicalRecord() {
     }
 
-    
+
     public Long getId() {
         return id;
     }

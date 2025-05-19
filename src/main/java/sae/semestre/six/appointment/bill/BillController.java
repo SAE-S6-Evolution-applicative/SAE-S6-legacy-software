@@ -48,10 +48,6 @@ public class BillingController {
         this.emailService = emailService;
     }
 
-    private BillController() {
-    }
-
-
     @Operation(summary = "Process a bill", description = "Creates and processes a new bill for a patient")
     @ApiResponse(responseCode = "200", description = "Bill processed successfully")
     @ApiResponse(responseCode = "400", description = "Invalid data")
@@ -60,15 +56,15 @@ public class BillingController {
             @Parameter(description = "Patient ID") @RequestParam String patientId,
             @Parameter(description = "Doctor ID") @RequestParam String doctorId,
             @Parameter(description = "List of medical acts id") @RequestParam Long[] medicalActId
-            ) throws Exception {
+    ) throws Exception {
 
-            Patient patient = patientRepository.findById(Long.parseLong(patientId)).orElseThrow(
-                    () -> new RuntimeException("Patient not found")
-            );
-            Doctor doctor = doctorRepository.findById(Long.parseLong(doctorId)).orElseThrow(
-                    () -> new RuntimeException("Doctor not found")
-            );
-            
+        Patient patient = patientRepository.findById(Long.parseLong(patientId)).orElseThrow(
+                () -> new RuntimeException("Patient not found")
+        );
+        Doctor doctor = doctorRepository.findById(Long.parseLong(doctorId)).orElseThrow(
+                () -> new RuntimeException("Doctor not found")
+        );
+
         List<MedicalAct> medicalActs = medicalActService.findByIds(medicalActId);
 
         Bill bill = billService.processBill(patient, doctor, medicalActs);
@@ -89,11 +85,11 @@ public class BillingController {
     @GetMapping("/insurance-coverage")
     public InsuranceCoverageResponse calculateInsurance(
             @Parameter(description = "Amount to cover") @RequestParam double amount
-            ) {
+    ) {
         double coverage = amount;
         return new InsuranceCoverageResponse(coverage);
     }
-    
+
     @Operation(summary = "Get total revenue", description = "Retrieves the total system revenue")
     @ApiResponse(responseCode = "200", description = "Total revenue")
     @GetMapping("/revenue")
@@ -104,7 +100,7 @@ public class BillingController {
         }
         return new RevenueResponse(totalRevenue);
     }
-    
+
     @Operation(summary = "Get pending bills", description = "Retrieves the list of pending bills")
     @ApiResponse(responseCode = "200", description = "List of pending bills")
     @GetMapping("/pending")

@@ -15,6 +15,9 @@ import java.util.Set;
 @Table(name = "bills")
 public class Bill {
 
+    private static final double REDUCTION_TRESHOLD = 500.0;
+    private static final double REDUCTION_PERCENTAGE = 0.9;
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -32,7 +35,7 @@ public class Bill {
 
     @Column(name = "bill_date")
     private LocalDateTime billDate = LocalDateTime.now();
-    
+
     @Column(name = "total_amount")
     private Double totalAmount = 0.0;
 
@@ -55,8 +58,19 @@ public class Bill {
     @Column(name = "total_brut")
     private Double totalBrut = 0.0;
 
-    private final static double REDUCTION_TRESHOLD = 500.0;
-    private final static double REDUCTION_PERCENTAGE = 0.9;
+    /**
+     * Compute the reduction base of the totalBrut
+     *
+     * @param totalBrut the sum of all billDetail
+     * @return total amount with reduction applied
+     */
+    public static double computeTotalAmountWithReduction(double totalBrut) {
+        double totalAmount = totalBrut;
+        if (totalBrut > REDUCTION_TRESHOLD) {
+            totalAmount = totalBrut * REDUCTION_PERCENTAGE;
+        }
+        return totalAmount;
+    }
 
     public Long getId() {
         return id;
@@ -126,20 +140,6 @@ public class Bill {
         this.totalBrut += billDetail.getLineTotal();
         this.totalAmount = computeTotalAmountWithReduction(totalBrut);
         return this;
-    }
-
-    /**
-     * Compute the reduction base of the totalBrut
-     *
-     * @param totalBrut the sum of all billDetail
-     * @return total amount with reduction applied
-     */
-    public static double computeTotalAmountWithReduction(double totalBrut) {
-        double totalAmount = totalBrut;
-        if (totalBrut > REDUCTION_TRESHOLD) {
-            totalAmount = totalBrut * REDUCTION_PERCENTAGE;
-        }
-        return totalAmount;
     }
 
     public enum Status {

@@ -12,38 +12,40 @@ import java.util.*;
 @Entity
 @Table(name = "patient_history")
 public class PatientHistory {
-    
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    
-    @ManyToOne(fetch = FetchType.EAGER) 
+
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "patient_id")
     private Patient patient;
-    
-    @OneToMany(mappedBy = "patientHistory", fetch = FetchType.EAGER) 
+
+    @OneToMany(mappedBy = "patientHistory", fetch = FetchType.EAGER)
     private Set<Appointment> appointments = new HashSet<>();
-    
-    @OneToMany(fetch = FetchType.EAGER) 
+
+    @OneToMany(fetch = FetchType.EAGER)
     private Set<Prescription> prescriptions = new HashSet<>();
-    
-    @OneToMany(fetch = FetchType.EAGER) 
+
+    @OneToMany(fetch = FetchType.EAGER)
     private Set<Treatment> treatments = new HashSet<>();
-    
-    @OneToMany(fetch = FetchType.EAGER) 
+
+    @OneToMany(fetch = FetchType.EAGER)
     private Set<Bill> bills = new HashSet<>();
-    
-    @OneToMany(fetch = FetchType.EAGER) 
+
+    @OneToMany(fetch = FetchType.EAGER)
     private Set<LabResult> labResults = new HashSet<>();
-    
+
     @Column(name = "visit_date")
     private LocalDateTime visitDate;
-    
+
     @Column(columnDefinition = "TEXT")
     private String diagnosis;
-    
+
     @Column(columnDefinition = "TEXT")
     private String symptoms;
+    @Column(columnDefinition = "TEXT")
+    private String notes;
 
     public Long getId() {
         return id;
@@ -51,10 +53,6 @@ public class PatientHistory {
 
     public void setId(Long id) {
         this.id = id;
-    }
-
-    public void setAppointments(Set<Appointment> appointments) {
-        this.appointments = appointments;
     }
 
     public Patient getPatient() {
@@ -129,27 +127,27 @@ public class PatientHistory {
         this.notes = notes;
     }
 
-    @Column(columnDefinition = "TEXT")
-    private String notes;
-    
-    
     public Set<Appointment> getAppointments() {
-        
+
         return new TreeSet<>(appointments);
     }
-    
+
+    public void setAppointments(Set<Appointment> appointments) {
+        this.appointments = appointments;
+    }
+
     public List<Bill> getBillsSorted() {
-        
+
         List<Bill> sortedBills = new ArrayList<>(bills);
         Collections.sort(sortedBills, (b1, b2) -> b2.getBillDate().compareTo(b1.getBillDate()));
         return sortedBills;
     }
-    
-    
+
+
     public Double getTotalBilledAmount() {
         return bills.stream()
-            .mapToDouble(Bill::getTotalAmount)
-            .sum();
+                .mapToDouble(Bill::getTotalAmount)
+                .sum();
     }
 
 

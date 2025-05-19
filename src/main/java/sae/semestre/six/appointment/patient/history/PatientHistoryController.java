@@ -16,7 +16,7 @@ import java.util.Map;
 @RequestMapping("/patients/history")
 @Tag(name = "Patients history", description = "Patient management API")
 public class PatientHistoryController {
-    
+
     @Autowired
     private PatientHistoryRepository patientHistoryRepository;
 
@@ -35,14 +35,14 @@ public class PatientHistoryController {
     @GetMapping("/{patientId}/summary")
     public Map<String, Object> getPatientSummary(@PathVariable Long patientId) {
         List<PatientHistory> histories = patientHistoryRepository.findAllByPatient_Id(patientId);
-        
+
         Map<String, Object> summary = new HashMap<>();
         summary.put("visitCount", histories.size());
         
         double totalBilled = histories.stream()
-            .mapToDouble(PatientHistory::getTotalBilledAmount)
-            .sum();
-            
+                .mapToDouble(PatientHistory::getTotalBilledAmount)
+                .sum();
+
         summary.put("totalBilled", totalBilled);
         return summary;
     }

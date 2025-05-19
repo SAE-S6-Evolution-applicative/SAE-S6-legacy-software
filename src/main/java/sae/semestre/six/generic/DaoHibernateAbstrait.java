@@ -8,22 +8,22 @@ import java.lang.reflect.ParameterizedType;
 import java.util.List;
 
 public abstract class DaoHibernateAbstrait<T, ID extends Serializable> implements DaoGenerique<T, ID> {
-    
+
     private final Class<T> classeEntite;
-    
+
     @PersistenceContext
     private EntityManager gestionnaireEntite;
-    
+
     @SuppressWarnings("unchecked")
     public DaoHibernateAbstrait() {
         this.classeEntite = (Class<T>) ((ParameterizedType) getClass()
                 .getGenericSuperclass()).getActualTypeArguments()[0];
     }
-    
+
     protected EntityManager getGestionnaireEntite() {
         return gestionnaireEntite;
     }
-    
+
     @Override
     public T trouverParId(ID id) {
         try {
@@ -33,7 +33,7 @@ public abstract class DaoHibernateAbstrait<T, ID extends Serializable> implement
             throw e;
         }
     }
-    
+
     @Override
     @SuppressWarnings("unchecked")
     public List<T> trouverTout() {
@@ -45,7 +45,7 @@ public abstract class DaoHibernateAbstrait<T, ID extends Serializable> implement
             throw e;
         }
     }
-    
+
     @Override
     public void sauvegarder(T entite) {
         try {
@@ -55,7 +55,7 @@ public abstract class DaoHibernateAbstrait<T, ID extends Serializable> implement
             throw e;
         }
     }
-    
+
     @Override
     public void mettreAJour(T entite) {
         try {
@@ -65,7 +65,7 @@ public abstract class DaoHibernateAbstrait<T, ID extends Serializable> implement
             throw e;
         }
     }
-    
+
     @Override
     public void supprimer(T entite) {
         try {
@@ -75,7 +75,7 @@ public abstract class DaoHibernateAbstrait<T, ID extends Serializable> implement
             throw e;
         }
     }
-    
+
     @Override
     public void supprimerParId(ID id) {
         T entite = trouverParId(id);

@@ -8,7 +8,7 @@ import java.time.LocalDateTime;
 @Entity
 @Table(name = "prescriptions")
 public class Prescription {
-    
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -43,7 +43,8 @@ public class Prescription {
     private LocalDateTime lastModified = LocalDateTime.now();
 
 
-    public Prescription() {}
+    public Prescription() {
+    }
 
 
     public Long getId() {
@@ -106,23 +107,23 @@ public class Prescription {
     public Boolean getInventoryUpdated() {
         return inventoryUpdated;
     }
-    
+
     public void setInventoryUpdated(Boolean inventoryUpdated) {
         this.inventoryUpdated = inventoryUpdated;
     }
-    
+
     public LocalDateTime getCreatedDate() {
         return createdDate;
     }
-    
+
     public void setCreatedDate(LocalDateTime createdDate) {
         this.createdDate = createdDate;
     }
-    
+
     public LocalDateTime getLastModified() {
         return lastModified;
     }
-    
+
     public void setLastModified(LocalDateTime lastModified) {
         this.lastModified = lastModified;
     }

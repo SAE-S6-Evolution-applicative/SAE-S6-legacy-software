@@ -14,12 +14,10 @@ import java.util.List;
 @Service
 public class MedicalActService {
 
+    private static final Logger logger = LoggerFactory.getLogger(MedicalActService.class);
     private final BillDetailService billDetailService;
     private final MedicalActRepository medicalActRepository;
-
     private final BillService billService;
-
-    private static final Logger logger = LoggerFactory.getLogger(MedicalActService.class);
 
     public MedicalActService(MedicalActRepository medicalActRepository, BillService billService, BillDetailService billDetailService) {
         this.medicalActRepository = medicalActRepository;

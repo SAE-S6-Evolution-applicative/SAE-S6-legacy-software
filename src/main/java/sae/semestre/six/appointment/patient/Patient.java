@@ -40,11 +40,11 @@ public class Patient {
     @OneToMany(mappedBy = "patient")
     private Set<Appointment> appointments = new HashSet<>();
 
-    
+
     public Patient() {
     }
 
-    
+
     public Long getId() {
         return id;
     }

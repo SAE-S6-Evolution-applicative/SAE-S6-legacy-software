@@ -85,7 +85,7 @@ public class PatientHistorySpecification {
      * Creates a specification that filters patient history records within a given date range.
      *
      * @param startDate The beginning of the date range (inclusive)
-     * @param endDate The end of the date range (inclusive)
+     * @param endDate   The end of the date range (inclusive)
      * @return A specification that matches records within the date range, or all records if either date is null
      */
     public static Specification<PatientHistory> inDateRange(LocalDateTime startDate, LocalDateTime endDate) {

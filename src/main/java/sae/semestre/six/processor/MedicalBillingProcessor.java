@@ -8,9 +8,8 @@ import java.util.List;
 import java.util.Map;
 
 public class MedicalBillingProcessor {
-    private static volatile MedicalBillingProcessor instance;
     private static final String BILLING_FILE = "C:\\hospital\\billing.txt";
-
+    private static volatile MedicalBillingProcessor instance;
     private final Map<String, Double> priceList = new HashMap<>();
     private final List<String> pendingBills = new ArrayList<>();
     private double totalRevenue = 0.0;

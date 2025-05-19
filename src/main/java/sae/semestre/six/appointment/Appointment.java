@@ -46,11 +46,11 @@ public class Appointment {
     @Column(name = "room_number")
     private String roomNumber;
 
-    
+
     public Appointment() {
     }
 
-    
+
     public Long getId() {
         return id;
     }

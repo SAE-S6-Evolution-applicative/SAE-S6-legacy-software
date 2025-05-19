@@ -31,6 +31,8 @@ public class SchedulingController {
     DoctorRepository doctorRepository;
 
     PatientRepository patientRepository;
+    @Autowired
+    private EmailService emailService;
 
     @Autowired
     public SchedulingController(AppointmentRepository appointmentRepository, DoctorRepository doctorRepository, PatientRepository patientRepository) {
@@ -38,10 +40,6 @@ public class SchedulingController {
         this.doctorRepository = doctorRepository;
         this.patientRepository = patientRepository;
     }
-
-    @Autowired
-    private EmailService emailService;
-
 
     @Operation(summary = "Schedule an appointment", description = "Creates a new appointment between a doctor and a patient")
     @ApiResponse(responseCode = "200", description = "Appointment scheduled successfully")
@@ -93,7 +91,6 @@ public class SchedulingController {
             return "Error: " + e.getMessage();
         }
     }
-
 
 
     @Operation(summary = "Get available slots", description = "Retrieves all available time slots for a doctor on a given date")

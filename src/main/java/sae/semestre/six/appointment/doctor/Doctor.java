@@ -38,11 +38,11 @@ public class Doctor {
     @OneToMany(mappedBy = "doctor", fetch = FetchType.LAZY)
     private Set<Appointment> appointments = new HashSet<>();
 
-    
+
     public Doctor() {
     }
 
-    
+
     public Long getId() {
         return id;
     }

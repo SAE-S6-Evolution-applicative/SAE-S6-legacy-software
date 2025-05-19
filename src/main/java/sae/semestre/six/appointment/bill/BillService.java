@@ -11,16 +11,14 @@ import java.util.List;
 @Service
 public class BillService {
 
+    private final BillDetailRepository billDetailRepository;
+    private final BillRepository billRepository;
+
     @Autowired
     public BillService(BillRepository billRepository, BillDetailRepository billDetailRepository) {
         this.billRepository = billRepository;
         this.billDetailRepository = billDetailRepository;
     }
-
-    private final BillDetailRepository billDetailRepository;
-
-    private final BillRepository billRepository;
-
 
     public List<Bill> findPendingBills() {
         return billRepository.findBillsByStatus(Bill.Status.PENDING);
