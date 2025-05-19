@@ -6,7 +6,7 @@ import org.springframework.data.jpa.repository.Query;
 import java.time.LocalDate;
 import java.util.List;
 
-interface BillRepository extends JpaRepository<Bill, Long> {
+public interface BillRepository extends JpaRepository<Bill, Long> {
     Bill findBillByBillNumber(String billNumber);
 
     List<Bill> findBillsByPatient_Id(Long patientId);

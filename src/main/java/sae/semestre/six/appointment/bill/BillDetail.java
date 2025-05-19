@@ -64,6 +64,7 @@ public class BillDetail {
             throw new IllegalArgumentException("MedicalAct is not active");
         }
         this.medicalAct = medicalAct;
+        calculateLineTotal();
     }
 
     public Integer getQuantity() {

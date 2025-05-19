@@ -142,6 +142,22 @@ public class Bill {
         return this;
     }
 
+    /**
+     * Recalculate the total amount of the bill.
+     * @return the recalculated bill
+     */
+    public Bill recalculate() {
+        if (getStatus() != Status.PENDING) {
+            throw new IllegalArgumentException("Bill is not PENDING");
+        }
+
+        double totalBrut = billDetails.stream()
+                .map(BillDetail::getLineTotal)
+                .reduce(0.0, Double::sum);
+        this.totalAmount = computeTotalAmountWithReduction(totalBrut);
+        return this;
+    }
+
     public enum Status {
         PENDING,
         PAID

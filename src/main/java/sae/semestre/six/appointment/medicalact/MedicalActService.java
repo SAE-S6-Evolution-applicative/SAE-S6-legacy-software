@@ -2,7 +2,9 @@ package sae.semestre.six.appointment.medicalact;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import sae.semestre.six.appointment.bill.Bill;
 import sae.semestre.six.appointment.bill.BillDetail;
 import sae.semestre.six.appointment.bill.BillDetailService;
 import sae.semestre.six.appointment.bill.BillService;
@@ -19,6 +21,7 @@ public class MedicalActService {
     private final MedicalActRepository medicalActRepository;
     private final BillService billService;
 
+    @Autowired
     public MedicalActService(MedicalActRepository medicalActRepository, BillService billService, BillDetailService billDetailService) {
         this.medicalActRepository = medicalActRepository;
         this.billService = billService;
@@ -57,16 +60,19 @@ public class MedicalActService {
         return medicalActRepository.findAllByActive(true);
     }
 
+    /**
+     * Update the price of the medical act. The total price of invoices
+     * containing details of the medical procedure is updated.
+     * @param price new price of the medical act
+     * @param medicalAct medical act to update
+     */
     public void updatePrice(double price, MedicalAct medicalAct) {
         var newMedicalAct = medicalActRepository.save(medicalAct.updatePrice(price));
         List<BillDetail> billDetails = billDetailService.updateBillDetail(medicalAct, newMedicalAct);
-        // recalculate Bill
-    }
 
-    //private void recalculateAllPendingBills() throws Exception {
-    //    for (String billId : pendingBills) {
-    //        // TODO : Implement the logic to recalculate the bill
-    //        processBill(billId, "RECALC", new Long[]{0L});
-    //    }
-    //}
+        billDetails.stream()
+                   .map(BillDetail::getBill)
+                   .distinct()
+                   .forEach(Bill::recalculate);
+    }
 }

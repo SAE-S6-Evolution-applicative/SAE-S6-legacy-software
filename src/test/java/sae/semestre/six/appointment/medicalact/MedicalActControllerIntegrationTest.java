@@ -11,9 +11,14 @@ import org.springframework.http.MediaType;
 import org.springframework.test.context.bean.override.mockito.MockitoSpyBean;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
+import sae.semestre.six.appointment.bill.Bill;
+import sae.semestre.six.appointment.bill.BillDetail;
+import sae.semestre.six.appointment.bill.BillDetailRepository;
+import sae.semestre.six.appointment.bill.BillRepository;
 
 import java.util.List;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
@@ -34,6 +39,12 @@ class MedicalActControllerIntegrationTest {
 
     @MockitoSpyBean
     private MedicalActRepository medicalActRepository;
+
+    @MockitoSpyBean
+    private BillRepository billRepository;
+
+    @MockitoSpyBean
+    private BillDetailRepository billDetailRepository;
 
     @Test
     void testGetPrices() throws Exception {
@@ -76,6 +87,30 @@ class MedicalActControllerIntegrationTest {
 
         assertFalse(medicalActRepository.findById(act1.getId()).orElseThrow().isActive());
         verify(medicalActService, times(1)).updatePrice(eq(updatedPrice), any(MedicalAct.class));
+    }
+
+    @Test
+    void testUpdatePriceWithBill() throws Exception {
+        var act1 = new MedicalAct("ACT1", 10.0);
+        act1 = medicalActRepository.save(act1);
+
+        Bill bill = billRepository.save(new Bill());
+        BillDetail billDetail = billDetailRepository.save(new BillDetail(bill, act1, 1));
+
+        bill = billRepository.save(bill.addBillDetail(billDetail));
+        assertEquals(act1.getPrice(), bill.getTotalAmount());
+
+        Double updatedPrice = 75.0;
+
+        server.perform(put("/medicalAct/")
+                        .param("idMedicalAct", act1.getId().toString())
+                        .param("price", updatedPrice.toString()))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.success").value(true));
+
+        assertFalse(medicalActRepository.findById(act1.getId()).orElseThrow().isActive());
+        verify(medicalActService, times(1)).updatePrice(eq(updatedPrice), any(MedicalAct.class));
+        assertEquals(updatedPrice, billRepository.findById(bill.getId()).orElseThrow().getTotalAmount());
     }
 
     @Test
