@@ -2,19 +2,16 @@ package sae.semestre.six.appointment.prescription;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.List;
 
 import static org.junit.Assert.*;
 
 public class PrescriptionControllerTest {
-    
+
+    @Autowired
     private PrescriptionController prescriptionController;
-    
-    @Before
-    public void setUp() {
-        prescriptionController = new PrescriptionController();
-    }
     
     
     @Test
