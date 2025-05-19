@@ -46,7 +46,7 @@ public class PrescriptionController {
     @Operation(summary = "Add a prescription", description = "Creates a new prescription for a patient")
     @ApiResponse(responseCode = "200", description = "Prescription created successfully")
     @ApiResponse(responseCode = "400", description = "Invalid data")
-    @PostMapping("/add")
+    @PostMapping
     public String addPrescription(
             @Parameter(description = "Patient ID") @RequestParam String patientId,
             @Parameter(description = "List of medicines") @RequestParam String[] medicines,
@@ -107,25 +107,22 @@ public class PrescriptionController {
     @GetMapping("/patient/{patientId}")
     public List<String> getPatientPrescriptions(
             @Parameter(description = "Patient ID") @PathVariable String patientId) {
-        
         return patientPrescriptions.getOrDefault(patientId, new ArrayList<>());
     }
     
     @Operation(summary = "Get medicine inventory", description = "Retrieves the current medicine inventory status")
     @ApiResponse(responseCode = "200", description = "Inventory status")
-    @GetMapping("/inventory")
+    @GetMapping("/medicines/inventory")
     public Map<String, Integer> getInventory() {
-        
         return medicineInventory;
     }
     
     @Operation(summary = "Refill medicine", description = "Adds quantities to the medicine inventory")
     @ApiResponse(responseCode = "200", description = "Refill completed")
-    @PostMapping("/refill")
+    @PatchMapping("/medicines/refill")
     public String refillMedicine(
             @Parameter(description = "Medicine name") @RequestParam String medicine,
             @Parameter(description = "Quantity to add") @RequestParam int quantity) {
-        
         medicineInventory.put(medicine, 
             medicineInventory.getOrDefault(medicine, 0) + quantity);
         return "Refilled " + medicine;
@@ -133,19 +130,17 @@ public class PrescriptionController {
     
     @Operation(summary = "Calculate prescription cost", description = "Calculates the total cost of a prescription")
     @ApiResponse(responseCode = "200", description = "Cost calculated")
-    @GetMapping("/cost/{prescriptionId}")
+    @GetMapping("/{prescriptionId}/cost")
     public double calculateCost(
             @Parameter(description = "Prescription ID") @PathVariable String prescriptionId) {
-        
         return medicinePrices.values().stream()
             .mapToDouble(Double::doubleValue)
             .sum() * 1.2; 
     }
     
-    
     @Operation(summary = "Clear all data", description = "Clears all prescription data")
     @ApiResponse(responseCode = "200", description = "Data cleared")
-    @DeleteMapping("/clear")
+    @DeleteMapping
     public void clearAllData() {
         patientPrescriptions.clear();
         medicineInventory.clear();

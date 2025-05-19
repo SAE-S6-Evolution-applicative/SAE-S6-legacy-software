@@ -1,5 +1,8 @@
 package sae.semestre.six.stock;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import sae.semestre.six.email.EmailService;
@@ -14,6 +17,7 @@ import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/inventory")
+@Tag(name = "Inventory", description = "Inventory management API")
 public class InventoryController {
     
     @Autowired
@@ -23,40 +27,39 @@ public class InventoryController {
     private InventoryRepository inventoryRepository;
     
     private final EmailService emailService = EmailService.getInstance();
-    
-    
-    @PostMapping("/supplier-invoice")
+
+    @Operation(summary = "Process a supplier invoice", description = "Processes a new supplier invoice")
+    @ApiResponse(responseCode = "200", description = "Process completed")
+    @PostMapping("/supplier-invoices")
     public String processSupplierInvoice(@RequestBody SupplierInvoice invoice) {
         try {
-            
             for (SupplierInvoiceDetail detail : invoice.getDetails()) {
                 Inventory inventory = detail.getInventory();
-                
                 
                 inventory.setQuantity(inventory.getQuantity() + detail.getQuantity());
                 inventory.setUnitPrice(detail.getUnitPrice());
                 inventory.setLastRestocked(LocalDate.now());
-                
                 
                 inventoryRepository.save(inventory);
             }
             
             return "Supplier invoice processed successfully";
         } catch (Exception e) {
-            
             return "Error: " + e.getMessage();
         }
     }
-    
-    
-    @GetMapping("/low-stock")
+
+    @Operation(summary = "Get inventory items with a low stock", description = "Retrieves all inventory items with a low stock")
+    @ApiResponse(responseCode = "200", description = "Low stocks items")
+    @GetMapping("/items/low-stock")
     public List<Inventory> getLowStockItems() {
         return inventoryService.findAll().stream()
             .filter(Inventory::needsRestock)
             .collect(Collectors.toList());
     }
-    
-    
+
+    @Operation(summary = "Reorder items who needs a restock", description = "Sends email requests to restock items who need a restock")
+    @ApiResponse(responseCode = "200", description = "reorder completed")
     @PostMapping("/reorder")
     public String reorderItems() {
         List<Inventory> lowStockItems = inventoryService.findNeedingRestock();

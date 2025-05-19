@@ -17,7 +17,7 @@ import java.io.FileWriter;
 import java.util.*;
 
 @RestController
-@RequestMapping("/billing")
+@RequestMapping("/bills")
 @Tag(name = "Billing", description = "Billing management API")
 public class BillingController {
     
@@ -57,7 +57,7 @@ public class BillingController {
     @Operation(summary = "Process a bill", description = "Creates and processes a new bill for a patient")
     @ApiResponse(responseCode = "200", description = "Bill processed successfully")
     @ApiResponse(responseCode = "400", description = "Invalid data")
-    @PostMapping("/process")
+    @PostMapping
     public String processBill(
             @Parameter(description = "Patient ID") @RequestParam String patientId,
             @Parameter(description = "Doctor ID") @RequestParam String doctorId,
@@ -147,7 +147,7 @@ public class BillingController {
     
     @Operation(summary = "Calculate insurance coverage", description = "Calculates insurance coverage for a given amount")
     @ApiResponse(responseCode = "200", description = "Coverage calculated")
-    @GetMapping("/insurance")
+    @GetMapping("/insurance-coverage")
     public String calculateInsurance(
             @Parameter(description = "Amount to cover") @RequestParam double amount) {
         double coverage = amount;

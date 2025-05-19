@@ -18,7 +18,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @RestController
-@RequestMapping("/scheduling")
+@RequestMapping("/appointments")
 @Tag(name = "Scheduling", description = "Appointment management API")
 public class SchedulingController {
 
@@ -45,7 +45,7 @@ public class SchedulingController {
     @Operation(summary = "Schedule an appointment", description = "Creates a new appointment between a doctor and a patient")
     @ApiResponse(responseCode = "200", description = "Appointment scheduled successfully")
     @ApiResponse(responseCode = "400", description = "Invalid data or time conflict")
-    @PostMapping("/appointment")
+    @PostMapping
     public String scheduleAppointment(
             @Parameter(description = "Doctor ID") @RequestParam Long doctorId,
             @Parameter(description = "Patient ID") @RequestParam Long patientId,
