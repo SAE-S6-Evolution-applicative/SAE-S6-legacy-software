@@ -1,6 +1,6 @@
 /*
- * Treatment.java                                  14 mai 2025
- * IUT de Rodez, pas de droit d'auteur
+ * MedicalAct.java                                  19 mai. 2025
+ * IUT de Rodez, no author rights
  */
 
 package sae.semestre.six.appointment.medicalact;

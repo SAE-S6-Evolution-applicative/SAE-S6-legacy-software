@@ -1,5 +1,5 @@
 /*
- * PatientHistorySpecification.java                                 15 mai 2025
+ * PatientHistorySpecification.java                                  19 mai. 2025
  * IUT de Rodez, no author rights
  */
 

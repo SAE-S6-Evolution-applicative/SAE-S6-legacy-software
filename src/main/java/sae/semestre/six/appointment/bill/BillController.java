@@ -1,3 +1,8 @@
+/*
+ * BillController.java                                  19 mai. 2025
+ * IUT de Rodez, pas de droit d'auteur
+ */
+
 package sae.semestre.six.appointment.bill;
 
 import io.swagger.v3.oas.annotations.Operation;

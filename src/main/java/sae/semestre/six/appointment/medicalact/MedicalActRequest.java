@@ -1,5 +1,5 @@
 /*
- * MedicalActRequest.java 15 may 2025
+ * MedicalActRequest.java                                  19 mai. 2025
  * IUT de Rodez, no author rights
  */
 

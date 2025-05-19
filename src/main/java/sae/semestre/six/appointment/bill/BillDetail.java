@@ -1,3 +1,8 @@
+/*
+ * BillDetail.java                                  19 mai. 2025
+ * IUT de Rodez, no author rights
+ */
+
 package sae.semestre.six.appointment.bill;
 
 import jakarta.persistence.*;
