@@ -13,7 +13,7 @@ import sae.semestre.six.common.SuccessfullResponseModel;
 import java.util.List;
 
 @RestController
-@RequestMapping("/medicalAct")
+@RequestMapping("/medicalAct/")
 public class MedicalActController {
 
     private final MedicalActService medicalActService;
