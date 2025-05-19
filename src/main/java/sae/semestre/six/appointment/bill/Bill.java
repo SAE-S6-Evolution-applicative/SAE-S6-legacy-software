@@ -15,7 +15,7 @@ import java.util.Set;
 @Table(name = "bills")
 public class Bill {
 
-    private static final double REDUCTION_TRESHOLD = 500.0;
+    private static final double REDUCTION_THRESHOLD = 500.0;
     private static final double REDUCTION_PERCENTAGE = 0.9;
 
     @Id
@@ -66,7 +66,7 @@ public class Bill {
      */
     public static double computeTotalAmountWithReduction(double totalBrut) {
         double totalAmount = totalBrut;
-        if (totalBrut > REDUCTION_TRESHOLD) {
+        if (totalBrut > REDUCTION_THRESHOLD) {
             totalAmount = totalBrut * REDUCTION_PERCENTAGE;
         }
         return totalAmount;
