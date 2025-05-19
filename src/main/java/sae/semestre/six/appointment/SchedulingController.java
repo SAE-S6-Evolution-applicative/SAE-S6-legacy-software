@@ -31,14 +31,15 @@ public class SchedulingController {
     DoctorRepository doctorRepository;
 
     PatientRepository patientRepository;
-    @Autowired
+
     private EmailService emailService;
 
     @Autowired
-    public SchedulingController(AppointmentRepository appointmentRepository, DoctorRepository doctorRepository, PatientRepository patientRepository) {
+    public SchedulingController(AppointmentRepository appointmentRepository, DoctorRepository doctorRepository, PatientRepository patientRepository, EmailService emailService) {
         this.appointmentRepository = appointmentRepository;
         this.doctorRepository = doctorRepository;
         this.patientRepository = patientRepository;
+        this.emailService = emailService;
     }
 
     @Operation(summary = "Schedule an appointment", description = "Creates a new appointment between a doctor and a patient")

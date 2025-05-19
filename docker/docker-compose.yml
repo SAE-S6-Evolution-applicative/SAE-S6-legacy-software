@@ -9,6 +9,8 @@ services:
   mailHog:
     container_name: mailhog
     image: mailhog/mailhog
+    env_file:
+      - ./../.env # Loads environment variables from the .env file
     ports:
       - "8025:8025"
-      - "1025:1025"
+      - ${SMTP_PORT:-1025}:1025

@@ -29,30 +29,31 @@ class MedicalActServiceTest {
 
     @Test
     void findByIds_ShouldReturnMatchingMedicalActs_WhenIdsAreValid() {
-        // Arrange
+        // Given medicals act
         MedicalAct act1 = new MedicalAct("Consultation", 50.0);
         MedicalAct act2 = new MedicalAct("Surgery", 200.0);
         setId(act1, 1L);
         setId(act2, 2L);
-
         List<Long> ids = Arrays.asList(1L, 2L);
-        when(medicalActRepository.findAllById(ids)).thenReturn(Arrays.asList(act1, act2));
 
-        // Act
+        // When we find by ids the medicals a
+        when(medicalActRepository.findAllById(ids)).thenReturn(Arrays.asList(act1, act2));
         List<MedicalAct> result = medicalActService.findByIds(new Long[]{1L, 2L});
 
-        // Assert
+        // Then...
         assertEquals(2, result.size());
         assertTrue(result.containsAll(Arrays.asList(act1, act2)) && result.size() == 2);
     }
 
     @Test
     void findByIds_ShouldThrow_WhenNoIdsMatch() {
-        // Arrange
+        // Given a list of wrong medical act ids
         List<Long> ids = Arrays.asList(3L, 4L);
+
+        // When we try to find medicals act with wrong ids
         when(medicalActRepository.findAllById(ids)).thenReturn(Collections.emptyList());
 
-        // Act
+        // Then...
         assertThrows(IllegalArgumentException.class, () -> {
             medicalActService.findByIds(new Long[]{3L, 4L});
         });
@@ -60,13 +61,15 @@ class MedicalActServiceTest {
 
     @Test
     void findByIds_ShouldThrow_WhenOneIdDontMatch() {
-        // Arrange
+        // Given a list of medical act ids with one wrong id
         MedicalAct act2 = new MedicalAct("Surgery", 200.0);
         setId(act2, 3L);
         List<Long> ids = Arrays.asList(act2.getId(), 4L);
+
+        // When we try to find medicals act
         when(medicalActRepository.findAllById(ids)).thenReturn(List.of(act2));
 
-        // Act
+        // Then...
         assertThrows(IllegalArgumentException.class, () -> {
             medicalActService.findByIds(new Long[]{act2.getId(), 4L});
         });
@@ -74,13 +77,12 @@ class MedicalActServiceTest {
 
     @Test
     void findByIds_ShouldReturnEmptyList_WhenIdsArrayIsEmpty() {
-        // Arrange
+        // Given an empty list of medical act id
+        // When we try to find medical act by id with an empty list of id
         when(medicalActRepository.findAllById(Collections.emptyList())).thenReturn(Collections.emptyList());
-
-        // Act
         List<MedicalAct> result = medicalActService.findByIds(new Long[]{});
 
-        // Assert
+        // Then...
         assertIsEmpty(result);
     }
 

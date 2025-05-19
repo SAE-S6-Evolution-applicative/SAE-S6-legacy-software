@@ -20,14 +20,14 @@ public class MedicalActController {
         this.medicalActRepository = medicalActRepository;
     }
 
-    @GetMapping("/")
+    @GetMapping
     public PricesResponse getPrices() {
         return new PricesResponse(
                 medicalActService.getAllActive()
         );
     }
 
-    @PutMapping("/")
+    @PutMapping
     public SuccessfullResponseModel updatePrice(
             @RequestParam Long idMedicalAct,
             @RequestParam double price) throws Exception {
@@ -36,7 +36,7 @@ public class MedicalActController {
         return new SuccessfullResponseModel("Price updated", true);
     }
 
-    @PostMapping("/")
+    @PostMapping
     public MedicalActResponse createMedicalAct(
             @RequestBody MedicalActRequest medicalActRequest) {
         MedicalAct medicalAct = new MedicalAct(medicalActRequest.name(), medicalActRequest.price());

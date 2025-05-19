@@ -10,10 +10,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import sae.semestre.six.appointment.doctor.Doctor;
 import sae.semestre.six.appointment.doctor.DoctorRepository;
+import sae.semestre.six.appointment.doctor.DoctorService;
 import sae.semestre.six.appointment.medicalact.MedicalAct;
 import sae.semestre.six.appointment.medicalact.MedicalActService;
 import sae.semestre.six.appointment.patient.Patient;
 import sae.semestre.six.appointment.patient.PatientRepository;
+import sae.semestre.six.appointment.patient.PatientService;
 import sae.semestre.six.common.SuccessfullResponseModel;
 import sae.semestre.six.email.EmailService;
 
@@ -31,21 +33,25 @@ public class BillingController {
 
     private MedicalActService medicalActService;
 
-    private PatientRepository patientRepository;
+    private PatientService patientService;
 
-    private DoctorRepository doctorRepository;
+    private DoctorService doctorService;
 
     private EmailService emailService;
 
     @Autowired
     public BillController(
-            DoctorRepository doctorRepository, PatientRepository patientRepository, BillService billService, MedicalActService medicalActService, EmailService emailService
+            DoctorService doctorService,
+            BillService billService,
+            MedicalActService medicalActService,
+            EmailService emailService,
+            PatientService patientService
     ) {
-        this.doctorRepository = doctorRepository;
-        this.patientRepository = patientRepository;
+        this.doctorService = doctorService;
         this.billService = billService;
         this.medicalActService = medicalActService;
         this.emailService = emailService;
+        this.patientService = patientService;
     }
 
     @Operation(summary = "Process a bill", description = "Creates and processes a new bill for a patient")
@@ -58,12 +64,8 @@ public class BillingController {
             @Parameter(description = "List of medical acts id") @RequestParam Long[] medicalActId
     ) throws Exception {
 
-        Patient patient = patientRepository.findById(Long.parseLong(patientId)).orElseThrow(
-                () -> new RuntimeException("Patient not found")
-        );
-        Doctor doctor = doctorRepository.findById(Long.parseLong(doctorId)).orElseThrow(
-                () -> new RuntimeException("Doctor not found")
-        );
+        Patient patient = patientService.getPatient(Long.parseLong(patientId));
+        Doctor doctor = doctorService.getDoctor(Long.parseLong(doctorId));
 
         List<MedicalAct> medicalActs = medicalActService.findByIds(medicalActId);
 
@@ -86,19 +88,14 @@ public class BillingController {
     public InsuranceCoverageResponse calculateInsurance(
             @Parameter(description = "Amount to cover") @RequestParam double amount
     ) {
-        double coverage = amount;
-        return new InsuranceCoverageResponse(coverage);
+        return new InsuranceCoverageResponse(amount);
     }
 
     @Operation(summary = "Get total revenue", description = "Retrieves the total system revenue")
     @ApiResponse(responseCode = "200", description = "Total revenue")
     @GetMapping("/revenue")
     public RevenueResponse getTotalRevenue() {
-        Double totalRevenue = billService.getTotalRevenue();
-        if (totalRevenue == null) {
-            totalRevenue = 0.0;
-        }
-        return new RevenueResponse(totalRevenue);
+        return new RevenueResponse(billService.getTotalRevenue());
     }
 
     @Operation(summary = "Get pending bills", description = "Retrieves the list of pending bills")

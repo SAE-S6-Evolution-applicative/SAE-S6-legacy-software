@@ -20,14 +20,22 @@ import java.util.stream.Collectors;
 @Tag(name = "Inventory", description = "Inventory management API")
 public class InventoryController {
 
-    @Autowired
     private InventoryService inventoryService;
 
-    @Autowired
     private InventoryRepository inventoryRepository;
 
-    @Autowired
     private EmailService emailService;
+
+    @Autowired
+    public InventoryController(
+            InventoryService inventoryService,
+            InventoryRepository inventoryRepository,
+            EmailService emailService
+    ) {
+        this.inventoryService = inventoryService;
+        this.inventoryRepository = inventoryRepository;
+        this.emailService = emailService;
+    }
     
     @Operation(summary = "Process a supplier invoice", description = "Processes a new supplier invoice")
     @ApiResponse(responseCode = "200", description = "Process completed")

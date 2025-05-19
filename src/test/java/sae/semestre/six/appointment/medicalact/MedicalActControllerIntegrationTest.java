@@ -48,6 +48,7 @@ class MedicalActControllerIntegrationTest {
 
     @Test
     void testGetPrices() throws Exception {
+        // Given some medicals act
         var act1 = new MedicalAct("ACT1", 10.0);
         var act2 = new MedicalAct("ACT2", 20.0);
         var act3 = new MedicalAct("ACT3", 50.0);
@@ -59,10 +60,12 @@ class MedicalActControllerIntegrationTest {
 
         medicalActRepository.saveAll(acts);
 
+        // When we try to get all medicals act
         server.perform(get("/medicalAct/"))
                 .andDo(result -> {
                     log.info("Result: {}", result.getResponse().getContentAsString());
                 })
+                // Then...
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$.medicalActList").isArray())
@@ -74,40 +77,46 @@ class MedicalActControllerIntegrationTest {
 
     @Test
     void testUpdatePrice() throws Exception {
+        // Given a medical act
         var act1 = new MedicalAct("ACT1", 10.0);
         act1 = medicalActRepository.save(act1);
 
         Double updatedPrice = 75.0;
 
+        // When wr try to update the price of the medical act
         server.perform(put("/medicalAct/")
                         .param("idMedicalAct", act1.getId().toString())
                         .param("price", updatedPrice.toString()))
+                // Then...
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.success").value(true));
 
+        // And then...
         assertFalse(medicalActRepository.findById(act1.getId()).orElseThrow().isActive());
         verify(medicalActService, times(1)).updatePrice(eq(updatedPrice), any(MedicalAct.class));
     }
 
     @Test
     void testUpdatePriceWithBill() throws Exception {
+        // Given a bill with a medical act in their detail
         var act1 = new MedicalAct("ACT1", 10.0);
         act1 = medicalActRepository.save(act1);
 
         Bill bill = billRepository.save(new Bill());
         BillDetail billDetail = billDetailRepository.save(new BillDetail(bill, act1, 1));
-
         bill = billRepository.save(bill.addBillDetail(billDetail));
         assertEquals(act1.getPrice(), bill.getTotalAmount());
 
         Double updatedPrice = 75.0;
 
+        // When we update the price of the medical act
         server.perform(put("/medicalAct/")
                         .param("idMedicalAct", act1.getId().toString())
                         .param("price", updatedPrice.toString()))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.success").value(true));
 
+        // Then the bill have to be update too
         assertFalse(medicalActRepository.findById(act1.getId()).orElseThrow().isActive());
         verify(medicalActService, times(1)).updatePrice(eq(updatedPrice), any(MedicalAct.class));
         assertEquals(updatedPrice, billRepository.findById(bill.getId()).orElseThrow().getTotalAmount());
@@ -115,6 +124,7 @@ class MedicalActControllerIntegrationTest {
 
     @Test
     void testCreateMedicalAct() throws Exception {
+        // Given parameters for a medical act
         String name = "ACT1";
         Double price = 100.0;
         String requestBody = """
@@ -124,9 +134,11 @@ class MedicalActControllerIntegrationTest {
             }
             """.formatted(name, price);
 
+        // When we try to create a medical act
         server.perform(post("/medicalAct/")
                         .contentType("application/json")
                         .content(requestBody))
+                // Then...
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.medicalAct.price").value(price))
                 .andExpect(jsonPath("$.medicalAct.name").value(name));

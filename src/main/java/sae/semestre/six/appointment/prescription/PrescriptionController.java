@@ -32,14 +32,23 @@ public class PrescriptionController {
     }};
     private static final String AUDIT_FILE = "C:\\hospital\\prescriptions.log";
     private static int prescriptionCounter = 0;
-    @Autowired
+
     private BillService billService;
 
-    @Autowired
     private PatientRepository patientRepository;
 
-    @Autowired
     private PrescriptionRepository prescriptionRepository;
+
+    @Autowired
+    public PrescriptionController(
+            BillService billService,
+            PatientRepository patientRepository,
+            PrescriptionRepository prescriptionRepository
+    ) {
+        this.billService = billService;
+        this.patientRepository = patientRepository;
+        this.prescriptionRepository = prescriptionRepository;
+    }
 
     @Operation(summary = "Add a prescription", description = "Creates a new prescription for a patient")
     @ApiResponse(responseCode = "200", description = "Prescription created successfully")

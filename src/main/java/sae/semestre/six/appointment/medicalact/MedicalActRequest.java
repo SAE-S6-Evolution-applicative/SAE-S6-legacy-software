@@ -1,3 +1,8 @@
+/*
+ * MedicalActRequest.java 15 may 2025
+ * IUT de Rodez, no author rights
+ */
+
 package sae.semestre.six.appointment.medicalact;
 
 import io.swagger.v3.oas.annotations.media.Schema;

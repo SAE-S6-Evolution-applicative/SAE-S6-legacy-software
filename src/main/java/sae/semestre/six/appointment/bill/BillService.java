@@ -20,6 +20,10 @@ public class BillService {
         this.billDetailRepository = billDetailRepository;
     }
 
+    /**
+     * Find all the bill that have the pending status
+     * @return all the pending Bill
+     */
     public List<Bill> findPendingBills() {
         return billRepository.findBillsByStatus(Bill.Status.PENDING);
     }
@@ -29,20 +33,33 @@ public class BillService {
     }
 
     public Double getTotalRevenue() {
-        return billRepository.findTotalRevenue();
+        Double totalRevenue = billRepository.findTotalRevenue();
+        if (totalRevenue == null) {
+            totalRevenue = 0.0;
+        }
+        return totalRevenue;
     }
 
-    public Bill processBill(Patient patient, Doctor doctor, List<MedicalAct> medicalActs) throws Exception {
+    /**
+     * Creates a bill for a patient, a doctor, and a list of medical acts.
+     *
+     * @param patient the patient associated with the bill
+     * @param doctor the doctor associated with the bill
+     * @param medicalActs the list of medical acts to be billed
+     * @return the created and saved Bill
+     * @throws IllegalArgumentException if the list of medical acts is empty or contains inactive acts
+     */
+    public Bill processBill(Patient patient, Doctor doctor, List<MedicalAct> medicalActs) throws IllegalArgumentException {
         Bill bill = new Bill();
         bill.setBillNumber("BILL" + System.currentTimeMillis());
         bill.setPatient(patient);
         bill.setDoctor(doctor);
 
         if (medicalActs.isEmpty()) {
-            throw new Exception("No medical acts found");
+            throw new IllegalArgumentException("No medical acts found");
         }
         if (!medicalActs.stream().allMatch(MedicalAct::isActive)) {
-            throw new Exception("Some medical acts are inactive");
+            throw new IllegalArgumentException("Some medical acts are inactive");
         }
 
         medicalActs.stream()

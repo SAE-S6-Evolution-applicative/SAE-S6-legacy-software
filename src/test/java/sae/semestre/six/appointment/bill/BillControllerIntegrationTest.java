@@ -83,6 +83,7 @@ class BillControllerIntegrationTest {
 
     @Test
     void testProcessBill() throws Exception {
+        // Given a patient, doctor, appointment and a medical act
         Patient patient = new Patient();
         patient.setPatientNumber("PAT001");
         patient.setFirstName("John");
@@ -109,12 +110,15 @@ class BillControllerIntegrationTest {
 
         MedicalAct consultation = medicalActRepository.save(new MedicalAct("CONSULTATION", 10.0));
 
+        // When the process bill endpoint is called
         server.perform(post("/bills/process")
                         .param("patientId", patient.getId().toString())
                         .param("doctorId", doctor.getId().toString())
                         .param("medicalActId", consultation.getId().toString()))
+                // Then...
                 .andExpect(status().isOk());
 
+        // Then the bill should be created and associated with the patient and doctor
         Bill billCreated = billRepository.findBillsByDoctor_Id(doctor.getId()).get(0);
         assertEquals(doctor, billCreated.getDoctor());
 
@@ -125,6 +129,8 @@ class BillControllerIntegrationTest {
 
     @Test
     void testProcessBill_ButOneDontMatch() throws Exception {
+        // Given a patient, doctor, appointment and a medical act
+        // and a invalid medical act id
         Patient patient = new Patient();
         patient.setPatientNumber("PAT001");
         patient.setFirstName("John");
@@ -152,10 +158,12 @@ class BillControllerIntegrationTest {
         MedicalAct consultation = medicalActRepository.save(new MedicalAct("CONSULTATION", 10.0));
         Long invalidId = 999L;
 
+        // When the process bill endpoint is called with an invalid medical act id
         server.perform(post("/billing/process")
                         .param("patientId", patient.getId().toString())
                         .param("doctorId", doctor.getId().toString())
                         .param("medicalActId", consultation.getId().toString(), invalidId.toString()))
+                // Then
                 .andExpect(status().is5xxServerError())
                 .andExpect(jsonPath("$.detail").value(containsString("Some medical act are not found: [999]")))
                 .andExpect(jsonPath("$.detail").value(containsString(invalidId.toString())));
@@ -163,6 +171,8 @@ class BillControllerIntegrationTest {
 
     @Test
     void testProcessBill_ButNoneDontMatch() throws Exception {
+        // Given a patient, doctor, appointment and a medical act and an invalid
+        // medical act id
         Patient patient = new Patient();
         patient.setPatientNumber("PAT001");
         patient.setFirstName("John");
@@ -189,16 +199,19 @@ class BillControllerIntegrationTest {
 
         Long invalidId = 999L;
 
+        // When the process bill endpoint is called with an invalid medical act id
         server.perform(post("/billing/process")
                         .param("patientId", patient.getId().toString())
                         .param("doctorId", doctor.getId().toString())
                         .param("medicalActId", invalidId.toString()))
+                // Then...
                 .andExpect(status().is5xxServerError())
                 .andExpect(jsonPath("$.detail").value(containsString("Some medical act are not found: [999]")));
     }
 
     @Test
     void testProcessBill_ButOneIsInactive() throws Exception {
+        // Given a patient, doctor, appointment and a medical act
         Patient patient = new Patient();
         patient.setPatientNumber("PAT001");
         patient.setFirstName("John");
@@ -227,33 +240,41 @@ class BillControllerIntegrationTest {
         consultation.setActive(false);
         consultation = medicalActRepository.save(consultation);
 
+        // When the process bill endpoint is called with an inactive medical act
         server.perform(post("/billing/process")
                         .param("patientId", patient.getId().toString())
                         .param("doctorId", doctor.getId().toString())
                         .param("medicalActId", consultation.getId().toString()))
+                // Then...
                 .andExpect(status().is5xxServerError())
                 .andExpect(jsonPath("$.detail").value(containsString("Some medical acts are inactive")));
     }
 
     @Test
     void testCalculateInsurance() throws Exception {
+        // Given an amount for a bill
         String amount = "1000.0";
 
+        // When the calculate insurance endpoint is called
         server.perform(get("/bills/insurance")
                         .param("amount", amount))
+                // Then...
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.amount").value(amount));
     }
 
     @Test
     void testGetTotalRevenue() throws Exception {
+        // When the calculation of revenue endpoint is called
         server.perform(get("/bills/revenue"))
+                // Then...
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.totalRevenue").value(0.0));
     }
 
     @Test
     void testGetPendingBills() throws Exception {
+        // Given 3 Bill where two bill are pending
         Bill bill1 = new Bill();
         bill1.setStatus(Bill.Status.PENDING);
         bill1 = billRepository.save(bill1);
@@ -266,7 +287,9 @@ class BillControllerIntegrationTest {
         bill3.setStatus(Bill.Status.PENDING);
         bill3 = billRepository.save(bill3);
 
+        // When we fetch all pending bill
         server.perform(get("/bills/pending"))
+                // Then two bills are return
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$.pendingBills").isArray())
@@ -279,15 +302,19 @@ class BillControllerIntegrationTest {
 
     @Test
     void testCalculateInsuranceWithZeroAmount() throws Exception {
+        // Given zero amount
         String amount = "0.0";
-        server.perform(get("/bills/insurance-coverage")
+        // When the calculate insurance endpoint is called
+        server.perform(get("/bills/insurance")
                         .param("amount", amount))
+                // Then...
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.amount").value(amount));
     }
 
     @Test
     void testTotalRevenueWithOneBill() throws Exception {
+        // Given a Bill with a total amount of 20
         MedicalAct medicalAct = medicalActRepository.save(new MedicalAct("ACT1", 10.0));
         Bill bill = billRepository.save(new Bill());
         BillDetail billDetail = billDetailRepository.save(new BillDetail(bill, medicalAct, 2));
@@ -296,7 +323,9 @@ class BillControllerIntegrationTest {
 
         assertEquals(20, bill.getTotalAmount());
 
+        // When we get the revenue
         server.perform(get("/billing/revenue"))
+                // Then te total revenue return is 20
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.totalRevenue").value(20.0));
     }
