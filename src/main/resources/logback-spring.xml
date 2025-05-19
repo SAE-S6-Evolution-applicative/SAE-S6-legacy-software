@@ -19,7 +19,7 @@
 
     <!-- Specific appender for BillingService with simplify pattern -->
     <appender name="BILLING_FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
-        <file>bill.log</file>
+        <file>logs/bill.log</file>
         <encoder>
             <!-- Simple Pattern that only dispplay the message -->
             <pattern>%msg%n</pattern>
