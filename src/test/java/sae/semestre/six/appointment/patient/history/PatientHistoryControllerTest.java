@@ -63,7 +63,7 @@ class PatientHistoryControllerTest {
         String startDate = "2023-01-01";
         String endDate = "2023-12-31";
 
-        server.perform(get("/patient-history/search")
+        server.perform(get("/patients/history/search")
                     .param("keyword", keyword)
                     .param("startDate",  startDate)
                     .param("endDate", endDate)

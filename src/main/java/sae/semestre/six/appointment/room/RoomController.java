@@ -27,31 +27,27 @@ public class RoomController {
         this.roomRepository = roomRepository;
     }
 
-
     @Operation(summary = "Assign a room", description = "Assigns a room to an appointment")
     @ApiResponse(responseCode = "200", description = "Room assigned successfully")
     @ApiResponse(responseCode = "400", description = "Invalid data or room unavailable")
-    @PostMapping("/assign")
+    @PutMapping("/{roomNumber}/appointments/{appointmentId}")
     public String assignRoom(
-            @Parameter(description = "Appointment ID") @RequestParam Long appointmentId,
-            @Parameter(description = "Room number") @RequestParam String roomNumber) {
+            @Parameter(description = "Appointment ID") @PathVariable Long appointmentId,
+            @Parameter(description = "Room number") @PathVariable String roomNumber) {
         try {
             Room room = roomRepository.findByRoomNumber(roomNumber);
             Appointment appointment = appointmentRepository.findById(appointmentId).orElseThrow(
                     () -> new Exception()
             );
             
-            
             if (room.getType().equals("SURGERY") && 
                 !appointment.getDoctor().getSpecialization().equals("SURGEON")) {
                 return "Error: Only surgeons can use surgery rooms";
             }
             
-            
             if (room.getCurrentPatientCount() >= room.getCapacity()) {
                 return "Error: Room is at full capacity";
             }
-            
             
             room.setCurrentPatientCount(room.getCurrentPatientCount() + 1);
             appointment.setRoomNumber(roomNumber);
@@ -65,12 +61,11 @@ public class RoomController {
         }
     }
     
-    
     @Operation(summary = "Check room availability", description = "Retrieves room availability information")
     @ApiResponse(responseCode = "200", description = "Availability information")
-    @GetMapping("/availability")
+    @GetMapping("/{roomNumber}/availability")
     public Map<String, Object> getRoomAvailability(
-            @Parameter(description = "Room number") @RequestParam String roomNumber) {
+            @Parameter(description = "Room number") @PathVariable String roomNumber) {
         Room room = roomRepository.findByRoomNumber(roomNumber);
         Map<String, Object> result = new HashMap<>();
         

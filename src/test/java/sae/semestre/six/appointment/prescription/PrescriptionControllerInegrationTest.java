@@ -78,7 +78,7 @@ class PrescriptionControllerInegrationTest {
 
         when(patientRepository.findById(1L)).thenReturn(Optional.of(patient));
 
-        server.perform(post("/prescriptions/add")
+        server.perform(post("/prescriptions")
                         .param("patientId", patient.getId().toString())
                         .param("medicines", medicines)
                         .param("notes", notes))
@@ -102,7 +102,7 @@ class PrescriptionControllerInegrationTest {
 
         when(patientRepository.findById(nonExistentPatientId)).thenThrow(new RuntimeException("Patient not found"));
 
-        server.perform(post("/prescriptions/add")
+        server.perform(post("/prescriptions")
                         .param("patientId", String.valueOf(nonExistentPatientId))
                         .param("medicines", medicines)
                         .param("notes", notes))

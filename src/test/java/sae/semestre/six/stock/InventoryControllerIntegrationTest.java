@@ -72,7 +72,7 @@ class InventoryControllerIntegrationTest {
         double unitPrice = 10.0;
         SupplierInvoice supplierInvoice = createSupplierInvoice(inventory, addedQuantity, unitPrice);
 
-        server.perform(post("/inventory/supplier-invoice")
+        server.perform(post("/inventory/supplier-invoices")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(asJson(supplierInvoice)))
                 .andDo(print())
@@ -101,7 +101,7 @@ class InventoryControllerIntegrationTest {
         String errorMessage = "Database error";
         doThrow(new RuntimeException(errorMessage)).when(inventoryRepository).save(any());
 
-        server.perform(post("/inventory/supplier-invoice")
+        server.perform(post("/inventory/supplier-invoices")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(asJson(supplierInvoice)))
                 .andDo(print())
@@ -160,7 +160,7 @@ class InventoryControllerIntegrationTest {
         );
         when(inventoryService.findAll()).thenReturn(mockItems);
 
-        server.perform(get("/inventory/low-stock"))
+        server.perform(get("/inventory/items/low-stock"))
                 .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(MockMvcResultMatchers.jsonPath("$").isArray())
@@ -173,7 +173,7 @@ class InventoryControllerIntegrationTest {
     void testGetLowStockItemsButEmptyListIsReturned() throws Exception {
         when(inventoryService.findAll()).thenReturn(Collections.emptyList());
 
-        server.perform(get("/inventory/low-stock"))
+        server.perform(get("/inventory/items/low-stock"))
                 .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(MockMvcResultMatchers.jsonPath("$").isArray())

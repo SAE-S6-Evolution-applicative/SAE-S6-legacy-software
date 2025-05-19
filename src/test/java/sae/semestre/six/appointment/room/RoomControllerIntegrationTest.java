@@ -22,8 +22,7 @@ import java.util.Optional;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.*;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @ExtendWith(MockitoExtension.class)
@@ -75,9 +74,7 @@ class RoomControllerIntegrationTest {
         when(roomRepository.findByRoomNumber(room.getRoomNumber())).thenReturn(room);
         when(appointmentRepository.findById(appointment.getId())).thenReturn(Optional.of(appointment));
 
-        server.perform(post("/rooms/assign")
-                        .param("appointmentId", String.valueOf(appointment.getId()))
-                        .param("roomNumber", room.getRoomNumber()))
+        server.perform(put("/rooms/" + room.getRoomNumber() + "/appointments/" + appointment.getId()))
                 .andExpect(status().isOk())
                 .andExpect(MockMvcResultMatchers.content().string("Room assigned successfully"));
 
@@ -103,9 +100,7 @@ class RoomControllerIntegrationTest {
         when(roomRepository.findByRoomNumber(room.getRoomNumber())).thenReturn(room);
         when(appointmentRepository.findById(appointment.getId())).thenReturn(Optional.of(appointment));
 
-        server.perform(post("/rooms/assign")
-                        .param("appointmentId", String.valueOf(appointment.getId()))
-                        .param("roomNumber", room.getRoomNumber()))
+        server.perform(put("/rooms/" + room.getRoomNumber() + "/appointments/" + appointment.getId()))
                 .andExpect(status().isOk())
                 .andExpect(MockMvcResultMatchers.content().string("Error: Only surgeons can use surgery rooms"));
     }
@@ -128,9 +123,7 @@ class RoomControllerIntegrationTest {
         when(roomRepository.findByRoomNumber(room.getRoomNumber())).thenReturn(room);
         when(appointmentRepository.findById(appointment.getId())).thenReturn(Optional.of(appointment));
 
-        server.perform(post("/rooms/assign")
-                        .param("appointmentId", String.valueOf(appointment.getId()))
-                        .param("roomNumber", room.getRoomNumber()))
+        server.perform(put("/rooms/" + room.getRoomNumber() + "/appointments/" + appointment.getId()))
                 .andExpect(status().isOk())
                 .andExpect(MockMvcResultMatchers.content().string("Error: Room is at full capacity"));
     }
@@ -153,9 +146,7 @@ class RoomControllerIntegrationTest {
         when(roomRepository.findByRoomNumber(room.getRoomNumber())).thenThrow(new RuntimeException("Room not found"));
         when(appointmentRepository.findById(appointment.getId())).thenReturn(Optional.of(appointment));
 
-        server.perform(post("/rooms/assign")
-                        .param("appointmentId", String.valueOf(appointment.getId()))
-                        .param("roomNumber", room.getRoomNumber()))
+        server.perform(put("/rooms/" + room.getRoomNumber() + "/appointments/" + appointment.getId()))
                 .andExpect(status().isOk())
                 .andExpect(MockMvcResultMatchers.content().string("Error: Room not found"));
     }
@@ -170,8 +161,7 @@ class RoomControllerIntegrationTest {
 
         when(roomRepository.findByRoomNumber(room.getRoomNumber())).thenReturn(room);
 
-        server.perform(get("/rooms/availability")
-                        .param("roomNumber", room.getRoomNumber()))
+        server.perform(get("/rooms/" + room.getRoomNumber() + "/availability"))
                 .andExpect(status().isOk())
                 .andExpect(MockMvcResultMatchers.jsonPath("$.roomNumber").value(room.getRoomNumber()))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.capacity").value(room.getCapacity()))

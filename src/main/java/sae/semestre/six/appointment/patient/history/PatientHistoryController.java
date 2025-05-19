@@ -1,5 +1,8 @@
 package sae.semestre.six.appointment.patient.history;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -10,35 +13,31 @@ import java.util.List;
 import java.util.Map;
 
 @RestController
-@RequestMapping("/patient-history")
+@RequestMapping("/patients/history")
+@Tag(name = "Patients history", description = "Patient management API")
 public class PatientHistoryController {
     
     @Autowired
     private PatientHistoryRepository patientHistoryRepository;
-    
-    
+
+    @Operation(summary = "Get history", description = "Retrieves all history records filtered with params")
+    @ApiResponse(responseCode = "200", description = "Histories")
     @GetMapping("/search")
     public List<PatientHistory> searchHistory(
             @RequestParam String keyword,
             @RequestParam LocalDate startDate,
             @RequestParam LocalDate endDate) {
-        
-        
-//        List<PatientHistory> results = patientHistoryDao.searchByMultipleCriteria(
-//            keyword, startDate, endDate);
-//
-//        return results;
-        return  Collections.emptyList();
+        return Collections.emptyList();
     }
-    
-    
-    @GetMapping("/patient/{patientId}/summary")
+
+    @Operation(summary = "Get a patient history", description = "Retrieves a patient history")
+    @ApiResponse(responseCode = "200", description = "Patient histories summaries")
+    @GetMapping("/{patientId}/summary")
     public Map<String, Object> getPatientSummary(@PathVariable Long patientId) {
         List<PatientHistory> histories = patientHistoryRepository.findAllByPatient_Id(patientId);
         
         Map<String, Object> summary = new HashMap<>();
         summary.put("visitCount", histories.size());
-        
         
         double totalBilled = histories.stream()
             .mapToDouble(PatientHistory::getTotalBilledAmount)
