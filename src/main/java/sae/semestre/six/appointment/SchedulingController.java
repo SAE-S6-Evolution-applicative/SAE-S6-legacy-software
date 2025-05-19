@@ -1,5 +1,9 @@
 package sae.semestre.six.appointment;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import sae.semestre.six.appointment.doctor.Doctor;
@@ -15,6 +19,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/scheduling")
+@Tag(name = "Scheduling", description = "Appointment management API")
 public class SchedulingController {
 
     public static final int SCHEDULE_START_HOUR = 9;
@@ -37,11 +42,14 @@ public class SchedulingController {
     private final EmailService emailService = EmailService.getInstance();
 
 
+    @Operation(summary = "Schedule an appointment", description = "Creates a new appointment between a doctor and a patient")
+    @ApiResponse(responseCode = "200", description = "Appointment scheduled successfully")
+    @ApiResponse(responseCode = "400", description = "Invalid data or time conflict")
     @PostMapping("/appointment")
     public String scheduleAppointment(
-            @RequestParam Long doctorId,
-            @RequestParam Long patientId,
-            @RequestParam LocalDateTime appointmentDateTime) {
+            @Parameter(description = "Doctor ID") @RequestParam Long doctorId,
+            @Parameter(description = "Patient ID") @RequestParam Long patientId,
+            @Parameter(description = "Appointment date and time") @RequestParam LocalDateTime appointmentDateTime) {
         try {
             Doctor doctor = doctorRepository.findById(doctorId).orElseThrow(
                     () -> new RuntimeException("Doctor not found")
@@ -87,10 +95,12 @@ public class SchedulingController {
 
 
 
+    @Operation(summary = "Get available slots", description = "Retrieves all available time slots for a doctor on a given date")
+    @ApiResponse(responseCode = "200", description = "List of available slots")
     @GetMapping("/available-slots")
     public List<LocalDateTime> getAvailableSlots(
-            @RequestParam Long doctorId,
-            @RequestParam LocalDate date) {
+            @Parameter(description = "Doctor ID") @RequestParam Long doctorId,
+            @Parameter(description = "Date to check for available slots") @RequestParam LocalDate date) {
 
         List<LocalDateTime> availableSlots = new ArrayList<>();
 

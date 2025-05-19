@@ -1,5 +1,9 @@
 package sae.semestre.six.appointment.bill;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.hibernate.Hibernate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -14,6 +18,7 @@ import java.util.*;
 
 @RestController
 @RequestMapping("/billing")
+@Tag(name = "Billing", description = "Billing management API")
 public class BillingController {
     
     private static volatile BillingController instance;
@@ -49,11 +54,14 @@ public class BillingController {
         return instance;
     }
     
+    @Operation(summary = "Process a bill", description = "Creates and processes a new bill for a patient")
+    @ApiResponse(responseCode = "200", description = "Bill processed successfully")
+    @ApiResponse(responseCode = "400", description = "Invalid data")
     @PostMapping("/process")
     public String processBill(
-            @RequestParam String patientId,
-            @RequestParam String doctorId,
-            @RequestParam String[] treatments) {
+            @Parameter(description = "Patient ID") @RequestParam String patientId,
+            @Parameter(description = "Doctor ID") @RequestParam String doctorId,
+            @Parameter(description = "List of treatments") @RequestParam String[] treatments) {
         try {
             Patient patient = patientRepository.findById(Long.parseLong(patientId)).orElseThrow(
                     () -> new RuntimeException("Patient not found")
@@ -113,10 +121,12 @@ public class BillingController {
         }
     }
     
+    @Operation(summary = "Update treatment price", description = "Modifies the price of a treatment type")
+    @ApiResponse(responseCode = "200", description = "Price updated successfully")
     @PutMapping("/price")
     public String updatePrice(
-            @RequestParam String treatment,
-            @RequestParam double price) {
+            @Parameter(description = "Treatment type") @RequestParam String treatment,
+            @Parameter(description = "New price") @RequestParam double price) {
         priceList.put(treatment, price);
         recalculateAllPendingBills();
         return "Price updated";
@@ -128,22 +138,31 @@ public class BillingController {
         }
     }
     
+    @Operation(summary = "Get price list", description = "Retrieves all treatment prices")
+    @ApiResponse(responseCode = "200", description = "Price list")
     @GetMapping("/prices")
     public Map<String, Double> getPrices() {
         return priceList;
     }
     
+    @Operation(summary = "Calculate insurance coverage", description = "Calculates insurance coverage for a given amount")
+    @ApiResponse(responseCode = "200", description = "Coverage calculated")
     @GetMapping("/insurance")
-    public String calculateInsurance(@RequestParam double amount) {
+    public String calculateInsurance(
+            @Parameter(description = "Amount to cover") @RequestParam double amount) {
         double coverage = amount;
         return "Insurance coverage: $" + coverage;
     }
     
+    @Operation(summary = "Get total revenue", description = "Retrieves the total system revenue")
+    @ApiResponse(responseCode = "200", description = "Total revenue")
     @GetMapping("/revenue")
     public String getTotalRevenue() {
         return "Total Revenue: $" + totalRevenue;
     }
     
+    @Operation(summary = "Get pending bills", description = "Retrieves the list of pending bills")
+    @ApiResponse(responseCode = "200", description = "List of pending bills")
     @GetMapping("/pending")
     public List<String> getPendingBills() {
         return pendingBills;
