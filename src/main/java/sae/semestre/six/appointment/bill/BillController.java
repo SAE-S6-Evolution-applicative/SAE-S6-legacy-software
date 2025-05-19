@@ -14,12 +14,10 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import sae.semestre.six.appointment.doctor.Doctor;
-import sae.semestre.six.appointment.doctor.DoctorRepository;
 import sae.semestre.six.appointment.doctor.DoctorService;
 import sae.semestre.six.appointment.medicalact.MedicalAct;
 import sae.semestre.six.appointment.medicalact.MedicalActService;
 import sae.semestre.six.appointment.patient.Patient;
-import sae.semestre.six.appointment.patient.PatientRepository;
 import sae.semestre.six.appointment.patient.PatientService;
 import sae.semestre.six.common.SuccessfullResponseModel;
 import sae.semestre.six.email.EmailService;
@@ -30,7 +28,7 @@ import java.util.Objects;
 @RestController
 @RequestMapping("/bills")
 @Tag(name = "Billing", description = "Billing management API")
-public class BillingController {
+public class BillController {
 
     private static final Logger logger = LoggerFactory.getLogger(BillController.class);
 
@@ -46,17 +44,17 @@ public class BillingController {
 
     @Autowired
     public BillController(
-            DoctorService doctorService,
             BillService billService,
             MedicalActService medicalActService,
-            EmailService emailService,
-            PatientService patientService
+            PatientService patientService,
+            DoctorService doctorService,
+            EmailService emailService
     ) {
-        this.doctorService = doctorService;
         this.billService = billService;
         this.medicalActService = medicalActService;
-        this.emailService = emailService;
         this.patientService = patientService;
+        this.doctorService = doctorService;
+        this.emailService = emailService;
     }
 
     @Operation(summary = "Process a bill", description = "Creates and processes a new bill for a patient")
