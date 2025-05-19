@@ -50,7 +50,7 @@ public class InventoryController {
     }
 
     @Operation(summary = "Get inventory items with a low stock", description = "Retrieves all inventory items with a low stock")
-    @ApiResponse(responseCode = "200", description = "Low stocks items")
+    @ApiResponse(responseCode = "200", description = "Low stock items")
     @GetMapping("/items/low-stock")
     public List<Inventory> getLowStockItems() {
         return inventoryService.findAll().stream()
