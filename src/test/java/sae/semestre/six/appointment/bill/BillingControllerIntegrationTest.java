@@ -49,7 +49,7 @@ class BillingControllerIntegrationTest {
 
     @Test
     void testProcessBill() throws Exception {
-        server.perform(post("/billing/process")
+        server.perform(post("/bills")
                 .param("patientId", "1")
                 .param("doctorId", "1")
                 .param("treatments", "CONSULTATION"))
@@ -58,7 +58,7 @@ class BillingControllerIntegrationTest {
 
     @Test
     void testUpdatePrice() throws Exception {
-        server.perform(put("/billing/price")
+        server.perform(put("/bills/price")
                 .param("treatment", "CONSULTATION")
                 .param("price", "75.0"))
                 .andExpect(status().isOk())
@@ -67,7 +67,7 @@ class BillingControllerIntegrationTest {
 
     @Test
     void testGetPrices() throws Exception {
-        server.perform(get("/billing/prices"))
+        server.perform(get("/bills/prices"))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(content().json("{\"CONSULTATION\":50.0,\"XRAY\":150.0,\"CHIRURGIE\":1000.0}"));
@@ -75,7 +75,7 @@ class BillingControllerIntegrationTest {
 
     @Test
     void testCalculateInsurance() throws Exception {
-        server.perform(get("/billing/insurance")
+        server.perform(get("/bills/insurance-coverage")
                 .param("amount", "1000"))
                 .andExpect(status().isOk())
                 .andExpect(content().string("Insurance coverage: $1000.0"));
@@ -83,7 +83,7 @@ class BillingControllerIntegrationTest {
 
     @Test
     void testUpdatePriceWithInvalidTreatment() throws Exception {
-        server.perform(put("/billing/price")
+        server.perform(put("/bills/price")
                         .param("treatment", "INVALID_TREATMENT")
                         .param("price", "100.0"))
                 .andExpect(status().isOk())
@@ -92,14 +92,14 @@ class BillingControllerIntegrationTest {
 
     @Test
     void testGetTotalRevenue() throws Exception {
-        server.perform(get("/billing/revenue"))
+        server.perform(get("/bills/revenue"))
                 .andExpect(status().isOk())
                 .andExpect(content().string("Total Revenue: $0.0"));
     }
 
     @Test
     void testGetPendingBills() throws Exception {
-        server.perform(get("/billing/pending"))
+        server.perform(get("/bills/pending"))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(content().json("[]"));
@@ -108,7 +108,7 @@ class BillingControllerIntegrationTest {
 
     @Test
     void testCalculateInsuranceWithZeroAmount() throws Exception {
-        server.perform(get("/billing/insurance")
+        server.perform(get("/bills/insurance-coverage")
                         .param("amount", "0"))
                 .andExpect(status().isOk())
                 .andExpect(content().string("Insurance coverage: $0.0"));
