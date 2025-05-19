@@ -6,3 +6,9 @@ services:
       - ./../.env # Loads environment variables from the .env file
     ports:
       - "7878:3306"
+  mailHog:
+    container_name: mailhog
+    image: mailhog/mailhog
+    ports:
+      - "8025:8025"
+      - "1025:1025"

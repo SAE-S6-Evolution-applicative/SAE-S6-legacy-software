@@ -1,52 +1,35 @@
 package sae.semestre.six.email;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
-import org.springframework.mail.javamail.JavaMailSenderImpl;
+import org.springframework.stereotype.Service;
 
-import java.util.Properties;
 
+@Service
 public class EmailService {
-    
-    private static EmailService instance;
-    private final JavaMailSender mailSender;
-    
-    private EmailService() {
-        
-        JavaMailSenderImpl sender = new JavaMailSenderImpl();
-        sender.setHost("smtp.gmail.com");
-        sender.setPort(587);
-        sender.setUsername("hospital.system@gmail.com");
-        sender.setPassword("hospital123!");
-        
-        Properties props = sender.getJavaMailProperties();
-        props.put("mail.transport.protocol", "smtp");
-        props.put("mail.smtp.auth", "true");
-        props.put("mail.smtp.starttls.enable", "true");
-        
-        this.mailSender = sender;
+
+    private JavaMailSender mailSender;
+
+    @Autowired
+    public EmailService(JavaMailSender mailSender) {
+        this.mailSender = mailSender;
     }
-    
-    public static EmailService getInstance() {
-        if (instance == null) {
-            instance = new EmailService();
-        }
-        return instance;
+
+    /**
+     * Send a simple email
+     *
+     * @param receiver The receiver of the email
+     * @param subject  The subject of the email
+     * @param text     Content of the email
+     */
+    public void sendEmail(String receiver, String subject, String text) {
+        SimpleMailMessage message = new SimpleMailMessage();
+        message.setTo(receiver);
+        message.setSubject(subject);
+        message.setText(text);
+        message.setFrom("hospital.system@gmail.com");
+
+        mailSender.send(message);
     }
-    
-    
-    public void sendEmail(String to, String subject, String body) {
-        try {
-            SimpleMailMessage message = new SimpleMailMessage();
-            message.setFrom("hospital.system@gmail.com");
-            message.setTo(to);
-            message.setSubject(subject);
-            message.setText(body);
-            
-            mailSender.send(message);
-            System.out.println("Email sent successfully");
-        } catch (Exception e) {
-            System.out.println("Failed to send email: " + e.getMessage());
-        }
-    }
-} 
+}

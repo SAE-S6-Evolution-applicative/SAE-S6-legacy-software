@@ -18,6 +18,7 @@ import sae.semestre.six.appointment.medicalact.MedicalActRepository;
 import sae.semestre.six.appointment.medicalact.MedicalActService;
 import sae.semestre.six.appointment.patient.Patient;
 import sae.semestre.six.appointment.patient.PatientRepository;
+import sae.semestre.six.email.EmailService;
 
 import java.time.LocalDateTime;
 
@@ -52,13 +53,18 @@ class BillControllerIntegrationTest {
 
     @Autowired
     private MedicalActService medicalActService;
-    
+
     @Autowired
     private MedicalActRepository medicalActRepository;
+
     @Autowired
     private BillDetailRepository billDetailRepository;
+
     @Autowired
     private AppointmentRepository appointmentRepository;
+
+    @Autowired
+    private EmailService emailService;
 
     @Test
     void testProcessBill() throws Exception {

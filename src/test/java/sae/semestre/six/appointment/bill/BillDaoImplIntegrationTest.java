@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
 import sae.semestre.six.appointment.patient.Patient;
+import sae.semestre.six.email.EmailService;
 
 import java.util.List;
 
@@ -22,6 +23,9 @@ class BillDaoImplIntegrationTest {
 
     @PersistenceContext
     private EntityManager entityManager;
+
+    @Autowired
+    private EmailService emailService;
 
     @Test
     void testFindByBillNumber() {

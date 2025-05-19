@@ -38,8 +38,9 @@ public class SchedulingController {
         this.doctorRepository = doctorRepository;
         this.patientRepository = patientRepository;
     }
-    
-    private final EmailService emailService = EmailService.getInstance();
+
+    @Autowired
+    private EmailService emailService;
 
 
     @Operation(summary = "Schedule an appointment", description = "Creates a new appointment between a doctor and a patient")

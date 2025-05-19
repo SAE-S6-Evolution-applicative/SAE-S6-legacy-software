@@ -25,9 +25,10 @@ public class InventoryController {
 
     @Autowired
     private InventoryRepository inventoryRepository;
-    
-    private final EmailService emailService = EmailService.getInstance();
 
+    @Autowired
+    private EmailService emailService;
+    
     @Operation(summary = "Process a supplier invoice", description = "Processes a new supplier invoice")
     @ApiResponse(responseCode = "200", description = "Process completed")
     @PostMapping("/supplier-invoices")

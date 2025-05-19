@@ -7,10 +7,11 @@ import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.transaction.annotation.Transactional;
 import sae.semestre.six.appointment.medicalact.MedicalAct;
 import sae.semestre.six.appointment.medicalact.MedicalActRepository;
+import sae.semestre.six.email.EmailService;
 
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
 @Transactional
@@ -18,16 +19,19 @@ class BillDetailRepositoryTest {
     private BillRepository billRepository;
     private BillDetailRepository billDetailRepository;
     private MedicalActRepository medicalActRepository;
+    private EmailService emailService;
 
     @Autowired
     public BillDetailRepositoryTest(
             BillRepository billRepository,
             BillDetailRepository billDetailRepository,
-            MedicalActRepository medicalActRepository
+            MedicalActRepository medicalActRepository,
+            EmailService emailService
     ) {
         this.billRepository = billRepository;
         this.billDetailRepository = billDetailRepository;
         this.medicalActRepository = medicalActRepository;
+        this.emailService = emailService;
     }
 
     @Test

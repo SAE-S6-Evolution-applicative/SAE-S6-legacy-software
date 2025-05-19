@@ -35,16 +35,17 @@ public class BillingController {
 
     private DoctorRepository doctorRepository;
 
-    private final EmailService emailService = EmailService.getInstance();
+    private EmailService emailService;
 
     @Autowired
     public BillController(
-            DoctorRepository doctorRepository, PatientRepository patientRepository, BillService billService, MedicalActService medicalActService
+            DoctorRepository doctorRepository, PatientRepository patientRepository, BillService billService, MedicalActService medicalActService, EmailService emailService
     ) {
         this.doctorRepository = doctorRepository;
         this.patientRepository = patientRepository;
         this.billService = billService;
         this.medicalActService = medicalActService;
+        this.emailService = emailService;
     }
 
     private BillController() {
