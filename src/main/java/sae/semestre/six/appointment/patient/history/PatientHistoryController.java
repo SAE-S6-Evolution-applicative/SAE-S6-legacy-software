@@ -20,7 +20,7 @@ public class PatientHistoryController {
     @Autowired
     private PatientHistoryRepository patientHistoryRepository;
 
-    @Operation(summary = "Get an history", description = "Retrieves all history records filters with params")
+    @Operation(summary = "Get history", description = "Retrieves all history records filtered with params")
     @ApiResponse(responseCode = "200", description = "Histories")
     @GetMapping("/search")
     public List<PatientHistory> searchHistory(
