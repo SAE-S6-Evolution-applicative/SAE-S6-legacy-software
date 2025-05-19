@@ -10,21 +10,18 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.web.bind.annotation.*;
 
-import java.time.LocalDate;
-import java.util.Collections;
-import java.util.HashMap;
+import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Map;
 
 @RestController
 @RequestMapping("/patients/history")
 @Tag(name = "Patients history", description = "Patient management API")
 public class PatientHistoryController {
 
-    private final PatientHistoryRepository patientHistoryRepository;
+    private final PatientHistoryService patientHistoryService;
 
-    public PatientHistoryController(final PatientHistoryRepository patientHistoryRepository) {
-        this.patientHistoryRepository = patientHistoryRepository;
+    public PatientHistoryController(final PatientHistoryService patientHistoryService) {
+        this.patientHistoryService = patientHistoryService;
     }
 
     @Operation(summary = "Get history", description = "Retrieves all history records filtered with params")
@@ -32,25 +29,16 @@ public class PatientHistoryController {
     @GetMapping("/search")
     public List<PatientHistory> searchHistory(
             @RequestParam String keyword,
-            @RequestParam LocalDate startDate,
-            @RequestParam LocalDate endDate) {
-        return Collections.emptyList();
-    }
+            @RequestParam LocalDateTime startDate,
+            @RequestParam LocalDateTime endDate) {
 
+        return patientHistoryService.searchByMultipleCriteria(keyword, startDate, endDate);
+    }
+    
     @Operation(summary = "Get a patient history", description = "Retrieves a patient history")
     @ApiResponse(responseCode = "200", description = "Patient histories summaries")
     @GetMapping("/{patientId}/summary")
-    public Map<String, Object> getPatientSummary(@PathVariable Long patientId) {
-        List<PatientHistory> histories = patientHistoryRepository.findAllByPatient_Id(patientId);
-
-        Map<String, Object> summary = new HashMap<>();
-        summary.put("visitCount", histories.size());
-        
-        double totalBilled = histories.stream()
-                .mapToDouble(PatientHistory::getTotalBilledAmount)
-                .sum();
-
-        summary.put("totalBilled", totalBilled);
-        return summary;
+    public PatientSummaryResponse getPatientSummary(@PathVariable Long patientId) {
+        return patientHistoryService.getPatientSummary(patientId);
     }
 } 

@@ -15,6 +15,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.text.ParseException;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
@@ -24,10 +25,11 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @Transactional
 @AutoConfigureMockMvc
 class PatientHistoryControllerTest {
+
     private MockMvc server;
 
     @MockitoBean
-    private PatientHistoryRepository patientHistoryRepository;
+    private PatientHistoryService patientHistoryService;
 
     @InjectMocks
     private PatientHistoryController patientHistoryController;
@@ -35,6 +37,7 @@ class PatientHistoryControllerTest {
     private AutoCloseable autoCloseable;
 
     private PatientHistory history1;
+
     private PatientHistory history2;
 
     @BeforeEach
@@ -61,13 +64,13 @@ class PatientHistoryControllerTest {
     @Test
     void testSearchHistory() throws Exception {
         String keyword = "hello";
-        String startDate = "2023-01-01";
-        String endDate = "2023-12-31";
+        LocalDateTime startDate = LocalDateTime.of(2023, 1, 1, 0,0);
+        LocalDateTime endDate = LocalDateTime.of(2023, 12, 31, 0,0);
 
         server.perform(get("/patients/history/search")
                     .param("keyword", keyword)
-                    .param("startDate",  startDate)
-                    .param("endDate", endDate)
+                    .param("startDate",  startDate.toString())
+                    .param("endDate", endDate.toString())
                     .contentType(MediaType.APPLICATION_JSON)).andDo(print())
                 .andExpect(status().isOk());
     }

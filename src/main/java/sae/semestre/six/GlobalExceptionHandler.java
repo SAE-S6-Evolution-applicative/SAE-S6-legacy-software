@@ -27,6 +27,14 @@ public class GlobalExceptionHandler {
         return createProblemDetail(HttpStatus.INTERNAL_SERVER_ERROR, exception.getMessage(), "Unknown internal server error.");
     }
 
+    @ExceptionHandler(IllegalArgumentException.class)
+    @ResponseStatus(HttpStatus.UNAUTHORIZED)
+    public ProblemDetail handleUnauthorizeException(IllegalArgumentException exception) {
+        LOG.error("Illegal Argument Exception: {}", exception.getMessage());
+        LOG.error("Stack trace: ", exception);
+        return createProblemDetail(HttpStatus.UNAUTHORIZED, exception.getMessage(), "Bad request, all arguments must be provided.");
+    }
+
     /**
      * Create a ProblemDetail object with the status, message and description.
      *
