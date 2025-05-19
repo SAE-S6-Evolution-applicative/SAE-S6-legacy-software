@@ -47,3 +47,4 @@ logs/
 .env
 
 *.log
+.idea/vcs.xml
