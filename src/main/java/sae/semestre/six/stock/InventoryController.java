@@ -58,7 +58,7 @@ public class InventoryController {
             .collect(Collectors.toList());
     }
 
-    @Operation(summary = "Reorder items who needs a restock", description = "Sends email requests to restock items who need a restock")
+    @Operation(summary = "Reorder items that need a restock", description = "Sends email requests to restock items that need a restock")
     @ApiResponse(responseCode = "200", description = "reorder completed")
     @PostMapping("/reorder")
     public String reorderItems() {
