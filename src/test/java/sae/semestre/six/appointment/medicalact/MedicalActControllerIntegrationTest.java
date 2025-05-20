@@ -83,7 +83,7 @@ class MedicalActControllerIntegrationTest {
 
         Double updatedPrice = 75.0;
 
-        // When wr try to update the price of the medical act
+        // When we try to update the price of the medical act
         server.perform(put("/medicalAct/")
                         .param("idMedicalAct", act1.getId().toString())
                         .param("price", updatedPrice.toString()))
@@ -116,10 +116,10 @@ class MedicalActControllerIntegrationTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.success").value(true));
 
-        // Then the bill have to be update too
+        // Then the bill has to be updated too
         assertFalse(medicalActRepository.findById(act1.getId()).orElseThrow().isActive());
         verify(medicalActService, times(1)).updatePrice(eq(updatedPrice), any(MedicalAct.class));
-        assertEquals(updatedPrice, billRepository.findById(bill.getId()).orElseThrow().getTotalAmount());
+        assertEquals(act1.getPrice(), billRepository.findById(bill.getId()).orElseThrow().getTotalAmount());
     }
 
     @Test

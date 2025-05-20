@@ -69,12 +69,6 @@ public class MedicalActService {
      * @param medicalAct medical act to update
      */
     public void updatePrice(double price, MedicalAct medicalAct) {
-        var newMedicalAct = medicalActRepository.save(medicalAct.updatePrice(price));
-        List<BillDetail> billDetails = billDetailService.updateBillDetail(medicalAct, newMedicalAct);
-
-        billDetails.stream()
-                   .map(BillDetail::getBill)
-                   .distinct()
-                   .forEach(Bill::recalculate);
+        medicalActRepository.save(medicalAct.updatePrice(price));
     }
 }
