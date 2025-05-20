@@ -21,7 +21,7 @@
     <appender name="BILLING_FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
         <file>logs/bill.log</file>
         <encoder>
-            <!-- Simple Pattern that only dispplay the message -->
+            <!-- Simple Pattern that only display the message -->
             <pattern>%msg%n</pattern>
         </encoder>
         <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">

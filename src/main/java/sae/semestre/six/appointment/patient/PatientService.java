@@ -18,9 +18,16 @@ public class PatientService {
         this.patientRepository = patientRepository;
     }
 
+    /**
+     * Retrieves a patient entity from the repository based on their unique identifier.
+     *
+     * @param patientId the unique identifier of the patient to retrieve
+     * @return the patient entity associated with the given ID
+     * @throws IllegalArgumentException if no patient is found with the specified ID
+     */
     public Patient getPatient(Long patientId) {
         return patientRepository.findById(patientId).orElseThrow(
-                () -> new RuntimeException("Patient not found")
+                () -> new IllegalArgumentException("Patient not found with ID : " + patientId)
         );
     }
 }

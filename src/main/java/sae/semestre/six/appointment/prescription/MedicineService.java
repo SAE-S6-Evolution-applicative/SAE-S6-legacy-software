@@ -39,4 +39,14 @@ public class MedicineService {
     public List<Medicine> getAllMedicines() {
         return medicineRepository.findAll();
     }
+
+    /**
+     * Retrieves all medicines with the given IDs
+     *
+     * @param ids List of medicine IDs to retrieve
+     * @return List of found medicines (may not contain all requested IDs if some don't exist)
+     */
+    public List<Medicine> getByIds(List<Long> ids) {
+        return medicineRepository.findAllById(ids);
+    }
 }

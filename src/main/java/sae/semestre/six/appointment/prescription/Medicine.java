@@ -20,6 +20,10 @@ public class Medicine {
 
     private double price;
 
+    @ManyToOne
+    @JoinColumn(name = "prescription_id")
+    private Prescription prescription;
+
     public Medicine() {}
 
     public Medicine(String name, double price) {
@@ -45,5 +49,13 @@ public class Medicine {
 
     public void setPrice(double price) {
         this.price = price;
+    }
+
+    public Prescription getPrescription() {
+        return prescription;
+    }
+
+    public void setPrescription(Prescription prescription) {
+        this.prescription = prescription;
     }
 }

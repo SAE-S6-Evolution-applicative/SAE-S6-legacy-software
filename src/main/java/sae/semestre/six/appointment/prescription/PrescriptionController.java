@@ -12,6 +12,8 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
@@ -41,12 +43,13 @@ public class PrescriptionController {
     @ApiResponse(responseCode = "200", description = "Prescription created successfully")
     @ApiResponse(responseCode = "400", description = "Invalid data")
     @PostMapping
-    public void addPrescription( //TODO change to ResponseModel
-            @Parameter(description = "Patient ID") @RequestParam Long patientId,
-            @Parameter(description = "List of medicines") @RequestParam String[] medicines,
-            @Parameter(description = "Additional notes") @RequestParam String notes) {
+    public ResponseEntity<Void> addPrescription(
+            @Parameter(description = "Patient ID") @RequestBody Long patientId,
+            @Parameter(description = "List of medicines") @RequestBody List<Long> medicineIds,
+            @Parameter(description = "Additional notes") @RequestBody String notes) {
 
-        prescriptionService.addPrescription(patientId, medicines, notes);
+        prescriptionService.addPrescription(patientId, medicineIds, notes);
+        return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
     @Operation(summary = "Get patient prescriptions", description = "Retrieves all prescriptions for a patient")

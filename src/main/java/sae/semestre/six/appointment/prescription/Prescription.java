@@ -6,31 +6,35 @@
 package sae.semestre.six.appointment.prescription;
 
 import jakarta.persistence.*;
-import sae.semestre.six.appointment.Appointment;
 import sae.semestre.six.appointment.patient.Patient;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Entity
 @Table(name = "prescriptions")
 public class Prescription {
 
-    public Prescription(int previousPrescriptionNumber, Patient patient, String[] medicines, String notes) {
+    public static final double TVA_PERCENTAGE = 1.2;
+
+    /**
+     * Creates a new prescription with the specified parameters.
+     *
+     * @param previousPrescriptionNumber the previous prescription number used to generate the new prescription number
+     * @param patient the patient associated with the prescription
+     * @param medicines the list of medicines prescribed
+     * @param notes additional notes regarding the prescription
+     */
+    public Prescription(int previousPrescriptionNumber, Patient patient, List<Medicine> medicines, String notes) {
         this.prescriptionNumber = "RX" + previousPrescriptionNumber;
         this.patient = patient;
-        this.medicines = String.join(",", medicines);
+        this.medicines = medicines;
         this.notes = notes;
+        this.totalCost = calculateTotalCostTTC();
     }
 
-    Prescription prescription = new Prescription();
-            prescription.setPrescriptionNumber(prescriptionId);
-            prescription.setPatient(patient);
-
-            prescription.setMedicines(String.join(",", medicines));
-            prescription.setNotes(notes);
-
-    double cost = calculateCost(prescriptionId);
-            prescription.setTotalCost(cost);
+    public Prescription() {
+    }
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -44,7 +48,18 @@ public class Prescription {
     private Patient patient;
 
     @Column(name = "medicines")
-    private String medicines;
+    @OneToMany(mappedBy = "prescription", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Medicine> medicines;
+
+    public void addMedicine(Medicine medicine) {
+        this.medicines.add(medicine);
+        medicine.setPrescription(this);
+    }
+
+    public void removeMedicine(Medicine medicine) {
+        this.medicines.remove(medicine);
+        medicine.setPrescription(null);
+    }
 
     @Column(name = "notes")
     private String notes;
@@ -89,11 +104,11 @@ public class Prescription {
         this.patient = patient;
     }
 
-    public String getMedicines() {
+    public List<Medicine> getMedicines() {
         return medicines;
     }
 
-    public void setMedicines(String medicines) {
+    public void setMedicines(List<Medicine> medicines) {
         this.medicines = medicines;
     }
 
@@ -169,5 +184,16 @@ public class Prescription {
         } catch (NumberFormatException e) {
             return 0;
         }
+    }
+
+    /**
+     * Calculates the total cost including tax (TTC) for all medicines in the prescription.
+     * The total is computed as the sum of the prices of all medicines multiplied by the
+     * TVA_PERCENTAGE constant.
+     *
+     * @return The total cost including tax (TTC) as a double.
+     */
+    public double calculateTotalCostTTC() {
+        return medicines.stream().mapToDouble(Medicine::getPrice).sum() * TVA_PERCENTAGE;
     }
 } 
