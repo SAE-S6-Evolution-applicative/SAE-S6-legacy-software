@@ -25,7 +25,7 @@ public class MedicalActService {
     private final MedicalActRepository medicalActRepository;
 
     @Autowired
-    public MedicalActService(MedicalActRepository medicalActRepository, BillDetailService billDetailService) {
+    public MedicalActService(final MedicalActRepository medicalActRepository, final BillDetailService billDetailService) {
         this.medicalActRepository = medicalActRepository;
         this.billDetailService = billDetailService;
     }

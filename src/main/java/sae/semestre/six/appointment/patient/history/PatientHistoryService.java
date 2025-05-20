@@ -18,7 +18,7 @@ public class PatientHistoryService {
     private final PatientHistoryRepository patientHistoryRepository;
 
     @Autowired
-    public PatientHistoryService(PatientHistoryRepository patientHistoryRepository) {
+    public PatientHistoryService(final PatientHistoryRepository patientHistoryRepository) {
         this.patientHistoryRepository = patientHistoryRepository;
     }
 

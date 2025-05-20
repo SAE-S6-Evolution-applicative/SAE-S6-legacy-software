@@ -22,8 +22,11 @@ import java.util.Map;
 @Tag(name = "Patients history", description = "Patient management API")
 public class PatientHistoryController {
 
-    @Autowired
-    private PatientHistoryRepository patientHistoryRepository;
+    private final PatientHistoryRepository patientHistoryRepository;
+
+    public PatientHistoryController(final PatientHistoryRepository patientHistoryRepository) {
+        this.patientHistoryRepository = patientHistoryRepository;
+    }
 
     @Operation(summary = "Get history", description = "Retrieves all history records filtered with params")
     @ApiResponse(responseCode = "200", description = "Histories")

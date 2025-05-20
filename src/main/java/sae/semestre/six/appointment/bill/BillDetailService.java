@@ -13,10 +13,11 @@ import java.util.List;
 
 @Service
 public class BillDetailService {
+
     private final BillDetailRepository billDetailRepository;
 
     @Autowired
-    public BillDetailService(BillDetailRepository billDetailRepository) {
+    public BillDetailService(final BillDetailRepository billDetailRepository) {
         this.billDetailRepository = billDetailRepository;
     }
 
