@@ -52,4 +52,16 @@ public class BillIntegrationTest {
         // Then nothing is throwned
         assertDoesNotThrow(saveBill::run);
     }
+
+    @Test
+    void testBillIsNotDeletable() {
+        // Given a bill saved in DB
+        Bill bill = billRepository.save(new Bill());
+
+        // When we try to delete it
+        Runnable deleteBill = () -> billRepository.delete(bill);
+
+        // Then an exception is thrown
+        assertThrows(BillCannotBeDeletedException.class, deleteBill::run);
+    }
 }

@@ -211,4 +211,9 @@ public class Bill {
             throw new BillModifiedException("Bill has been modified, your are not allowed to do that");
         }
     }
+
+    @PreRemove
+    void preventDeletion() {
+        throw new BillCannotBeDeletedException("A Bill cannot be deleted");
+    }
 }
