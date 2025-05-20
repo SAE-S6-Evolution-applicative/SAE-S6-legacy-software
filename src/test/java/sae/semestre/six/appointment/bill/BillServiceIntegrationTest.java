@@ -32,22 +32,4 @@ class BillServiceIntegrationTest {
     void setUp() {
         MockitoAnnotations.openMocks(this);
     }
-
-    @Test
-    void testProcessBill() {
-        // Method is empty, we simply test if that it does not generate any exception
-        assertDoesNotThrow(() -> {
-            billService.processBill("1", "test", new String[]{"CONSULTATION"});
-        });
-    }
-
-    @Test
-    void testProcessBillWithNullValues() {
-        // Verify that the method handle null values correctly
-        assertDoesNotThrow(() -> {
-            billService.processBill((String) null, null, null);
-        });
-    }
-
-
 }

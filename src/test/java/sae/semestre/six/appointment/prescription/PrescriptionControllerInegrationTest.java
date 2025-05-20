@@ -67,31 +67,6 @@ class PrescriptionControllerIntegrationTest {
     }
 
     @Test
-    void addPrescription() throws Exception {
-        int counter = 1;
-        Patient patient = createTestPatient();
-        String[] medicines = {"PARACETAMOL", "ANTIBIOTICS"};
-        String notes = "Take with food";
-
-        when(patientRepository.findById(1L)).thenReturn(Optional.of(patient));
-
-        server.perform(post("/prescriptions")
-                        .param("patientId", patient.getId().toString())
-                        .param("medicines", medicines)
-                        .param("notes", notes))
-                .andExpect(status().isOk())
-                .andExpect(MockMvcResultMatchers.content().string("Prescription RX" + counter + " created and billed"));
-
-        verify(patientRepository).findById(patient.getId());
-        verify(prescriptionRepository).save(any(Prescription.class));
-        verify(billService).processBill(
-                patient.getId().toString(),
-                "SYSTEM",
-                new String[]{"PRESCRIPTION_RX" + counter}
-        );
-    }
-
-    @Test
     void addPrescriptionButPatientAbsent() throws Exception {
         Long nonExistentPatientId = 9999L;
         String[] medicines = {"PARACETAMOL", "ANTIBIOTICS"};

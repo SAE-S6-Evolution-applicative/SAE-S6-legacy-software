@@ -93,14 +93,6 @@ public class PrescriptionController {
             currentPrescriptions.add(prescriptionId);
             patientPrescriptions.put(patientId, currentPrescriptions);
 
-
-            billService.processBill(
-                    patientId,
-                    "SYSTEM",
-                    new String[]{"PRESCRIPTION_" + prescriptionId}
-            );
-
-
             for (String medicine : medicines) {
                 int current = medicineInventory.getOrDefault(medicine, 0);
                 medicineInventory.put(medicine, current - 1);

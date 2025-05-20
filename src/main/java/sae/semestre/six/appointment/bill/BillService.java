@@ -31,11 +31,6 @@ public class BillService {
         return billRepository.findBillsByStatus(Bill.Status.PENDING);
     }
 
-    public void processBill(String patientId, String source, String[] items) {
-        // This method is been here since the beginning
-        // TODO find original behavior
-    }
-
     public Double getTotalRevenue() {
         Double totalRevenue = billRepository.findTotalRevenue();
         if (totalRevenue == null) {
