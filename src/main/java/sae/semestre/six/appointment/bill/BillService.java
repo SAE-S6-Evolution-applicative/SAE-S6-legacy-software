@@ -33,7 +33,7 @@ public class BillService {
 
     public void processBill(String patientId, String source, String[] items) {
         // This method is been here since the beginning
-
+        // TODO find original behavior
     }
 
     public Double getTotalRevenue() {
