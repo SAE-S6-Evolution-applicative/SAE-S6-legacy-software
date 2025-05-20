@@ -87,7 +87,7 @@ class PatientHistoryTest {
     @Test
     void testSetAndGetVisitDate() {
         // Arrange
-        LocalDateTime visitDate = LocalDateTime .now();
+        LocalDateTime visitDate = LocalDateTime.now();
 
         // Act
         patientHistory.setVisitDate(visitDate);

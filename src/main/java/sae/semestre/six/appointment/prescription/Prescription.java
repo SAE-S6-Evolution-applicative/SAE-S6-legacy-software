@@ -1,3 +1,8 @@
+/*
+ * Prescription.java                                  19 mai. 2025
+ * IUT de Rodez, no author rights
+ */
+
 package sae.semestre.six.appointment.prescription;
 
 import jakarta.persistence.*;
@@ -8,7 +13,7 @@ import java.time.LocalDateTime;
 @Entity
 @Table(name = "prescriptions")
 public class Prescription {
-    
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -41,10 +46,6 @@ public class Prescription {
 
     @Column(name = "last_modified")
     private LocalDateTime lastModified = LocalDateTime.now();
-
-
-    public Prescription() {}
-
 
     public Long getId() {
         return id;
@@ -106,23 +107,23 @@ public class Prescription {
     public Boolean getInventoryUpdated() {
         return inventoryUpdated;
     }
-    
+
     public void setInventoryUpdated(Boolean inventoryUpdated) {
         this.inventoryUpdated = inventoryUpdated;
     }
-    
+
     public LocalDateTime getCreatedDate() {
         return createdDate;
     }
-    
+
     public void setCreatedDate(LocalDateTime createdDate) {
         this.createdDate = createdDate;
     }
-    
+
     public LocalDateTime getLastModified() {
         return lastModified;
     }
-    
+
     public void setLastModified(LocalDateTime lastModified) {
         this.lastModified = lastModified;
     }

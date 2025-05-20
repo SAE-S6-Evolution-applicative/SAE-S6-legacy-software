@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
 import sae.semestre.six.appointment.patient.Patient;
+import sae.semestre.six.email.EmailService;
 
 import java.util.List;
 
@@ -18,10 +19,13 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 class BillDaoImplIntegrationTest {
 
     @Autowired
-    private BillDao billDao;
+    private BillRepository billRepository;
 
     @PersistenceContext
     private EntityManager entityManager;
+
+    @Autowired
+    private EmailService emailService;
 
     @Test
     void testFindByBillNumber() {
@@ -29,12 +33,12 @@ class BillDaoImplIntegrationTest {
         Bill bill = new Bill();
         bill.setBillNumber("BILL001");
         bill.setTotalAmount(100.0);
-        bill.setStatus("PENDING");
+        bill.setStatus(Bill.Status.PENDING);
         entityManager.persist(bill);
         entityManager.flush();
 
         // When
-        Bill foundBill = billDao.findByBillNumber("BILL001");
+        Bill foundBill = billRepository.findBillByBillNumber("BILL001");
 
         // Then
         assertNotNull(foundBill);
@@ -57,7 +61,7 @@ class BillDaoImplIntegrationTest {
         entityManager.flush();
 
         // When
-        List<Bill> bills = billDao.findByPatientId(patient.getId());
+        List<Bill> bills = billRepository.findBillsByPatient_Id(patient.getId());
 
         // Then
         assertEquals(1, bills.size());

@@ -1,3 +1,8 @@
+/*
+ * Appointment.java                                  19 mai. 2025
+ * IUT de Rodez, no author rights
+ */
+
 package sae.semestre.six.appointment;
 
 import jakarta.persistence.*;
@@ -46,11 +51,6 @@ public class Appointment {
     @Column(name = "room_number")
     private String roomNumber;
 
-    
-    public Appointment() {
-    }
-
-    
     public Long getId() {
         return id;
     }

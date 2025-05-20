@@ -1,3 +1,8 @@
+/*
+ * InventoryController.java                                  19 mai. 2025
+ * IUT de Rodez, no author rights
+ */
+
 package sae.semestre.six.stock;
 
 import io.swagger.v3.oas.annotations.Operation;
@@ -19,15 +24,24 @@ import java.util.stream.Collectors;
 @RequestMapping("/inventory")
 @Tag(name = "Inventory", description = "Inventory management API")
 public class InventoryController {
-    
-    @Autowired
+
     private InventoryService inventoryService;
 
-    @Autowired
     private InventoryRepository inventoryRepository;
-    
-    private final EmailService emailService = EmailService.getInstance();
 
+    private EmailService emailService;
+
+    @Autowired
+    public InventoryController(
+            InventoryService inventoryService,
+            InventoryRepository inventoryRepository,
+            EmailService emailService
+    ) {
+        this.inventoryService = inventoryService;
+        this.inventoryRepository = inventoryRepository;
+        this.emailService = emailService;
+    }
+    
     @Operation(summary = "Process a supplier invoice", description = "Processes a new supplier invoice")
     @ApiResponse(responseCode = "200", description = "Process completed")
     @PostMapping("/supplier-invoices")
@@ -42,7 +56,7 @@ public class InventoryController {
                 
                 inventoryRepository.save(inventory);
             }
-            
+
             return "Supplier invoice processed successfully";
         } catch (Exception e) {
             return "Error: " + e.getMessage();
@@ -54,8 +68,8 @@ public class InventoryController {
     @GetMapping("/items/low-stock")
     public List<Inventory> getLowStockItems() {
         return inventoryService.findAll().stream()
-            .filter(Inventory::needsRestock)
-            .collect(Collectors.toList());
+                .filter(Inventory::needsRestock)
+                .collect(Collectors.toList());
     }
 
     @Operation(summary = "Reorder items that need a restock", description = "Sends email requests to restock items that need a restock")
@@ -63,26 +77,26 @@ public class InventoryController {
     @PostMapping("/reorder")
     public String reorderItems() {
         List<Inventory> lowStockItems = inventoryService.findNeedingRestock();
-        
+
         for (Inventory item : lowStockItems) {
-            
+
             int reorderQuantity = item.getReorderLevel() * 2;
-            
-            
+
+
             try (FileWriter fw = new FileWriter("C:\\hospital\\orders.txt", true)) {
                 fw.write("REORDER: " + item.getItemCode() + ", Quantity: " + reorderQuantity + "\n");
             } catch (IOException e) {
                 e.printStackTrace();
             }
-            
-            
+
+
             emailService.sendEmail(
-                "supplier@example.com",
-                "Reorder Request",
-                "Please restock " + item.getName() + " (Quantity: " + reorderQuantity + ")"
+                    "supplier@example.com",
+                    "Reorder Request",
+                    "Please restock " + item.getName() + " (Quantity: " + reorderQuantity + ")"
             );
         }
-        
+
         return "Reorder requests sent for " + lowStockItems.size() + " items";
     }
 } 

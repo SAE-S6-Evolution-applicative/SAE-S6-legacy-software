@@ -1,8 +1,14 @@
+/*
+ * Doctor.java                                  19 mai. 2025
+ * IUT de Rodez, no author rights
+ */
+
 package sae.semestre.six.appointment.doctor;
 
 import jakarta.persistence.*;
 import sae.semestre.six.appointment.Appointment;
 
+import java.util.HashSet;
 import java.util.Set;
 
 @Entity
@@ -35,13 +41,13 @@ public class Doctor {
     private String department;
 
     @OneToMany(mappedBy = "doctor", fetch = FetchType.LAZY)
-    private Set<Appointment> appointments;
+    private Set<Appointment> appointments = new HashSet<>();
 
-    
+
     public Doctor() {
     }
 
-    
+
     public Long getId() {
         return id;
     }
@@ -112,5 +118,11 @@ public class Doctor {
 
     public void setAppointments(Set<Appointment> appointments) {
         this.appointments = appointments;
+    }
+
+    public Doctor addAppointment(Appointment appointment) {
+        this.appointments.add(appointment);
+        appointment.setDoctor(this);
+        return this;
     }
 } 

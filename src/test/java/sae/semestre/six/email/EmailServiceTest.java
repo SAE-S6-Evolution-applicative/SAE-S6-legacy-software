@@ -1,103 +1,50 @@
-/*
- * EmailServiceTest.java                                 21 avr. 2025
- * IUT de Rodez, no author rights
- */
-
 package sae.semestre.six.email;
 
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
+import com.icegreen.greenmail.configuration.GreenMailConfiguration;
+import com.icegreen.greenmail.junit5.GreenMailExtension;
+import com.icegreen.greenmail.util.ServerSetupTest;
+import jakarta.mail.internet.MimeMessage;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.ArgumentCaptor;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.mail.SimpleMailMessage;
-import org.springframework.mail.javamail.JavaMailSender;
-import org.springframework.test.util.ReflectionTestUtils;
+import org.junit.jupiter.api.extension.RegisterExtension;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.TestPropertySource;
 
-import java.io.ByteArrayOutputStream;
-import java.io.PrintStream;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.verify;
-
-@ExtendWith(MockitoExtension.class)
+@SpringBootTest
+@TestPropertySource(properties = {
+        "spring.mail.host=localhost",
+        "spring.mail.port=3025",
+        "spring.mail.username=",
+        "spring.mail.password="
+})
 class EmailServiceTest {
 
-    @Mock
-    private JavaMailSender mockMailSender;
+    @RegisterExtension
+    static GreenMailExtension greenMail = new GreenMailExtension(ServerSetupTest.SMTP)
+            .withConfiguration(GreenMailConfiguration.aConfig().withUser("test", "test"));
 
+    @Autowired
     private EmailService emailService;
-    private final ByteArrayOutputStream outContent = new ByteArrayOutputStream();
-    private final PrintStream originalOut = System.out;
-
-    @BeforeEach
-    void setUp() {
-        // Redirect standard output to capture messages
-        System.setOut(new PrintStream(outContent));
-
-        // Get the singleton instance
-        emailService = EmailService.getInstance();
-
-        // Inject mock inside the singleton instance
-        ReflectionTestUtils.setField(emailService, "mailSender", mockMailSender);
-    }
-
-    @AfterEach
-    void tearDown() {
-        System.setOut(originalOut);
-    }
 
     @Test
-    void testSendEmailSuccess() {
-        // Arrange
-        String to = "destinataire@exemple.com";
-        String subject = "Sujet de test";
-        String body = "Corps du message de test";
+    void shouldSendEmail() throws Exception {
+        // Given
+        String to = "test@example.com";
+        String subject = "Test Subject";
+        String text = "Test message";
 
-        // Act
-        emailService.sendEmail(to, subject, body);
+        // When
+        emailService.sendEmail(to, subject, text);
 
-        // Assert
-        ArgumentCaptor<SimpleMailMessage> messageCaptor = ArgumentCaptor.forClass(SimpleMailMessage.class);
-        verify(mockMailSender).send(messageCaptor.capture());
+        // Then
+        MimeMessage[] messages = greenMail.getReceivedMessages();
+        assertEquals(1, messages.length);
 
-        SimpleMailMessage sentMessage = messageCaptor.getValue();
-        assertEquals("hospital.system@gmail.com", sentMessage.getFrom());
-        assertEquals(to, sentMessage.getTo()[0]);
-        assertEquals(subject, sentMessage.getSubject());
-        assertEquals(body, sentMessage.getText());
-
-        assertTrue(outContent.toString().contains("Email sent successfully"));
-    }
-
-    @Test
-    void testSendEmailFailure() {
-        // Arrange
-        String to = "destinataire@exemple.com";
-        String subject = "Sujet de test";
-        String body = "Corps du message de test";
-
-        doThrow(new RuntimeException("Erreur test")).when(mockMailSender).send(any(SimpleMailMessage.class));
-
-        // Act
-        emailService.sendEmail(to, subject, body);
-
-        // Assert
-        assertTrue(outContent.toString().contains("Failed to send email: Erreur test"));
-    }
-
-    @Test
-    void testGetInstance() {
-        // Act
-        EmailService instance1 = EmailService.getInstance();
-        EmailService instance2 = EmailService.getInstance();
-
-        // Assert
-        assertNotNull(instance1);
-        assertSame(instance1, instance2, "getInstance should return the same instance (pattern Singleton)");
+        MimeMessage message = messages[0];
+        assertEquals(to, message.getAllRecipients()[0].toString());
+        assertEquals(subject, message.getSubject());
+        assertEquals(text, message.getContent().toString().trim());
     }
 }

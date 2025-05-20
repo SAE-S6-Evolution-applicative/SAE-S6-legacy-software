@@ -1,3 +1,8 @@
+/*
+ * Patient.java                                  19 mai. 2025
+ * IUT de Rodez, no author rights
+ */
+
 package sae.semestre.six.appointment.patient;
 
 import jakarta.persistence.*;
@@ -40,11 +45,11 @@ public class Patient {
     @OneToMany(mappedBy = "patient")
     private Set<Appointment> appointments = new HashSet<>();
 
-    
+
     public Patient() {
     }
 
-    
+
     public Long getId() {
         return id;
     }

@@ -1,3 +1,8 @@
+/*
+ * RoomController.java                                  19 mai. 2025
+ * IUT de Rodez, no author rights
+ */
+
 package sae.semestre.six.appointment.room;
 
 import io.swagger.v3.oas.annotations.Operation;
@@ -18,7 +23,7 @@ import java.util.Map;
 public class RoomController {
 
     private final RoomRepository roomRepository;
-    
+
     private final AppointmentRepository appointmentRepository;
 
     @Autowired
@@ -51,10 +56,10 @@ public class RoomController {
             
             room.setCurrentPatientCount(room.getCurrentPatientCount() + 1);
             appointment.setRoomNumber(roomNumber);
-            
+
             roomRepository.save(room);
             appointmentRepository.save(appointment);
-            
+
             return "Room assigned successfully";
         } catch (Exception e) {
             return "Error: " + e.getMessage();
@@ -68,12 +73,12 @@ public class RoomController {
             @Parameter(description = "Room number") @PathVariable String roomNumber) {
         Room room = roomRepository.findByRoomNumber(roomNumber);
         Map<String, Object> result = new HashMap<>();
-        
+
         result.put("roomNumber", room.getRoomNumber());
         result.put("capacity", room.getCapacity());
         result.put("currentPatients", room.getCurrentPatientCount());
         result.put("available", room.canAcceptPatient());
-        
+
         return result;
     }
 } 

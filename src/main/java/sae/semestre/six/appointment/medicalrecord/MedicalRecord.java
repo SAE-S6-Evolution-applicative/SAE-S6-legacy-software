@@ -1,3 +1,8 @@
+/*
+ * MedicalRecord.java                                  19 mai. 2025
+ * IUT de Rodez, no author rights
+ */
+
 package sae.semestre.six.appointment.medicalrecord;
 
 import jakarta.persistence.*;
@@ -49,11 +54,11 @@ public class MedicalRecord {
     @Column(name = "weight")
     private Float weight;
 
-    
+
     public MedicalRecord() {
     }
 
-    
+
     public Long getId() {
         return id;
     }

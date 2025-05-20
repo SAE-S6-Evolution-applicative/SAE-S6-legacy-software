@@ -1,3 +1,8 @@
+/*
+ * SchedulingController.java                                  19 mai. 2025
+ * IUT de Rodez, no author rights
+ */
+
 package sae.semestre.six.appointment;
 
 import io.swagger.v3.oas.annotations.Operation;
@@ -32,15 +37,15 @@ public class SchedulingController {
 
     PatientRepository patientRepository;
 
+    private EmailService emailService;
+
     @Autowired
-    public SchedulingController(AppointmentRepository appointmentRepository, DoctorRepository doctorRepository, PatientRepository patientRepository) {
+    public SchedulingController(AppointmentRepository appointmentRepository, DoctorRepository doctorRepository, PatientRepository patientRepository, EmailService emailService) {
         this.appointmentRepository = appointmentRepository;
         this.doctorRepository = doctorRepository;
         this.patientRepository = patientRepository;
+        this.emailService = emailService;
     }
-    
-    private final EmailService emailService = EmailService.getInstance();
-
 
     @Operation(summary = "Schedule an appointment", description = "Creates a new appointment between a doctor and a patient")
     @ApiResponse(responseCode = "200", description = "Appointment scheduled successfully")
@@ -92,7 +97,6 @@ public class SchedulingController {
             return "Error: " + e.getMessage();
         }
     }
-
 
 
     @Operation(summary = "Get available slots", description = "Retrieves all available time slots for a doctor on a given date")

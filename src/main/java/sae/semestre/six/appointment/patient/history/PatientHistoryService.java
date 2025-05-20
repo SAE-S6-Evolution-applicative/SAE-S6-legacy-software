@@ -27,8 +27,8 @@ public class PatientHistoryService {
      *
      * @param keyword The keyword to search for in patient history fields such as diagnosis, notes, or patient details.
      *                If null or empty, this criterion is ignored.
-     * @param start The start of the date range for the search (inclusive). If null, no lower date boundary is applied.
-     * @param end The end of the date range for the search (inclusive). If null, no upper date boundary is applied.
+     * @param start   The start of the date range for the search (inclusive). If null, no lower date boundary is applied.
+     * @param end     The end of the date range for the search (inclusive). If null, no upper date boundary is applied.
      * @return A list of patient history records that match the specified criteria. Returns an empty list if no records are found.
      */
     public List<PatientHistory> searchByMultipleCriteria(String keyword, LocalDateTime start, LocalDateTime end) {

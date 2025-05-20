@@ -7,17 +7,26 @@ package sae.semestre.six.appointment.bill;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.InjectMocks;
 import org.mockito.MockitoAnnotations;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
+import org.springframework.transaction.annotation.Transactional;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 
-@SpringBootTest
-class BillingServiceTest {
+@SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
+@Transactional
+class BillServiceIntegrationTest {
 
-    @InjectMocks
-    private BillingService billingService;
+    private BillService billService;
+
+    @Autowired
+    public BillServiceIntegrationTest(
+            BillService billService
+    ) {
+        this.billService = billService;
+    }
 
     @BeforeEach
     void setUp() {
@@ -26,9 +35,9 @@ class BillingServiceTest {
 
     @Test
     void testProcessBill() {
-        // Method is empty, we simply testinf that it does not generate any exception
+        // Method is empty, we simply test if that it does not generate any exception
         assertDoesNotThrow(() -> {
-            billingService.processBill("1", "test", new String[]{"CONSULTATION"});
+            billService.processBill("1", "test", new String[]{"CONSULTATION"});
         });
     }
 
@@ -36,7 +45,9 @@ class BillingServiceTest {
     void testProcessBillWithNullValues() {
         // Verify that the method handle null values correctly
         assertDoesNotThrow(() -> {
-            billingService.processBill(null, null, null);
+            billService.processBill((String) null, null, null);
         });
     }
+
+
 }
