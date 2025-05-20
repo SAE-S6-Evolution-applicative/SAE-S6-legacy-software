@@ -98,6 +98,11 @@ VALUES (1, 10.00, 12.00, '2024-01-01'),
        (2, 450.00, 500.00, '2024-01-15'),
        (3, 3.50, 4.00, '2024-02-01');
 
+INSERT INTO medicine (medicine_id, medicine_name, price) VALUES
+(1, 'PARACETAMOL', 5.0),
+(2, 'ANTIBIOTICS', 25.0),
+(3, 'VITAMINS', 15.0);
+
 -- Insertion de l'inventaire
 INSERT INTO inventory (item_code, name, quantity, unit_price, reorder_level, last_restocked)
 VALUES ('MAT001', 'Seringues 10ml', 2000, 0.25, 500, '2024-02-01 10:00:00'),
