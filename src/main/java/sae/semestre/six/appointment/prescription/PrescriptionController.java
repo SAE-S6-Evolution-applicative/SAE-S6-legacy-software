@@ -13,8 +13,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
-import sae.semestre.six.appointment.patient.Patient;
-import sae.semestre.six.appointment.patient.PatientRepository;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -31,72 +29,24 @@ public class PrescriptionController {
 
     private static final Map<String, List<String>> patientPrescriptions = new HashMap<>();
     private static final Map<String, Integer> medicineInventory = new HashMap<>();
-
-    private static final Map<String, Double> medicinePrices = new HashMap<String, Double>() {{
-        put("PARACETAMOL", 5.0);
-        put("ANTIBIOTICS", 25.0);
-        put("VITAMINS", 15.0);
-    }};
-    private static int prescriptionCounter = 0;
-
-    private final PatientRepository patientRepository;
-
-    private final PrescriptionRepository prescriptionRepository;
+    
+    private final PrescriptionService prescriptionService;
 
     @Autowired
-    public PrescriptionController(
-            final PatientRepository patientRepository,
-            final PrescriptionRepository prescriptionRepository
-    ) {
-        this.patientRepository = patientRepository;
-        this.prescriptionRepository = prescriptionRepository;
+    public PrescriptionController(final PrescriptionService prescriptionService) {
+        this.prescriptionService = prescriptionService;
     }
 
     @Operation(summary = "Add a prescription", description = "Creates a new prescription for a patient")
     @ApiResponse(responseCode = "200", description = "Prescription created successfully")
     @ApiResponse(responseCode = "400", description = "Invalid data")
     @PostMapping
-    public String addPrescription(
-            @Parameter(description = "Patient ID") @RequestParam String patientId,
+    public void addPrescription( //TODO change to ResponseModel
+            @Parameter(description = "Patient ID") @RequestParam Long patientId,
             @Parameter(description = "List of medicines") @RequestParam String[] medicines,
             @Parameter(description = "Additional notes") @RequestParam String notes) {
-        try {
-            prescriptionCounter++;
-            String prescriptionId = "RX" + prescriptionCounter;
 
-            Prescription prescription = new Prescription();
-            prescription.setPrescriptionNumber(prescriptionId);
-
-            Patient patient = patientRepository.findById(Long.parseLong(patientId)).orElseThrow(
-                    () -> new RuntimeException("Patient not found")
-            );
-            prescription.setPatient(patient);
-
-            prescription.setMedicines(String.join(",", medicines));
-            prescription.setNotes(notes);
-
-            double cost = calculateCost(prescriptionId);
-            prescription.setTotalCost(cost);
-
-
-            prescriptionRepository.save(prescription);
-
-            logger.info("Prescription created: {}, cost: {}", prescriptionId, cost);
-
-            List<String> currentPrescriptions = patientPrescriptions.getOrDefault(patientId, new ArrayList<>());
-            currentPrescriptions.add(prescriptionId);
-            patientPrescriptions.put(patientId, currentPrescriptions);
-
-            for (String medicine : medicines) {
-                int current = medicineInventory.getOrDefault(medicine, 0);
-                medicineInventory.put(medicine, current - 1);
-            }
-
-            return "Prescription " + prescriptionId + " created and billed";
-        } catch (Exception e) {
-            e.printStackTrace();
-            return "Failed: " + e;
-        }
+        prescriptionService.addPrescription(patientId, medicines, notes);
     }
 
     @Operation(summary = "Get patient prescriptions", description = "Retrieves all prescriptions for a patient")

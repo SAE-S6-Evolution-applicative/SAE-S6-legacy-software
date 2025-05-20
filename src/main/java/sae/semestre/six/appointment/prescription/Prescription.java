@@ -6,6 +6,7 @@
 package sae.semestre.six.appointment.prescription;
 
 import jakarta.persistence.*;
+import sae.semestre.six.appointment.Appointment;
 import sae.semestre.six.appointment.patient.Patient;
 
 import java.time.LocalDateTime;
@@ -13,6 +14,23 @@ import java.time.LocalDateTime;
 @Entity
 @Table(name = "prescriptions")
 public class Prescription {
+
+    public Prescription(int previousPrescriptionNumber, Patient patient, String[] medicines, String notes) {
+        this.prescriptionNumber = "RX" + previousPrescriptionNumber;
+        this.patient = patient;
+        this.medicines = String.join(",", medicines);
+        this.notes = notes;
+    }
+
+    Prescription prescription = new Prescription();
+            prescription.setPrescriptionNumber(prescriptionId);
+            prescription.setPatient(patient);
+
+            prescription.setMedicines(String.join(",", medicines));
+            prescription.setNotes(notes);
+
+    double cost = calculateCost(prescriptionId);
+            prescription.setTotalCost(cost);
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -131,5 +149,25 @@ public class Prescription {
     @PreUpdate
     public void preUpdate() {
         lastModified = LocalDateTime.now();
+    }
+
+    /**
+     * Extracts the numeric part from a prescription number string.
+     *
+     * @return The numeric part as an integer, or 0 if no numeric part is found
+     */
+    public int extractNumericPartFromPrescriptionNumber() {
+        if (prescriptionNumber == null || prescriptionNumber.isEmpty()) {
+            return 0;
+        }
+
+        String numericPart = prescriptionNumber.replaceAll("[^0-9]", "");
+
+        // Convert to integer, default to 0 if no digits were found
+        try {
+            return Integer.parseInt(numericPart);
+        } catch (NumberFormatException e) {
+            return 0;
+        }
     }
 } 

@@ -202,7 +202,7 @@ class BillControllerIntegrationTest {
                         .param("doctorId", doctor.getId().toString())
                         .param("medicalActId", consultation.getId().toString(), invalidId.toString()))
                 // Then
-                .andExpect(status().is5xxServerError())
+                .andExpect(status().is4xxClientError())
                 .andExpect(jsonPath("$.detail").value(containsString("Some medical act are not found: [999]")))
                 .andExpect(jsonPath("$.detail").value(containsString(invalidId.toString())));
     }
@@ -243,7 +243,7 @@ class BillControllerIntegrationTest {
                         .param("doctorId", doctor.getId().toString())
                         .param("medicalActId", invalidId.toString()))
                 // Then...
-                .andExpect(status().is5xxServerError())
+                .andExpect(status().is4xxClientError())
                 .andExpect(jsonPath("$.detail").value(containsString("Some medical act are not found: [999]")));
     }
 
@@ -284,7 +284,7 @@ class BillControllerIntegrationTest {
                         .param("doctorId", doctor.getId().toString())
                         .param("medicalActId", consultation.getId().toString()))
                 // Then...
-                .andExpect(status().is5xxServerError())
+                .andExpect(status().is4xxClientError())
                 .andExpect(jsonPath("$.detail").value(containsString("Some medical acts are inactive")));
     }
 
