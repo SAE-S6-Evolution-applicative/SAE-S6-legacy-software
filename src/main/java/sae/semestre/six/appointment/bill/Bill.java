@@ -169,18 +169,16 @@ public class Bill {
     }
 
     record BillCopy(
-            String billNumber,
             Double totalAmount,
             Set<BillDetail> billDetails,
             Double totalBrut
     ) {
         public BillCopy(Bill bill) {
-            this(bill.getBillNumber(), bill.getTotalAmount(), bill.getBillDetails(), bill.getTotalBrut());
+            this(bill.getTotalAmount(), bill.getBillDetails(), bill.getTotalBrut());
         }
 
         public boolean equals(Bill bill) {
-            return Objects.equals(this.billNumber, bill.getBillNumber()) &&
-                    Objects.equals(this.totalAmount, bill.getTotalAmount()) &&
+            return Objects.equals(this.totalAmount, bill.getTotalAmount()) &&
                     Objects.equals(this.billDetails, bill.getBillDetails()) &&
                     Objects.equals(this.totalBrut, bill.getTotalBrut());
         }

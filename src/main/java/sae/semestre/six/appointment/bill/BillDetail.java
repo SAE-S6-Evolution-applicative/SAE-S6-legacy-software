@@ -40,6 +40,12 @@ public class BillDetail {
         calculateLineTotal();
     }
 
+    public BillDetail(MedicalAct medicalAct, Integer quantity) {
+        this.medicalAct = medicalAct;
+        this.quantity = quantity;
+        calculateLineTotal();
+    }
+
     public void calculateLineTotal() {
         this.lineTotal = this.quantity * this.medicalAct.getPrice();
     }

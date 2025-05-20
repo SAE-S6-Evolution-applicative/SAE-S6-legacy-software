@@ -9,6 +9,9 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.TransactionSystemException;
+import org.springframework.transaction.annotation.Transactional;
+import sae.semestre.six.appointment.medicalact.MedicalAct;
+import sae.semestre.six.appointment.medicalact.MedicalActRepository;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -17,15 +20,17 @@ public class BillIntegrationTest {
 
     @Autowired
     private BillRepository billRepository;
+    @Autowired
+    private MedicalActRepository medicalActRepository;
 
 
     @Test
-    void testBillIsUnmodifiable() {
+    void testBillIsUnmodifiable_ButTheTotalAmountHaveBeenUpdated() {
         // Given a bill saved in DB
         Bill bill = billRepository.save(new Bill());
 
         // When we modify the bill and we try to save it
-        bill.setBillNumber("BILL123");
+        bill.setTotalAmount(1234567.0);
         Runnable saveBill = () -> billRepository.save(bill);
 
         // Then an exception is thrown
@@ -39,6 +44,31 @@ public class BillIntegrationTest {
 
         assertInstanceOf(BillModifiedException.class, rootCause);
         assertEquals("Bill has been modified, your are not allowed to do that", rootCause.getMessage());
+    }
+
+    @Test
+    void testBillIsUnmodifiable_ButTheBillDetailsHaveBeenUpdated() {
+        // Given a bill saved in DB
+        Bill bill = billRepository.save(new Bill());
+        MedicalAct medicalAct = medicalActRepository.save(new MedicalAct("Medical Act", 100.0));
+
+        // When we modify the bill and we try to save it
+        bill.addBillDetail(new BillDetail(medicalAct, 1));
+        Runnable saveBill = () -> billRepository.save(bill);
+
+        // Then an exception is thrown
+
+        // And it contains a BillModifiedException as root cause
+        Throwable rootCause = assertThrows(TransactionSystemException.class, saveBill::run);
+
+        while (rootCause.getCause() != null && !(rootCause instanceof BillModifiedException)) {
+            rootCause = rootCause.getCause();
+        }
+
+        assertInstanceOf(BillModifiedException.class, rootCause);
+        assertEquals("Bill has been modified, your are not allowed to do that", rootCause.getMessage());
+
+        medicalActRepository.delete(medicalAct);
     }
 
     @Test
