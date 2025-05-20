@@ -3,7 +3,6 @@ package sae.semestre.six.appointment.medicalact;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.transaction.annotation.Transactional;
@@ -12,7 +11,6 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.when;
 import static sae.semestre.six.CustomAssertion.assertIsEmpty;
@@ -70,9 +68,7 @@ class MedicalActServiceTest {
         when(medicalActRepository.findAllById(ids)).thenReturn(List.of(act2));
 
         // Then...
-        assertThrows(IllegalArgumentException.class, () -> {
-            medicalActService.findByIds(new Long[]{act2.getId(), 4L});
-        });
+        assertThrows(IllegalArgumentException.class, () -> medicalActService.findByIds(new Long[]{act2.getId(), 4L}));
     }
 
     @Test

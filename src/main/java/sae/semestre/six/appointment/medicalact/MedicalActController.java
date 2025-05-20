@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.*;
 import sae.semestre.six.common.SuccessfullResponseModel;
 
 import java.util.List;
+import java.util.NoSuchElementException;
 
 @RestController
 @RequestMapping("/medicalAct/")
@@ -35,7 +36,7 @@ public class MedicalActController {
     @PutMapping
     public SuccessfullResponseModel updatePrice(
             @RequestParam Long idMedicalAct,
-            @RequestParam double price) throws Exception {
+            @RequestParam double price) throws NoSuchElementException {
         MedicalAct medicalAct = medicalActRepository.findById(idMedicalAct).orElseThrow();
         medicalActService.updatePrice(price, medicalAct);
         return new SuccessfullResponseModel("Price updated", true);

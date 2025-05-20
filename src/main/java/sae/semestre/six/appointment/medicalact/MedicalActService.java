@@ -12,7 +12,6 @@ import org.springframework.stereotype.Service;
 import sae.semestre.six.appointment.bill.Bill;
 import sae.semestre.six.appointment.bill.BillDetail;
 import sae.semestre.six.appointment.bill.BillDetailService;
-import sae.semestre.six.appointment.bill.BillService;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -24,12 +23,10 @@ public class MedicalActService {
     private static final Logger logger = LoggerFactory.getLogger(MedicalActService.class);
     private final BillDetailService billDetailService;
     private final MedicalActRepository medicalActRepository;
-    private final BillService billService;
 
     @Autowired
-    public MedicalActService(MedicalActRepository medicalActRepository, BillService billService, BillDetailService billDetailService) {
+    public MedicalActService(MedicalActRepository medicalActRepository, BillDetailService billDetailService) {
         this.medicalActRepository = medicalActRepository;
-        this.billService = billService;
         this.billDetailService = billDetailService;
     }
 

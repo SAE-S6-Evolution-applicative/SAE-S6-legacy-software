@@ -47,11 +47,6 @@ public class Prescription {
     @Column(name = "last_modified")
     private LocalDateTime lastModified = LocalDateTime.now();
 
-
-    public Prescription() {
-    }
-
-
     public Long getId() {
         return id;
     }

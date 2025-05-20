@@ -166,10 +166,11 @@ public class Bill {
             throw new IllegalArgumentException("Bill is not PENDING");
         }
 
-        double totalBrut = billDetails.stream()
-                .map(BillDetail::getLineTotal)
-                .reduce(0.0, Double::sum);
-        this.totalAmount = computeTotalAmountWithReduction(totalBrut);
+        this.totalAmount = computeTotalAmountWithReduction(
+                billDetails.stream()
+                        .map(BillDetail::getLineTotal)
+                        .reduce(0.0, Double::sum)
+        );
         return this;
     }
 

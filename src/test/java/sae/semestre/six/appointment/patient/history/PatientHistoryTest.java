@@ -10,9 +10,6 @@ import sae.semestre.six.appointment.patient.Patient;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.time.LocalDate;
-import java.time.Month;
-import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.when;
@@ -90,7 +87,7 @@ class PatientHistoryTest {
     @Test
     void testSetAndGetVisitDate() {
         // Arrange
-        LocalDateTime visitDate = LocalDateTime .now();
+        LocalDateTime visitDate = LocalDateTime.now();
 
         // Act
         patientHistory.setVisitDate(visitDate);

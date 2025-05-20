@@ -65,7 +65,7 @@ public class BillController {
             @Parameter(description = "Patient ID") @RequestParam String patientId,
             @Parameter(description = "Doctor ID") @RequestParam String doctorId,
             @Parameter(description = "List of medical acts id") @RequestParam Long[] medicalActId
-    ) throws Exception {
+    ) {
 
         Patient patient = patientService.getPatient(Long.parseLong(patientId));
         Doctor doctor = doctorService.getDoctor(Long.parseLong(doctorId));

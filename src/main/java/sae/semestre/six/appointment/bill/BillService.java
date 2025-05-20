@@ -16,13 +16,11 @@ import java.util.List;
 @Service
 public class BillService {
 
-    private final BillDetailRepository billDetailRepository;
     private final BillRepository billRepository;
 
     @Autowired
-    public BillService(BillRepository billRepository, BillDetailRepository billDetailRepository) {
+    public BillService(BillRepository billRepository) {
         this.billRepository = billRepository;
-        this.billDetailRepository = billDetailRepository;
     }
 
     /**
@@ -34,6 +32,7 @@ public class BillService {
     }
 
     public void processBill(String patientId, String source, String[] items) {
+        // This method is been here since the beginning
 
     }
 

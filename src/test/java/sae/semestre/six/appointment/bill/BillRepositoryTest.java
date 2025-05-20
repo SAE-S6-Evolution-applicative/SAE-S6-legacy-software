@@ -12,7 +12,7 @@ import static org.junit.jupiter.api.Assertions.assertNotEquals;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @Transactional
-public class BillRepositoryTest {
+class BillRepositoryTest {
 
     private BillRepository billRepository;
     private BillDetailRepository billDetailRepository;

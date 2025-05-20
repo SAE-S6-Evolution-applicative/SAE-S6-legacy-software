@@ -17,7 +17,7 @@ import static org.mockito.Mockito.times;
 
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
 @Transactional
-public class BillDetailServiceTest {
+class BillDetailServiceTest {
 
     @Autowired
     private BillDetailService billDetailService;
