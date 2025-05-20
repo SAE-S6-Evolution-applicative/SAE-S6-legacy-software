@@ -27,7 +27,7 @@ public class RoomController {
     private final AppointmentRepository appointmentRepository;
 
     @Autowired
-    public RoomController(AppointmentRepository appointmentRepository, RoomRepository roomRepository) {
+    public RoomController(final AppointmentRepository appointmentRepository, final RoomRepository roomRepository) {
         this.appointmentRepository = appointmentRepository;
         this.roomRepository = roomRepository;
     }

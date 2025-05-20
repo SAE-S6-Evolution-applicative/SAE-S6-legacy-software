@@ -31,16 +31,20 @@ public class SchedulingController {
 
     public static final int SCHEDULE_STOP_HOUR = 17;
 
-    AppointmentRepository appointmentRepository;
+    private final AppointmentRepository appointmentRepository;
 
-    DoctorRepository doctorRepository;
+    private final DoctorRepository doctorRepository;
 
-    PatientRepository patientRepository;
+    private final PatientRepository patientRepository;
 
-    private EmailService emailService;
+    private final EmailService emailService;
 
     @Autowired
-    public SchedulingController(AppointmentRepository appointmentRepository, DoctorRepository doctorRepository, PatientRepository patientRepository, EmailService emailService) {
+    public SchedulingController(
+            final AppointmentRepository appointmentRepository,
+            final DoctorRepository doctorRepository,
+            final PatientRepository patientRepository,
+            final EmailService emailService) {
         this.appointmentRepository = appointmentRepository;
         this.doctorRepository = doctorRepository;
         this.patientRepository = patientRepository;

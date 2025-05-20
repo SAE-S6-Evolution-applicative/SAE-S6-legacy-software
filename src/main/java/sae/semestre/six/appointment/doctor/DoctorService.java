@@ -14,7 +14,7 @@ public class DoctorService {
     private final DoctorRepository doctorRepository;
 
     @Autowired
-    DoctorService(DoctorRepository doctorRepository) {
+    DoctorService(final DoctorRepository doctorRepository) {
         this.doctorRepository = doctorRepository;
     }
 

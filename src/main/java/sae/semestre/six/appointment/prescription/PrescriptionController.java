@@ -38,17 +38,17 @@ public class PrescriptionController {
     private static final String AUDIT_FILE = "C:\\hospital\\prescriptions.log";
     private static int prescriptionCounter = 0;
 
-    private BillService billService;
+    private final BillService billService;
 
-    private PatientRepository patientRepository;
+    private final PatientRepository patientRepository;
 
-    private PrescriptionRepository prescriptionRepository;
+    private final PrescriptionRepository prescriptionRepository;
 
     @Autowired
     public PrescriptionController(
-            BillService billService,
-            PatientRepository patientRepository,
-            PrescriptionRepository prescriptionRepository
+            final BillService billService,
+            final PatientRepository patientRepository,
+            final PrescriptionRepository prescriptionRepository
     ) {
         this.billService = billService;
         this.patientRepository = patientRepository;

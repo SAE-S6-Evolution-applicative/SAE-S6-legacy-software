@@ -8,12 +8,17 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.MockitoAnnotations;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
+import org.springframework.test.context.bean.override.mockito.MockitoSpyBean;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import org.springframework.transaction.annotation.Transactional;
 import sae.semestre.six.email.EmailService;
 import sae.semestre.six.stock.supplier.SupplierInvoice;
 import sae.semestre.six.stock.supplier.SupplierInvoiceDetail;
@@ -31,36 +36,22 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@ExtendWith(MockitoExtension.class)
-@WebMvcTest(InventoryController.class)
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@Transactional
+@AutoConfigureMockMvc
 class InventoryControllerIntegrationTest {
 
-    private MockMvc server;
+    @Autowired
+    MockMvc server;
 
-    @MockitoBean
+    @MockitoSpyBean
     private InventoryRepository inventoryRepository;
 
-    @MockitoBean
+    @MockitoSpyBean
     private InventoryService inventoryService;
 
-    @MockitoBean
+    @MockitoSpyBean
     private EmailService emailService;
-
-    @InjectMocks
-    private InventoryController inventoryController;
-
-    private AutoCloseable autoCloseable;
-
-    @BeforeEach
-    void setUp() {
-        autoCloseable = MockitoAnnotations.openMocks(this);
-        server = MockMvcBuilders.standaloneSetup(inventoryController).build();
-    }
-
-    @AfterEach
-    void tearDown() throws Exception {
-        autoCloseable.close();
-    }
 
     @Test
     void testProcessSupplierInvoice() throws Exception {

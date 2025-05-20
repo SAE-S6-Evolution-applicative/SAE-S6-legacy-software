@@ -25,17 +25,17 @@ import java.util.stream.Collectors;
 @Tag(name = "Inventory", description = "Inventory management API")
 public class InventoryController {
 
-    private InventoryService inventoryService;
+    private final InventoryService inventoryService;
 
-    private InventoryRepository inventoryRepository;
+    private final InventoryRepository inventoryRepository;
 
-    private EmailService emailService;
+    private final EmailService emailService;
 
     @Autowired
     public InventoryController(
-            InventoryService inventoryService,
-            InventoryRepository inventoryRepository,
-            EmailService emailService
+            final InventoryService inventoryService,
+            final InventoryRepository inventoryRepository,
+            final EmailService emailService
     ) {
         this.inventoryService = inventoryService;
         this.inventoryRepository = inventoryRepository;

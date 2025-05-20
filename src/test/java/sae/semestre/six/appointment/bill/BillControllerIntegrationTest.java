@@ -10,6 +10,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.TestPropertySource;
+import org.springframework.test.context.bean.override.mockito.MockitoSpyBean;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
 import sae.semestre.six.appointment.Appointment;
@@ -51,31 +52,31 @@ class BillControllerIntegrationTest {
     @Autowired
     private MockMvc server;
 
-    @Autowired
+    @MockitoSpyBean
     private BillRepository billRepository;
 
-    @Autowired
+    @MockitoSpyBean
     private BillService billService;
 
-    @Autowired
+    @MockitoSpyBean
     private PatientRepository patientRepository;
 
-    @Autowired
+    @MockitoSpyBean
     private DoctorRepository doctorRepository;
 
-    @Autowired
+    @MockitoSpyBean
     private MedicalActService medicalActService;
 
-    @Autowired
+    @MockitoSpyBean
     private MedicalActRepository medicalActRepository;
 
-    @Autowired
+    @MockitoSpyBean
     private BillDetailRepository billDetailRepository;
 
-    @Autowired
+    @MockitoSpyBean
     private AppointmentRepository appointmentRepository;
 
-    @Autowired
+    @MockitoSpyBean
     private EmailService emailService;
 
     @Test
