@@ -323,7 +323,7 @@ class BillControllerIntegrationTest {
 
         // When we get the revenue
         server.perform(get("/bills/revenue"))
-                // Then te total revenue return is 20
+                // Then the total revenue return is 20
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.totalRevenue").value(20.0));
     }

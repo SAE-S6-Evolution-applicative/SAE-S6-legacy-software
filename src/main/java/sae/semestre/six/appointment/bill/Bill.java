@@ -14,6 +14,7 @@ import sae.semestre.six.appointment.patient.history.PatientHistory;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.HashSet;
+import java.util.Objects;
 import java.util.Set;
 
 @Entity
@@ -62,6 +63,9 @@ public class Bill {
 
     @Column(name = "total_brut")
     private Double totalBrut = 0.0;
+
+    @Transient
+    private BillCopy copy;
 
     /**
      * Compute the reduction base of the totalBrut
@@ -162,5 +166,49 @@ public class Bill {
     public enum Status {
         PENDING,
         PAID
+    }
+
+    record BillCopy(
+            String billNumber,
+            Double totalAmount,
+            Set<BillDetail> billDetails,
+            Double totalBrut
+    ) {
+        public BillCopy(Bill bill) {
+            this(bill.getBillNumber(), bill.getTotalAmount(), bill.getBillDetails(), bill.getTotalBrut());
+        }
+
+        public boolean equals(Bill bill) {
+            return Objects.equals(this.billNumber, bill.getBillNumber()) &&
+                    Objects.equals(this.totalAmount, bill.getTotalAmount()) &&
+                    Objects.equals(this.billDetails, bill.getBillDetails()) &&
+                    Objects.equals(this.totalBrut, bill.getTotalBrut());
+        }
+    }
+
+    private Double getTotalBrut() {
+        return totalBrut;
+    }
+
+    /**
+     * When the entity is loaded, we create a copy of the entity,
+     * So we can check if its have been change.
+     */
+    @PostLoad
+    void copyPostLoad() {
+        this.copy = new BillCopy(this);
+    }
+
+    /**
+     * Ensures that the bill cannot be altered in db.
+     * <br>
+     * Check if copy is equal to the current instance. If doesn't throw an exception because the entity
+     * can't be modified
+     */
+    @PreUpdate
+    void checkUnalterability() {
+        if (this.copy != null && !this.copy.equals(this)) {
+            throw new BillModifiedException("Bill has been modified, your are not allowed to do that");
+        }
     }
 }
