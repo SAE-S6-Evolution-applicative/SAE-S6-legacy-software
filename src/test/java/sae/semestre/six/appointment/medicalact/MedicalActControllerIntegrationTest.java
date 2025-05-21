@@ -103,9 +103,8 @@ class MedicalActControllerIntegrationTest {
         var act1 = new MedicalAct("ACT1", 10.0);
         act1 = medicalActRepository.save(act1);
 
-        Bill bill = billRepository.save(new Bill());
-        BillDetail billDetail = billDetailRepository.save(new BillDetail(bill, act1, 1));
-        bill = billRepository.save(bill.addBillDetail(billDetail));
+        BillDetail billDetail = new BillDetail(act1, 1);
+        Bill bill = billRepository.save(new Bill().addBillDetail(billDetail));
         assertEquals(act1.getPrice(), bill.getTotalAmount());
 
         Double updatedPrice = 75.0;

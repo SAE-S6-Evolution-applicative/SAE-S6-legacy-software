@@ -70,8 +70,6 @@ public class BillIntegrationTest {
 
         assertInstanceOf(BillModifiedException.class, rootCause);
         assertEquals("Bill has been modified, your are not allowed to do that", rootCause.getMessage());
-
-        medicalActRepository.delete(medicalAct);
     }
 
     @Test

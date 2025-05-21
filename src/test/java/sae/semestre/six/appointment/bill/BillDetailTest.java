@@ -15,7 +15,7 @@ class BillDetailTest {
         // When
         detail.setMedicalAct(consultation);
         // Then
-        assertEquals("Consultation", detail.getMedicalAct().getName());
+        assertEquals("Consultation", detail.getNameMedicalAct());
     }
 
     @Test

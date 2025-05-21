@@ -40,17 +40,10 @@ public class BillDetail {
     public BillDetail() {
     }
 
-    // TODO delete
-    public BillDetail(Bill bill, Integer quantity, MedicalAct medicalAct) {
-        this(medicalAct, quantity);
-        this.bill = bill;
-        calculateLineTotal();
-    }
-
     public BillDetail(MedicalAct medicalAct, Integer quantity) {
         this.quantity = quantity;
-        this.nameMedicalAct = nameMedicalAct;
-        this.priceMedicalAct = priceMedicalAct;
+        this.nameMedicalAct = medicalAct.getName();
+        this.priceMedicalAct = medicalAct.getPrice();
         calculateLineTotal();
     }
 

@@ -83,7 +83,7 @@ public class BillDetailIntegrationTest {
     void testBillDetailIsNotDeletable() {
         // Given a bill saved in DB
         Bill bill = new Bill();
-        BillDetail billDetail = new BillDetail();
+        BillDetail billDetail = new BillDetail(new MedicalAct("Medical Act", 100.0), 2);
         bill.addBillDetail(billDetail);
         billRepository.save(bill);
 

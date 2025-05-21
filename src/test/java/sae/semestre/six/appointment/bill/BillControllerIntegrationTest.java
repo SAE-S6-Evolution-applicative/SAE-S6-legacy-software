@@ -314,11 +314,8 @@ class BillControllerIntegrationTest {
     @Test
     void testTotalRevenueWithOneBill() throws Exception {
         // Given a Bill with a total amount of 20
-        MedicalAct medicalAct = medicalActRepository.save(new MedicalAct("ACT1", 10.0));
-        Bill bill = billRepository.save(new Bill());
-        BillDetail billDetail = billDetailRepository.save(new BillDetail(bill, medicalAct, 2));
-
-        bill = billRepository.save(bill.addBillDetail(billDetail));
+        BillDetail billDetail = new BillDetail(new MedicalAct("ACT1", 10.0), 2);
+        Bill bill = billRepository.save(new Bill().addBillDetail(billDetail));
 
         assertEquals(20, bill.getTotalAmount());
 
