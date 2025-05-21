@@ -5,18 +5,24 @@
 
 package sae.semestre.six.processor;
 
-import java.io.FileWriter;
-import java.io.IOException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 public class MedicalBillingProcessor {
-    private static final String BILLING_FILE = "C:\\hospital\\billing.txt";
+
+    private static final Logger logger = LoggerFactory.getLogger(MedicalBillingProcessor.class);
+
     private static volatile MedicalBillingProcessor instance;
+
     private final Map<String, Double> priceList = new HashMap<>();
+
     private final List<String> pendingBills = new ArrayList<>();
+
     private double totalRevenue = 0.0;
 
     private MedicalBillingProcessor() {
@@ -58,15 +64,7 @@ public class MedicalBillingProcessor {
 
         billDetails += "Total: $" + total + "\n";
 
-
-        try {
-            FileWriter fw = new FileWriter(BILLING_FILE, true);
-            fw.write(billDetails);
-            fw.close();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
+        logger.info("Billing: {}", billDetails);
 
         pendingBills.add(billId);
         totalRevenue += total;

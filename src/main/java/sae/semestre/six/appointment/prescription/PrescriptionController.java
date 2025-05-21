@@ -9,13 +9,14 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import sae.semestre.six.appointment.bill.BillService;
 import sae.semestre.six.appointment.patient.Patient;
 import sae.semestre.six.appointment.patient.PatientRepository;
 
-import java.io.FileWriter;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -27,6 +28,9 @@ import java.util.Map;
 @Tag(name = "Prescriptions", description = "Prescription management API")
 public class PrescriptionController {
 
+
+    private static final Logger logger = LoggerFactory.getLogger(PrescriptionController.class);
+
     private static final Map<String, List<String>> patientPrescriptions = new HashMap<>();
     private static final Map<String, Integer> medicineInventory = new HashMap<>();
 
@@ -35,7 +39,6 @@ public class PrescriptionController {
         put("ANTIBIOTICS", 25.0);
         put("VITAMINS", 15.0);
     }};
-    private static final String AUDIT_FILE = "C:\\hospital\\prescriptions.log";
     private static int prescriptionCounter = 0;
 
     private final BillService billService;
@@ -84,11 +87,7 @@ public class PrescriptionController {
 
             prescriptionRepository.save(prescription);
 
-
-            new FileWriter(AUDIT_FILE, true)
-                    .append(LocalDate.now() + " - " + prescriptionId + "\n")
-                    .close();
-
+            logger.info("{}: {}", prescriptionId, cost);
 
             List<String> currentPrescriptions = patientPrescriptions.getOrDefault(patientId, new ArrayList<>());
             currentPrescriptions.add(prescriptionId);
