@@ -53,11 +53,15 @@ public class Prescription {
 
     public void addMedicine(Medicine medicine) {
         this.medicines.add(medicine);
+        // Remember to recalculate costs as the medicines list change
+        this.totalCost = calculateTotalCostTTC();
         medicine.setPrescription(this);
     }
 
     public void removeMedicine(Medicine medicine) {
         this.medicines.remove(medicine);
+        // Remember to recalculate costs as the medicines list change
+        this.totalCost = calculateTotalCostTTC();
         medicine.setPrescription(null);
     }
 
@@ -193,7 +197,7 @@ public class Prescription {
      *
      * @return The total cost including tax (TTC) as a double.
      */
-    public double calculateTotalCostTTC() {
-        return medicines.stream().mapToDouble(Medicine::getPrice).sum() * TVA_PERCENTAGE;
+    private double calculateTotalCostTTC() {
+        return medicines.stream().mapToDouble(Medicine::getUnitPrice).sum() * TVA_PERCENTAGE;
     }
 } 

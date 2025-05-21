@@ -16,21 +16,12 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 @RestController
 @RequestMapping("/prescriptions")
 @Tag(name = "Prescriptions", description = "Prescription management API")
 public class PrescriptionController {
-
-
-    private static final Logger logger = LoggerFactory.getLogger(PrescriptionController.class);
-
-    private static final Map<String, List<String>> patientPrescriptions = new HashMap<>();
-    private static final Map<String, Integer> medicineInventory = new HashMap<>();
     
     private final PrescriptionService prescriptionService;
 
@@ -54,46 +45,17 @@ public class PrescriptionController {
 
     @Operation(summary = "Get patient prescriptions", description = "Retrieves all prescriptions for a patient")
     @ApiResponse(responseCode = "200", description = "List of prescriptions")
-    @GetMapping("/patient/{patientId}")
-    public List<String> getPatientPrescriptions(
-            @Parameter(description = "Patient ID") @PathVariable String patientId) {
-        return patientPrescriptions.getOrDefault(patientId, new ArrayList<>());
-    }
-
-    @Operation(summary = "Get medicine inventory", description = "Retrieves the current medicine inventory status")
-    @ApiResponse(responseCode = "200", description = "Inventory status")
-    @GetMapping("/medicines/inventory")
-    public Map<String, Integer> getInventory() {
-        return medicineInventory;
-    }
-
-    @Operation(summary = "Refill medicine", description = "Adds quantities to the medicine inventory")
-    @ApiResponse(responseCode = "200", description = "Refill completed")
-    @PatchMapping("/medicines/refill")
-    public String refillMedicine(
-            @Parameter(description = "Medicine name") @RequestParam String medicine,
-            @Parameter(description = "Quantity to add") @RequestParam int quantity) {
-        medicineInventory.put(medicine,
-                medicineInventory.getOrDefault(medicine, 0) + quantity);
-        return "Refilled " + medicine;
+    @GetMapping("/prescriptions/{patientId}")
+    public List<Prescription> getPatientPrescriptions(
+            @Parameter(description = "Patient ID") @PathVariable Long patientId) {
+        return prescriptionService.findAllPrescriptionsByPatientId(patientId);
     }
 
     @Operation(summary = "Calculate prescription cost", description = "Calculates the total cost of a prescription")
     @ApiResponse(responseCode = "200", description = "Cost calculated")
     @GetMapping("/{prescriptionId}/cost")
     public double calculateCost(
-            @Parameter(description = "Prescription ID") @PathVariable String prescriptionId) {
-        return medicinePrices.values().stream()
-                .mapToDouble(Double::doubleValue)
-                .sum() * 1.2;
-    }
-
-    @Operation(summary = "Clear all data", description = "Clears all prescription data")
-    @ApiResponse(responseCode = "200", description = "Data cleared")
-    @DeleteMapping
-    public void clearAllData() {
-        patientPrescriptions.clear();
-        medicineInventory.clear();
-        prescriptionCounter = 0;
+            @Parameter(description = "Prescription ID") @PathVariable Long prescriptionId) {
+        return prescriptionService.getTotalCost(prescriptionId);
     }
 } 

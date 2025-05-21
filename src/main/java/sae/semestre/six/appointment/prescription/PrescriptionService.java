@@ -71,4 +71,40 @@ public class PrescriptionService {
     public Prescription findLastPrescription() {
         return prescriptionRepository.findLastPrescription().orElse(null);
     }
+
+    /**
+     * Retrieves all prescriptions associated with a specific patient ID.
+     *
+     * @param patientId the ID of the patient whose prescriptions are to be retrieved
+     * @return a list of prescriptions associated with the specified patient ID
+     */
+    public List<Prescription> findAllPrescriptionsByPatientId(Long patientId) {
+        return prescriptionRepository.findAllByPatient_Id(patientId);
+    }
+
+    /**
+     * Retrieves a Prescription object based on the provided prescription ID.
+     * If no prescription is found with the given ID, an IllegalArgumentException is thrown.
+     *
+     * @param prescriptionId the ID of the prescription to retrieve
+     * @return the Prescription object associated with the given ID
+     * @throws IllegalArgumentException if no prescription is found with the specified ID
+     */
+    public Prescription findPrescriptionById(Long prescriptionId) {
+        return prescriptionRepository.findById(prescriptionId).orElseThrow(
+                () -> new IllegalArgumentException("Prescription not found with ID : " + prescriptionId)
+        );
+    }
+
+    /**
+     * Calculates and returns the total cost of a prescription based on its ID.
+     *
+     * @param prescriptionId the ID of the prescription whose total cost is to be calculated
+     * @return the total cost of the specified prescription
+     * @throws IllegalArgumentException if no prescription is found with the specified ID
+     */
+    public double getTotalCost(Long prescriptionId) {
+        Prescription prescription = findPrescriptionById(prescriptionId);
+        return prescription.getTotalCost();
+    }
 }
