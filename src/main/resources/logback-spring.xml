@@ -31,6 +31,48 @@
         </rollingPolicy>
     </appender>
 
+    <!-- Specific appender for Prescription controller with simplify pattern -->
+    <appender name="PRESCRIPTION_FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>logs/prescription.log</file>
+        <encoder>
+            <!-- Simple Pattern that only dispplay the message -->
+            <pattern>%msg%n</pattern>
+        </encoder>
+        <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
+            <fileNamePattern>prescription.%d{yyyy-MM-dd}.%i.gz</fileNamePattern>
+            <maxFileSize>10MB</maxFileSize>
+            <maxHistory>30</maxHistory>
+        </rollingPolicy>
+    </appender>
+
+    <!-- Specific appender for Medical Billing processor with simplify pattern -->
+    <appender name="MEDICAL_BILLING_FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>logs/prescription.log</file>
+        <encoder>
+            <!-- Simple Pattern that only display the message -->
+            <pattern>%msg%n</pattern>
+        </encoder>
+        <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
+            <fileNamePattern>medicalBilling.%d{yyyy-MM-dd}.%i.gz</fileNamePattern>
+            <maxFileSize>10MB</maxFileSize>
+            <maxHistory>30</maxHistory>
+        </rollingPolicy>
+    </appender>
+
+    <!-- Specific appender for Inventory controller with simplify pattern -->
+    <appender name="INVENTORY_CONTROLLER_FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>logs/prescription.log</file>
+        <encoder>
+            <!-- Simple Pattern that only display the message -->
+            <pattern>%msg%n</pattern>
+        </encoder>
+        <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
+            <fileNamePattern>inventoryController.%d{yyyy-MM-dd}.%i.gz</fileNamePattern>
+            <maxFileSize>10MB</maxFileSize>
+            <maxHistory>30</maxHistory>
+        </rollingPolicy>
+    </appender>
+
     <!-- Console config -->
     <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
         <encoder>
