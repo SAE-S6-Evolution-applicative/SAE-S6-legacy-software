@@ -87,7 +87,7 @@ public class PrescriptionController {
 
             prescriptionRepository.save(prescription);
 
-            logger.info("{}: {}", prescriptionId, cost);
+            logger.info("Prescription created: {}, cost: {}", prescriptionId, cost);
 
             List<String> currentPrescriptions = patientPrescriptions.getOrDefault(patientId, new ArrayList<>());
             currentPrescriptions.add(prescriptionId);
