@@ -31,6 +31,48 @@
         </rollingPolicy>
     </appender>
 
+    <!-- Specific appender for Prescription controller with simplify pattern -->
+    <appender name="PRESCRIPTION_FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>logs/prescription.log</file>
+        <encoder>
+            <!-- Simple Pattern that only dispplay the message -->
+            <pattern>%msg%n</pattern>
+        </encoder>
+        <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
+            <fileNamePattern>prescription.%d{yyyy-MM-dd}.%i.gz</fileNamePattern>
+            <maxFileSize>10MB</maxFileSize>
+            <maxHistory>30</maxHistory>
+        </rollingPolicy>
+    </appender>
+
+    <!-- Specific appender for Medical Billing processor with simplify pattern -->
+    <appender name="MEDICAL_BILLING_FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>logs/medicalBilling.log</file>
+        <encoder>
+            <!-- Simple Pattern that only display the message -->
+            <pattern>%msg%n</pattern>
+        </encoder>
+        <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
+            <fileNamePattern>medicalBilling.%d{yyyy-MM-dd}.%i.gz</fileNamePattern>
+            <maxFileSize>10MB</maxFileSize>
+            <maxHistory>30</maxHistory>
+        </rollingPolicy>
+    </appender>
+
+    <!-- Specific appender for Inventory controller with simplify pattern -->
+    <appender name="INVENTORY_CONTROLLER_FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>logs/inventoryController.log</file>
+        <encoder>
+            <!-- Simple Pattern that only display the message -->
+            <pattern>%msg%n</pattern>
+        </encoder>
+        <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
+            <fileNamePattern>inventoryController.%d{yyyy-MM-dd}.%i.gz</fileNamePattern>
+            <maxFileSize>10MB</maxFileSize>
+            <maxHistory>30</maxHistory>
+        </rollingPolicy>
+    </appender>
+
     <!-- Console config -->
     <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
         <encoder>
@@ -42,6 +84,27 @@
     <!-- Specific Logger for BillController -->
     <logger name="sae.semestre.six.appointment.bill.BillController" level="INFO" additivity="false">
         <appender-ref ref="BILLING_FILE"/>
+        <appender-ref ref="FILE"/>
+        <appender-ref ref="CONSOLE"/>
+    </logger>
+
+    <!-- Specific Logger for PrescriptionController -->
+    <logger name="sae.semestre.six.appointment.prescription.PrescriptionController" level="INFO" additivity="false">
+        <appender-ref ref="PRESCRIPTION_FILE"/>
+        <appender-ref ref="FILE"/>
+        <appender-ref ref="CONSOLE"/>
+    </logger>
+
+    <!-- Specific Logger for MedicalBillingProcessor -->
+    <logger name="sae.semestre.six.appointment.bill.MedicalBillingProcessor" level="INFO" additivity="false">
+        <appender-ref ref="MEDICAL_BILLING_FILE"/>
+        <appender-ref ref="FILE"/>
+        <appender-ref ref="CONSOLE"/>
+    </logger>
+
+    <!-- Specific Logger for InventoryController -->
+    <logger name="sae.semestre.six.appointment.prescription.InventoryController" level="INFO" additivity="false">
+        <appender-ref ref="INVENTORY_CONTROLLER_FILE"/>
         <appender-ref ref="FILE"/>
         <appender-ref ref="CONSOLE"/>
     </logger>

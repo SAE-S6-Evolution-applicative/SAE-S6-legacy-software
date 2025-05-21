@@ -8,14 +8,15 @@ package sae.semestre.six.stock;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+import sae.semestre.six.appointment.bill.BillController;
 import sae.semestre.six.email.EmailService;
 import sae.semestre.six.stock.supplier.SupplierInvoice;
 import sae.semestre.six.stock.supplier.SupplierInvoiceDetail;
 
-import java.io.FileWriter;
-import java.io.IOException;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -24,6 +25,8 @@ import java.util.stream.Collectors;
 @RequestMapping("/inventory")
 @Tag(name = "Inventory", description = "Inventory management API")
 public class InventoryController {
+
+    private static final Logger logger = LoggerFactory.getLogger(InventoryController.class);
 
     private final InventoryService inventoryService;
 
@@ -82,13 +85,7 @@ public class InventoryController {
 
             int reorderQuantity = item.getReorderLevel() * 2;
 
-
-            try (FileWriter fw = new FileWriter("C:\\hospital\\orders.txt", true)) {
-                fw.write("REORDER: " + item.getItemCode() + ", Quantity: " + reorderQuantity + "\n");
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-
+            logger.info("REORDER: {}, Quantity: {}", item.getItemCode(), reorderQuantity);
 
             emailService.sendEmail(
                     "supplier@example.com",
