@@ -122,7 +122,8 @@ class BillControllerIntegrationTest {
 
         BillDetail billDetail = billCreated.getBillDetails().stream().findAny().get();
         assertEquals(10, billDetail.getLineTotal());
-        assertEquals(consultation, billDetail.getMedicalAct());
+        assertEquals(consultation.getPrice(), billDetail.getPriceMedicalAct());
+        assertEquals(consultation.getName(), billDetail.getNameMedicalAct());
     }
 
     @Test

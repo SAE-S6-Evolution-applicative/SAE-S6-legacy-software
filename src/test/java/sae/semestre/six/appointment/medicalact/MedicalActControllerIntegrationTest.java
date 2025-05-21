@@ -49,6 +49,7 @@ class MedicalActControllerIntegrationTest {
     @Test
     void testGetPrices() throws Exception {
         // Given some medicals act
+        int initialCount = medicalActRepository.findAllByActive(true).size();
         var act1 = new MedicalAct("ACT1", 10.0);
         var act2 = new MedicalAct("ACT2", 20.0);
         var act3 = new MedicalAct("ACT3", 50.0);
@@ -69,7 +70,7 @@ class MedicalActControllerIntegrationTest {
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$.medicalActList").isArray())
-                .andExpect(jsonPath("$.medicalActList.length()").value(acts.size()))
+                .andExpect(jsonPath("$.medicalActList.length()").value(acts.size() + initialCount))
                 .andExpect(jsonPath("$.medicalActList[0].name").value(act1.getName()))
                 .andExpect(jsonPath("$.medicalActList[0].price").value(act1.getPrice()))
                 .andExpect(jsonPath("$.medicalActList[0].active").value(act1.isActive()));
@@ -128,11 +129,11 @@ class MedicalActControllerIntegrationTest {
         String name = "ACT1";
         Double price = 100.0;
         String requestBody = """
-            {
-                "name": "%s",
-                "price": %s
-            }
-            """.formatted(name, price);
+                {
+                    "name": "%s",
+                    "price": %s
+                }
+                """.formatted(name, price);
 
         // When we try to create a medical act
         server.perform(post("/medicalAct/")

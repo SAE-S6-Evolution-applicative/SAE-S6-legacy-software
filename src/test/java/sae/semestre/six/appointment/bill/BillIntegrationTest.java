@@ -5,6 +5,7 @@
 
 package sae.semestre.six.appointment.bill;
 
+import jakarta.persistence.EntityManager;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -22,6 +23,8 @@ public class BillIntegrationTest {
     private BillRepository billRepository;
     @Autowired
     private MedicalActRepository medicalActRepository;
+    @Autowired
+    private EntityManager entityManager;
 
 
     @Test
@@ -31,7 +34,9 @@ public class BillIntegrationTest {
 
         // When we modify the bill and we try to save it
         bill.setTotalAmount(1234567.0);
-        Runnable saveBill = () -> billRepository.save(bill);
+        Runnable saveBill = () -> {
+            billRepository.save(bill);
+        };
 
         // Then an exception is thrown
 
@@ -50,14 +55,12 @@ public class BillIntegrationTest {
     void testBillIsUnmodifiable_ButTheBillDetailsHaveBeenUpdated() {
         // Given a bill saved in DB
         Bill bill = billRepository.save(new Bill());
-        MedicalAct medicalAct = medicalActRepository.save(new MedicalAct("Medical Act", 100.0));
 
         // When we modify the bill and we try to save it
-        bill.addBillDetail(new BillDetail(medicalAct, 1));
+        bill.addBillDetail(new BillDetail(new MedicalAct("Medical Act", 100.0), 1));
         Runnable saveBill = () -> billRepository.save(bill);
 
         // Then an exception is thrown
-
         // And it contains a BillModifiedException as root cause
         Throwable rootCause = assertThrows(TransactionSystemException.class, saveBill::run);
 
