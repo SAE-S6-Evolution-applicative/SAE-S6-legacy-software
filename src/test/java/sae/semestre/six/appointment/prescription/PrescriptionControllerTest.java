@@ -2,45 +2,47 @@ package sae.semestre.six.appointment.prescription;
 
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import sae.semestre.six.appointment.prescription.PrescriptionController.PrescriptionRequest;
 
 import java.util.List;
 
 import static org.junit.Assert.*;
 
+@SpringBootTest
 public class PrescriptionControllerTest {
 
     @Autowired
     private PrescriptionController prescriptionController;
 
-
     @Test
     public void testAddAndRetrievePrescription() {
-        String result = prescriptionController.addPrescription(
-                "PAT001",
-                new String[]{"PARACETAMOL"},
-                "Test notes"
-        );
+        PrescriptionRequest prescriptionRequest = new PrescriptionRequest(1L, List.of(1L,2L,3L),"Notes prescription");
+        prescriptionController.addPrescription(prescriptionRequest);
 
-        assertTrue(result.contains("created"));
-
-        List<String> prescriptions = prescriptionController.getPatientPrescriptions("PAT001");
+        // Supposons que getPatientPrescriptions attend un Long, pas un String
+        List<Prescription> prescriptions = prescriptionController.getPatientPrescriptions(1L);
+        assertNotNull(prescriptions);
         assertFalse(prescriptions.isEmpty());
-
-
-        assertTrue(prescriptions.get(0).startsWith("RX"));
+        assertTrue(prescriptions.getFirst().getPrescriptionNumber().startsWith("RX"));
     }
 
-
     @Test
-    public void testInventory() {
-        prescriptionController.refillMedicine("PARACETAMOL", 10);
-        assertEquals(10, (int) prescriptionController.getInventory().get("PARACETAMOL"));
+    public void testGetPatientPrescriptionsReturnsEmptyList() {
+        List<Prescription> prescriptions = prescriptionController.getPatientPrescriptions(999L);
+        assertNotNull(prescriptions);
+        assertTrue(prescriptions.isEmpty());
     }
 
-
     @Test
-    public void testClearData() {
-        prescriptionController.clearAllData();
-        assertTrue(prescriptionController.getInventory().isEmpty());
+    public void testCalculateCost() {
+        PrescriptionRequest prescriptionRequest = new PrescriptionRequest(1L, List.of(1L,2L,3L),"Notes prescription");
+        prescriptionController.addPrescription(prescriptionRequest);
+
+        List<Prescription> prescriptions = prescriptionController.getPatientPrescriptions(2L);
+        assertFalse(prescriptions.isEmpty());
+        Prescription prescription = prescriptions.getFirst();
+        double cost = prescriptionController.calculateCost(prescription.getId());
+        assertTrue(cost >= 0);
     }
 } 

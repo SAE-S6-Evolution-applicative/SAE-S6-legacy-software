@@ -9,15 +9,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import sae.semestre.six.appointment.bill.BillController;
-import sae.semestre.six.appointment.bill.BillService;
 import sae.semestre.six.appointment.patient.Patient;
-import sae.semestre.six.appointment.patient.PatientRepository;
 import sae.semestre.six.appointment.patient.PatientService;
+import sae.semestre.six.exception.EntityNotFoundException;
 
-import java.io.FileWriter;
 import java.time.LocalDate;
-import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -92,7 +88,7 @@ public class PrescriptionService {
      */
     public Prescription findPrescriptionById(Long prescriptionId) {
         return prescriptionRepository.findById(prescriptionId).orElseThrow(
-                () -> new IllegalArgumentException("Prescription not found with ID : " + prescriptionId)
+                () -> new EntityNotFoundException("Prescription not found with ID : " + prescriptionId)
         );
     }
 

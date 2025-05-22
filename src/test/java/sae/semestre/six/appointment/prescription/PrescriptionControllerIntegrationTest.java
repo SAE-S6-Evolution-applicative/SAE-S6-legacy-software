@@ -11,10 +11,12 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import org.springframework.transaction.annotation.Transactional;
 import sae.semestre.six.appointment.bill.BillService;
 import sae.semestre.six.appointment.patient.Patient;
-import sae.semestre.six.appointment.patient.PatientRepository;
+import sae.semestre.six.appointment.patient.PatientService;
+import sae.semestre.six.appointment.prescription.PrescriptionController.PrescriptionRequest;
 
 import java.time.LocalDate;
-import java.util.Optional;
+import java.util.Collections;
+import java.util.List;
 
 import static org.hamcrest.Matchers.containsString;
 import static org.mockito.Mockito.when;
@@ -37,11 +39,18 @@ class PrescriptionControllerIntegrationTest {
     @MockitoBean
     private BillService billService;
 
-    @MockitoBean
-    private PatientRepository patientRepository;
 
     @MockitoBean
     private PrescriptionRepository prescriptionRepository;
+
+    @MockitoBean
+    private PatientService patientService;
+
+    @Autowired
+    private PrescriptionService prescriptionService;
+
+    @MockitoBean
+    private MedicineService medicineService;
 
     private Patient createTestPatient() {
         Patient patient = new Patient();
@@ -57,17 +66,54 @@ class PrescriptionControllerIntegrationTest {
     }
 
     @Test
-    void addPrescriptionButPatientAbsent() throws Exception {
-        Long nonExistentPatientId = 9999L;
-        String[] medicines = {"PARACETAMOL", "ANTIBIOTICS"};
+    void addPrescription() throws Exception {
+        int counter = 1;
+        Patient patient = createTestPatient();
+        Medicine medicine = new Medicine("Paracétamol", 5.0);
+        medicine.setId(1L);
+        Medicine medicine2 = new Medicine("Anxiolitics", 15.0);
+        medicine2.setId(2L);
+
         String notes = "Take with food";
 
-        when(patientRepository.findById(nonExistentPatientId)).thenThrow(new RuntimeException("Patient not found"));
+        when(patientService.getPatient(1L)).thenReturn(patient);
+        when(medicineService.getByIds(List.of(1L, 2L))).thenReturn(List.of(medicine, medicine2));
+
+        String json = """
+        {
+          "patientId": %d,
+          "medicineIds": [1, 2],
+          "notes": "%s"
+        }
+        """.formatted(patient.getId(), notes);
 
         server.perform(post("/prescriptions")
-                        .param("patientId", String.valueOf(nonExistentPatientId))
-                        .param("medicines", medicines)
-                        .param("notes", notes))
+                        .contentType("application/json")
+                        .content(json))
+                .andExpect(status().isCreated());
+
+        verify(patientService).getPatient(patient.getId());
+        verify(prescriptionRepository).save(any(Prescription.class));
+    }
+
+    @Test
+    void addPrescriptionButPatientAbsent() throws Exception {
+        Long nonExistentPatientId = 9999L;
+        String notes = "Take with food";
+
+        when(patientService.getPatient(nonExistentPatientId)).thenThrow(new RuntimeException("Patient not found"));
+
+        String json = """
+        {
+          "patientId": %d,
+          "medicineIds": [1, 2],
+          "notes": "%s"
+        }
+        """.formatted(nonExistentPatientId, notes);
+
+        server.perform(post("/prescriptions")
+                        .contentType("application/json")
+                        .content(json))
                 .andExpect(status().isOk())
                 .andExpect(MockMvcResultMatchers.content().string(containsString("Failed")));
     }
@@ -75,12 +121,14 @@ class PrescriptionControllerIntegrationTest {
     @Test
     void getPatientPrescriptions() throws Exception {
         // Arrange
-        String patientId = "1";
+        Long patientId = 1L;
         Patient patient = createTestPatient();
-        when(patientRepository.findById(Long.parseLong(patientId))).thenReturn(Optional.of(patient));
+
+        when(patientService.getPatient(patientId)).thenReturn(patient);
+        when(prescriptionService.findAllPrescriptionsByPatientId(patientId)).thenReturn(Collections.emptyList());
 
         // Act
-        server.perform(get("/prescriptions/patient/" + patientId))
+        server.perform(get("/prescriptions/" + patientId))
                 .andExpect(status().isOk())
                 .andExpect(MockMvcResultMatchers.content().string("[]")); // Assuming no prescriptions exist
     }

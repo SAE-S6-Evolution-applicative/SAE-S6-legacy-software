@@ -34,18 +34,14 @@ public class PrescriptionController {
     @ApiResponse(responseCode = "200", description = "Prescription created successfully")
     @ApiResponse(responseCode = "400", description = "Invalid data")
     @PostMapping
-    public ResponseEntity<Void> addPrescription(
-            @Parameter(description = "Patient ID") @RequestBody Long patientId,
-            @Parameter(description = "List of medicines") @RequestBody List<Long> medicineIds,
-            @Parameter(description = "Additional notes") @RequestBody String notes) {
-
-        prescriptionService.addPrescription(patientId, medicineIds, notes);
+    public ResponseEntity<Void> addPrescription(@RequestBody PrescriptionRequest request) {
+        prescriptionService.addPrescription(request.patientId(), request.medicineIds(), request.notes());
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
     @Operation(summary = "Get patient prescriptions", description = "Retrieves all prescriptions for a patient")
     @ApiResponse(responseCode = "200", description = "List of prescriptions")
-    @GetMapping("/prescriptions/{patientId}")
+    @GetMapping("/{patientId}")
     public List<Prescription> getPatientPrescriptions(
             @Parameter(description = "Patient ID") @PathVariable Long patientId) {
         return prescriptionService.findAllPrescriptionsByPatientId(patientId);
@@ -58,4 +54,18 @@ public class PrescriptionController {
             @Parameter(description = "Prescription ID") @PathVariable Long prescriptionId) {
         return prescriptionService.getTotalCost(prescriptionId);
     }
+
+    /**
+     * Represents a request containing the necessary information to create a prescription.
+     *
+     * This record is used within the prescription management system to encapsulate the
+     * details required to create a new prescription, including the patient ID, the list
+     * of medicine IDs to be prescribed, and any additional notes.
+     *
+     * Fields:
+     * - patientId: The unique identifier of the patient for whom the prescription is created.
+     * - medicineIds: A list of unique identifiers for the medicines being prescribed.
+     * - notes: Any additional information or instructions associated with the prescription.
+     */
+    record PrescriptionRequest(Long patientId, List<Long> medicineIds, String notes) {}
 } 

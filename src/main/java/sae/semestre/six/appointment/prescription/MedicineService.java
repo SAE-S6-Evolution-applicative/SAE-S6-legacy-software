@@ -6,6 +6,7 @@
 package sae.semestre.six.appointment.prescription;
 
 import org.springframework.stereotype.Service;
+import sae.semestre.six.exception.EntityNotFoundException;
 
 import java.util.List;
 
@@ -27,7 +28,7 @@ public class MedicineService {
      */
     public Medicine getMedicineById(Long id) {
         return medicineRepository.findById(id).orElseThrow(
-                () -> new IllegalArgumentException("No medicine found with ID: " + id)
+                () -> new EntityNotFoundException("No medicine found with ID: " + id)
         );
     }
 

@@ -9,6 +9,7 @@ import jakarta.persistence.*;
 import sae.semestre.six.appointment.patient.Patient;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -28,12 +29,19 @@ public class Prescription {
     public Prescription(int previousPrescriptionNumber, Patient patient, List<Medicine> medicines, String notes) {
         this.prescriptionNumber = "RX" + previousPrescriptionNumber;
         this.patient = patient;
-        this.medicines = medicines;
+        this.medicines = medicines != null ? medicines : new ArrayList<>();
+        // Make bidirectional relation with each medicine
+        if (medicines != null) {
+            for (Medicine medicine : medicines) {
+                medicine.setPrescription(this);
+            }
+        }
         this.notes = notes;
         this.totalCost = calculateTotalCostTTC();
     }
 
     public Prescription() {
+        this.medicines = new ArrayList<>();
     }
 
     @Id
@@ -47,11 +55,13 @@ public class Prescription {
     @JoinColumn(name = "patient_id")
     private Patient patient;
 
-    @Column(name = "medicines")
     @OneToMany(mappedBy = "prescription", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Medicine> medicines;
+    private List<Medicine> medicines = new ArrayList<>();
 
     public void addMedicine(Medicine medicine) {
+        if (this.medicines == null) {
+            this.medicines = new ArrayList<>();
+        }
         this.medicines.add(medicine);
         // Remember to recalculate costs as the medicines list change
         this.totalCost = calculateTotalCostTTC();
@@ -59,10 +69,12 @@ public class Prescription {
     }
 
     public void removeMedicine(Medicine medicine) {
-        this.medicines.remove(medicine);
-        // Remember to recalculate costs as the medicines list change
-        this.totalCost = calculateTotalCostTTC();
-        medicine.setPrescription(null);
+        if (this.medicines != null) {
+            this.medicines.remove(medicine);
+            // Remember to recalculate costs as the medicines list change
+            this.totalCost = calculateTotalCostTTC();
+            medicine.setPrescription(null);
+            }
     }
 
     @Column(name = "notes")
@@ -110,10 +122,6 @@ public class Prescription {
 
     public List<Medicine> getMedicines() {
         return medicines;
-    }
-
-    public void setMedicines(List<Medicine> medicines) {
-        this.medicines = medicines;
     }
 
     public String getNotes() {
@@ -198,6 +206,9 @@ public class Prescription {
      * @return The total cost including tax (TTC) as a double.
      */
     private double calculateTotalCostTTC() {
+        if (medicines == null || medicines.isEmpty()) {
+            return 0.0;
+        }
         return medicines.stream().mapToDouble(Medicine::getUnitPrice).sum() * TVA_PERCENTAGE;
     }
 } 

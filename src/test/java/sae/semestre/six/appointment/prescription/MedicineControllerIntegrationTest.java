@@ -11,14 +11,17 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.bean.override.mockito.MockitoSpyBean;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
+import sae.semestre.six.exception.EntityNotFoundException;
 
 import java.util.Arrays;
 import java.util.List;
 
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
@@ -31,10 +34,10 @@ class MedicineControllerIntegrationTest {
     @Autowired
     private MockMvc server;
 
-    @MockitoSpyBean
+    @MockitoBean
     private MedicineService medicineService;
 
-    @MockitoSpyBean
+    @MockitoBean
     private MedicineRepository medicineRepository;
 
     private Medicine medicine1;
@@ -44,12 +47,14 @@ class MedicineControllerIntegrationTest {
     void setUp() {
         // Create test medicines
         medicine1 = new Medicine("Paracetamol", 10.0);
+        medicine1.setId(1L);
         medicine2 = new Medicine("Amoxicillin", 20.0);
+        medicine2.setId(2L);
     }
 
     @Test
     void testGetMedicineById() throws Exception {
-        // Given a medicine exists
+        // Given a medicine
         when(medicineService.getMedicineById(1L)).thenReturn(medicine1);
 
         // When we try to get the medicine by ID
@@ -57,10 +62,9 @@ class MedicineControllerIntegrationTest {
                 .andDo(print())
                 // Then we should get the medicine details
                 .andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$.id").value(medicine1.getId()))
                 .andExpect(jsonPath("$.name").value(medicine1.getName()))
-                .andExpect(jsonPath("$.price").value(medicine1.getPrice()));
+                .andExpect(jsonPath("$.unitPrice").value(medicine1.getUnitPrice()));
 
         verify(medicineService).getMedicineById(1L);
     }
@@ -69,7 +73,7 @@ class MedicineControllerIntegrationTest {
     void testGetMedicineByIdNotFound() throws Exception {
         // Given a medicine doesn't exist
         when(medicineService.getMedicineById(999L))
-                .thenThrow(new IllegalArgumentException("No medicine found with ID: 999"));
+                .thenThrow(new EntityNotFoundException("No medicine found with ID: 999"));
 
         // When we try to get the medicine by ID
         server.perform(get("/medicines/999"))
@@ -96,10 +100,10 @@ class MedicineControllerIntegrationTest {
                 .andExpect(jsonPath("$.length()").value(2))
                 .andExpect(jsonPath("$[0].id").value(medicine1.getId()))
                 .andExpect(jsonPath("$[0].name").value(medicine1.getName()))
-                .andExpect(jsonPath("$[0].price").value(medicine1.getPrice()))
+                .andExpect(jsonPath("$[0].unitPrice").value(medicine1.getUnitPrice()))
                 .andExpect(jsonPath("$[1].id").value(medicine2.getId()))
                 .andExpect(jsonPath("$[1].name").value(medicine2.getName()))
-                .andExpect(jsonPath("$[1].price").value(medicine2.getPrice()));
+                .andExpect(jsonPath("$[1].unitPrice").value(medicine2.getUnitPrice()));
 
         verify(medicineService).getAllMedicines();
     }

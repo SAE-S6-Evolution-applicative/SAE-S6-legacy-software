@@ -6,6 +6,7 @@
 package sae.semestre.six.stock;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.slf4j.Logger;
@@ -53,7 +54,7 @@ public class InventoryController {
                 Inventory inventory = detail.getInventory();
                 
                 inventory.setQuantity(inventory.getQuantity() + detail.getQuantity());
-                inventory.setUnitPrice(detail.getUnitPrice());
+                //inventory.setUnitPrice(detail.getUnitPrice());
                 inventory.setLastRestocked(LocalDate.now());
                 
                 inventoryRepository.save(inventory);
@@ -89,10 +90,24 @@ public class InventoryController {
             emailService.sendEmail(
                     "supplier@example.com",
                     "Reorder Request",
-                    "Please restock " + item.getName() + " (Quantity: " + reorderQuantity + ")"
+                    "Please restock " + item + " (Quantity: " + reorderQuantity + ")"
             );
         }
 
         return "Reorder requests sent for " + lowStockItems.size() + " items";
+    }
+
+    @Operation(summary = "Refill inventory medicine", description = "Adds quantities to the medicine inventory")
+    @ApiResponse(responseCode = "200", description = "Refill completed")
+    @PatchMapping("/inventory/refill")
+    public SuccessfullResponseModel refillMedicine(
+            @Parameter(description = "MedicineRequest containing medicine ID and a quantity to add")
+            @RequestBody RefillMedicineRequest medicineRequest
+    ) {
+
+        inventoryService.refillMedicine(medicineRequest);
+        return new SuccessfullResponseModel(
+                "Refilled correctly medicine with ID : " + medicineRequest.medicineId() + " in the Inventory",
+                true);
     }
 } 

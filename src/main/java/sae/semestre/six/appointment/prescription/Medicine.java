@@ -6,6 +6,7 @@
 package sae.semestre.six.appointment.prescription;
 
 import jakarta.persistence.*;
+import sae.semestre.six.stock.Inventory;
 
 @Entity
 @Table(name = "medicine")
@@ -13,26 +14,33 @@ public class Medicine {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "medicine_id")
+    @Column(name = "id")
     private Long id;
 
     private String name;
 
-    private double price;
+    private Double unitPrice;
 
     @ManyToOne
     @JoinColumn(name = "prescription_id")
     private Prescription prescription;
 
+    @OneToOne(mappedBy = "medicine")
+    private Inventory inventory;
+
     public Medicine() {}
 
-    public Medicine(String name, double price) {
+    public Medicine(String name, double unitPrice) {
         this.name = name;
-        this.price = price;
+        this.unitPrice = unitPrice;
     }
 
     public Long getId() {
         return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
     }
 
     public String getName() {
@@ -43,12 +51,12 @@ public class Medicine {
         this.name = name;
     }
 
-    public double getPrice() {
-        return price;
+    public Double getUnitPrice() {
+        return unitPrice;
     }
 
-    public void setPrice(double price) {
-        this.price = price;
+    public void setUnitPrice(Double unitPrice) {
+        this.unitPrice = unitPrice;
     }
 
     public Prescription getPrescription() {
@@ -57,5 +65,13 @@ public class Medicine {
 
     public void setPrescription(Prescription prescription) {
         this.prescription = prescription;
+    }
+
+    public Inventory getInventory() {
+        return inventory;
+    }
+
+    public void setInventory(Inventory inventory) {
+        this.inventory = inventory;
     }
 }

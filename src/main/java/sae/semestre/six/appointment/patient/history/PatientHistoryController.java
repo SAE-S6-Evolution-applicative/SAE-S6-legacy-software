@@ -20,6 +20,7 @@ public class PatientHistoryController {
 
     private final PatientHistoryService patientHistoryService;
 
+    @Autowired
     public PatientHistoryController(final PatientHistoryService patientHistoryService) {
         this.patientHistoryService = patientHistoryService;
     }

@@ -5,10 +5,13 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.MockitoAnnotations;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
+import org.springframework.test.context.bean.override.mockito.MockitoSpyBean;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.transaction.annotation.Transactional;
@@ -26,24 +29,19 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @AutoConfigureMockMvc
 class PatientHistoryControllerTest {
 
+    @Autowired
     private MockMvc server;
 
-    @MockitoBean
+    @MockitoSpyBean
     private PatientHistoryService patientHistoryService;
-
-    @InjectMocks
-    private PatientHistoryController patientHistoryController;
-
-    private AutoCloseable autoCloseable;
 
     private PatientHistory history1;
 
     private PatientHistory history2;
 
     @BeforeEach
-    void setUp() throws ParseException {
-        autoCloseable = MockitoAnnotations.openMocks(this);
-        server = MockMvcBuilders.standaloneSetup(patientHistoryController).build();
+    void setUp() {
+
         history1 = new PatientHistory();
 
         history1.setId(1L);
@@ -53,12 +51,6 @@ class PatientHistoryControllerTest {
         history2.setId(2L);
         history2.setVisitDate(LocalDateTime.of(2024, 1, 1, 1, 1));
         history2.setDiagnosis("Hello world!");
-
-    }
-
-    @AfterEach
-    void tearDown() throws Exception {
-        autoCloseable.close();
     }
 
     @Test
