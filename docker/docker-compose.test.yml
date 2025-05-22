@@ -1,0 +1,16 @@
+services:
+  mysql-test:
+    image: mysql:8.0.42
+    container_name: mysql-test
+    environment:
+      MYSQL_ROOT_PASSWORD: test
+      MYSQL_DATABASE: hospital_test
+      MYSQL_USER: test
+      MYSQL_PASSWORD: test
+    ports:
+      - "3307:3306"
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-ptest"]
+      interval: 5s
+      timeout: 5s
+      retries: 5 
