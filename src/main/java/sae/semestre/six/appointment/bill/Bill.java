@@ -67,6 +67,31 @@ public class Bill {
     @Transient
     private BillCopy copy;
 
+    public Bill() {
+    }
+
+    public Bill(Patient patient, Doctor doctor, List<MedicalAct> medicalActs) {
+        if (medicalActs.isEmpty()) {
+            throw new IllegalArgumentException("No medical acts found");
+        }
+        if (!medicalActs.stream().allMatch(MedicalAct::isActive)) {
+            throw new IllegalArgumentException("Some medical acts are inactive");
+        }
+
+        this.billNumber = "BILL" + System.currentTimeMillis();
+        this.patient = patient;
+        this.doctor = doctor;
+
+        medicalActs.stream()
+                .map(medicalAct -> {
+                    BillDetail billDetail = new BillDetail();
+                    billDetail.setMedicalAct(medicalAct);
+                    billDetail.calculateLineTotal();
+                    return billDetail;
+                })
+                .forEach(this::addBillDetail);
+    }
+
     /**
      * Compute the reduction base of the totalBrut
      *

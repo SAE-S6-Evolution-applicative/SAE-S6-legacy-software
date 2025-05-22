@@ -49,27 +49,6 @@ public class BillService {
      * @throws IllegalArgumentException if the list of medical acts is empty or contains inactive acts
      */
     public Bill processBill(Patient patient, Doctor doctor, List<MedicalAct> medicalActs) throws IllegalArgumentException {
-        Bill bill = new Bill();
-        bill.setBillNumber("BILL" + System.currentTimeMillis());
-        bill.setPatient(patient);
-        bill.setDoctor(doctor);
-
-        if (medicalActs.isEmpty()) {
-            throw new IllegalArgumentException("No medical acts found");
-        }
-        if (!medicalActs.stream().allMatch(MedicalAct::isActive)) {
-            throw new IllegalArgumentException("Some medical acts are inactive");
-        }
-
-        medicalActs.stream()
-                .map(medicalAct -> {
-                    BillDetail billDetail = new BillDetail();
-                    billDetail.setMedicalAct(medicalAct);
-                    billDetail.calculateLineTotal();
-                    return billDetail;
-                })
-                .forEach(bill::addBillDetail);
-
-        return billRepository.save(bill);
+        return billRepository.save(new Bill(patient, doctor, medicalActs));
     }
 }
