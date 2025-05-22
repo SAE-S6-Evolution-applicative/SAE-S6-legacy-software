@@ -41,11 +41,6 @@ BEGIN
             SET MESSAGE_TEXT = 'quantity cannot be updated';
     END IF;
 
-    IF NEW.unit_price != OLD.unit_price THEN
-        SIGNAL SQLSTATE '45000'
-            SET MESSAGE_TEXT = 'unit_price cannot be updated';
-    END IF;
-
     IF NEW.line_total != OLD.line_total THEN
         SIGNAL SQLSTATE '45000'
             SET MESSAGE_TEXT = 'line_total cannot be updated';

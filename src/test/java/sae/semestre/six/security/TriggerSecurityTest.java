@@ -1,5 +1,7 @@
 package sae.semestre.six.security;
 
+import jakarta.persistence.EntityManager;
+import org.hibernate.exception.GenericJDBCException;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -7,10 +9,13 @@ import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.transaction.annotation.Transactional;
 import sae.semestre.six.appointment.bill.Bill;
 import sae.semestre.six.appointment.bill.BillDetail;
-import sae.semestre.six.appointment.bill.BillRepository;
 import sae.semestre.six.appointment.bill.BillDetailRepository;
+import sae.semestre.six.appointment.bill.BillRepository;
+import sae.semestre.six.appointment.medicalact.MedicalAct;
 
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import java.sql.SQLException;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @Transactional
@@ -22,56 +27,96 @@ public class TriggerSecurityTest {
     @Autowired
     private BillDetailRepository billDetailRepository;
 
+    @Autowired
+    private EntityManager entityManager;
+
     @Test
     public void testPreventBillDeletion() {
         // Given
-        Bill bill = billRepository.findById(1L).orElseThrow();
+        Bill bill = billRepository.save(new Bill());
 
         // When & Then
-        assertThrows(Exception.class, () -> {
-            billRepository.delete(bill);
-        }, "Should not be able to delete a bill");
+        Throwable throwable = assertThrows(GenericJDBCException.class, () -> {
+            entityManager.createQuery("delete from Bill b where b.id = " + bill.getId()).executeUpdate();
+        });
+
+        while (throwable.getCause() != null && !(throwable instanceof SQLException)) {
+            throwable = throwable.getCause();
+        }
+
+        assertInstanceOf(SQLException.class, throwable);
+        assertEquals("A bill cannot be deleted", throwable.getMessage());
     }
 
     @Test
     public void testPreventBillTotalAmountUpdate() {
         // Given
-        Bill bill = billRepository.findById(1L).orElseThrow();
-        double originalAmount = bill.getTotalAmount();
-        ReflectionTestUtils.setField(bill, "totalAmount", originalAmount + 100.0);
+        Bill bill = new Bill();
+        bill.setTotalAmount(10.0);
+        bill = billRepository.save(bill);
+        final Long billId = bill.getId();
 
         // When & Then
-        assertThrows(Exception.class, () -> {
-            billRepository.save(bill);
-        }, "Should not be able to update bill total amount");
+        Throwable throwable = assertThrows(GenericJDBCException.class, () -> {
+            entityManager.createQuery("update Bill b set b.totalAmount = 1000 where b.id = " + billId).executeUpdate();
+        });
+
+        while (throwable.getCause() != null && !(throwable instanceof SQLException)) {
+            throwable = throwable.getCause();
+        }
+
+        assertInstanceOf(SQLException.class, throwable);
+        assertEquals("total_amount cannot be updated", throwable.getMessage());
     }
 
     @Test
     public void testPreventBillDetailDeletion() {
         // Given
-        BillDetail billDetail = billDetailRepository.findById(1L).orElseThrow();
+        MedicalAct medicalAct = new MedicalAct("Medical Act", 100.0);
+        Bill bill = new Bill();
+        BillDetail billDetail = new BillDetail();
+        billDetail.setMedicalAct(medicalAct);
+        bill.addBillDetail(billDetail);
+        bill = billRepository.save(bill);
+        billDetail = bill.getBillDetails().stream().findAny().get();
+        Long billDetailId = billDetail.getId();
 
         // When & Then
-        assertThrows(Exception.class, () -> {
-            billDetailRepository.delete(billDetail);
-        }, "Should not be able to delete a bill detail");
+        Throwable throwable = assertThrows(GenericJDBCException.class, () -> {
+            entityManager.createQuery("delete from BillDetail b where b.id = " + billDetailId).executeUpdate();
+        });
+
+        while (throwable.getCause() != null && !(throwable instanceof SQLException)) {
+            throwable = throwable.getCause();
+        }
+
+        assertInstanceOf(SQLException.class, throwable);
+        assertEquals("A bill detail cannot be deleted", throwable.getMessage());
     }
 
     @Test
     public void testPreventBillDetailUpdate() {
         // Given
-        BillDetail billDetail = billDetailRepository.findById(1L).orElseThrow();
-        
-        // Test quantity update
-        ReflectionTestUtils.setField(billDetail, "quantity", billDetail.getQuantity() + 1);
-        assertThrows(Exception.class, () -> {
-            billDetailRepository.save(billDetail);
-        }, "Should not be able to update quantity");
+        MedicalAct medicalAct = new MedicalAct("Medical Act", 100.0);
+        Bill bill = new Bill();
+        BillDetail billDetail = new BillDetail();
+        billDetail.setMedicalAct(medicalAct);
+        billDetail.setLineTotal(0.0);
+        bill.addBillDetail(billDetail);
+        billRepository.save(bill);
+        billDetail = billDetailRepository.findAll().get(0);
+        Long billDetailId = billDetail.getId();
 
-        // Test line total update
-        ReflectionTestUtils.setField(billDetail, "lineTotal", billDetail.getLineTotal() + 10.0);
-        assertThrows(Exception.class, () -> {
-            billDetailRepository.save(billDetail);
-        }, "Should not be able to update line total");
+        // When & Then
+        Throwable throwable = assertThrows(GenericJDBCException.class, () -> {
+            entityManager.createQuery("update BillDetail bd set bd.id = 1000 where bd.id = " + billDetailId).executeUpdate();
+        });
+
+        while (throwable.getCause() != null && !(throwable instanceof SQLException)) {
+            throwable = throwable.getCause();
+        }
+
+        assertInstanceOf(SQLException.class, throwable);
+        assertEquals("A bill detail cannot be deleted", throwable.getMessage());
     }
 } 
