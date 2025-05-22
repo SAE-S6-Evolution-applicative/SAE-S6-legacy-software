@@ -13,6 +13,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+import sae.semestre.six.appointment.bill.BillController;
+import sae.semestre.six.appointment.prescription.RefillMedicineRequest;
+import sae.semestre.six.common.SuccessfullResponseModel;
 import sae.semestre.six.email.EmailService;
 import sae.semestre.six.stock.supplier.SupplierInvoice;
 import sae.semestre.six.stock.supplier.SupplierInvoiceDetail;
@@ -85,7 +88,7 @@ public class InventoryController {
 
             int reorderQuantity = item.getReorderLevel() * 2;
 
-            logger.info("REORDER: {}, Quantity: {}", item.getItemCode(), reorderQuantity);
+            logger.info("REORDER: {}, Quantity: {}", item.getId(), reorderQuantity);
 
             emailService.sendEmail(
                     "supplier@example.com",
@@ -104,7 +107,6 @@ public class InventoryController {
             @Parameter(description = "MedicineRequest containing medicine ID and a quantity to add")
             @RequestBody RefillMedicineRequest medicineRequest
     ) {
-
         inventoryService.refillMedicine(medicineRequest);
         return new SuccessfullResponseModel(
                 "Refilled correctly medicine with ID : " + medicineRequest.medicineId() + " in the Inventory",
