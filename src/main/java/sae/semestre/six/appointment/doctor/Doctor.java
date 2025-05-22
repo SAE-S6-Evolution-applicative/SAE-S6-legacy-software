@@ -47,6 +47,12 @@ public class Doctor {
     public Doctor() {
     }
 
+    public Doctor(String doctorNumber, String firstName, String lastName) {
+        this.doctorNumber = doctorNumber;
+        this.firstName = firstName;
+        this.lastName = lastName;
+    }
+
 
     public Long getId() {
         return id;

@@ -3,9 +3,12 @@ package sae.semestre.six.appointment.bill;
 import com.icegreen.greenmail.configuration.GreenMailConfiguration;
 import com.icegreen.greenmail.junit5.GreenMailExtension;
 import com.icegreen.greenmail.util.ServerSetupTest;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
@@ -13,6 +16,7 @@ import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.bean.override.mockito.MockitoSpyBean;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
+import sae.semestre.six.FileHandler;
 import sae.semestre.six.appointment.Appointment;
 import sae.semestre.six.appointment.AppointmentRepository;
 import sae.semestre.six.appointment.doctor.Doctor;
@@ -24,7 +28,11 @@ import sae.semestre.six.appointment.patient.Patient;
 import sae.semestre.six.appointment.patient.PatientRepository;
 import sae.semestre.six.email.EmailService;
 
+import java.io.File;
+import java.io.IOException;
 import java.time.LocalDateTime;
+import java.util.Arrays;
+import java.util.List;
 
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.hasItems;
@@ -43,8 +51,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
         "spring.mail.password="
 })
 class BillControllerIntegrationTest {
-
-
     @RegisterExtension
     static GreenMailExtension greenMail = new GreenMailExtension(ServerSetupTest.SMTP)
             .withConfiguration(GreenMailConfiguration.aConfig().withUser("test", "test"));
@@ -78,6 +84,35 @@ class BillControllerIntegrationTest {
 
     @MockitoSpyBean
     private EmailService emailService;
+
+    @MockitoSpyBean
+    private FileHandler fileHandler;
+
+    @Value("${app.security.hash-folder-path}")
+    private String hashFolder;
+
+    @AfterEach
+    void deleteBillFileHash() throws IOException {
+        deleteFileRecursive(new File(hashFolder));
+    }
+
+    private static void deleteFileRecursive(File fileToDelete) throws IOException {
+        if (fileToDelete.isDirectory()) {
+            File[] childFilesToDelete = fileToDelete.listFiles();
+            if (childFilesToDelete != null) {
+                Arrays.stream(childFilesToDelete)
+                        .forEach(fileToDelete1 -> {
+                            try {
+                                deleteFileRecursive(fileToDelete1);
+                            } catch (IOException e) {
+                                throw new RuntimeException(e);
+                            }
+                        });
+            }
+        }
+
+        fileToDelete.delete();
+    }
 
     @Test
     void testProcessBill() throws Exception {
@@ -324,5 +359,20 @@ class BillControllerIntegrationTest {
                 // Then the total revenue return is 20
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.totalRevenue").value(20.0));
+    }
+
+    @Test
+    void testVerifyIntegrityBillOk() throws Exception {
+        // Given a Bill hashed
+        Bill bill = billService.processBill(
+                new Patient("1", "John", "Doe"),
+                new Doctor("134", "Albert", "Martin"),
+                List.of(new MedicalAct("XRAY", 100),
+                        new MedicalAct("XRAY", 100))
+        );
+        server.perform(get("/bills/verify-integrity")
+                        .param("billNumber", bill.getBillNumber()))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.success").value(true));
     }
 }

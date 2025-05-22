@@ -48,3 +48,6 @@ logs/
 
 *.log
 .idea/vcs.xml
+
+bill/**
+bill_test/**

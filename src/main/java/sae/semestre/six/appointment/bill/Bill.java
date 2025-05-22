@@ -7,15 +7,24 @@ package sae.semestre.six.appointment.bill;
 
 
 import jakarta.persistence.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import sae.semestre.six.FileHandler;
+import sae.semestre.six.HashUtils;
 import sae.semestre.six.appointment.doctor.Doctor;
+import sae.semestre.six.appointment.medicalact.MedicalAct;
 import sae.semestre.six.appointment.patient.Patient;
 import sae.semestre.six.appointment.patient.history.PatientHistory;
 
+import java.io.File;
+import java.nio.file.Files;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Objects;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @Entity
 @Table(name = "bills")
@@ -24,6 +33,9 @@ public class Bill {
     private static final double REDUCTION_THRESHOLD = 500.0;
     private static final double REDUCTION_PERCENTAGE = 0.9;
 
+    private static final Logger log = LoggerFactory.getLogger(Bill.class);
+
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -31,11 +43,11 @@ public class Bill {
     @Column(name = "bill_number", unique = true)
     private String billNumber;
 
-    @ManyToOne
+    @ManyToOne(cascade = CascadeType.PERSIST)
     @JoinColumn(name = "patient_id")
     private Patient patient;
 
-    @ManyToOne
+    @ManyToOne(cascade = CascadeType.PERSIST)
     @JoinColumn(name = "doctor_id")
     private Doctor doctor;
 
@@ -63,6 +75,9 @@ public class Bill {
 
     @Column(name = "total_brut")
     private Double totalBrut = 0.0;
+
+    @Column(nullable = false)
+    private String hash = "";
 
     @Transient
     private BillCopy copy;
@@ -92,6 +107,14 @@ public class Bill {
                 .forEach(this::addBillDetail);
     }
 
+    protected String getInfoToHash() {
+        return String.valueOf(this.totalAmount) +
+                this.totalBrut +
+                billDetails.stream()
+                        .map(billDetail -> billDetail.getNameMedicalAct() + billDetail.getPriceMedicalAct().toString() + billDetail.getQuantity().toString())
+                        .collect(Collectors.joining());
+    }
+
     /**
      * Compute the reduction base of the totalBrut
      *
@@ -104,6 +127,10 @@ public class Bill {
             totalAmount = totalBrut * REDUCTION_PERCENTAGE;
         }
         return totalAmount;
+    }
+
+    public void setHash(String hash) {
+        this.hash = hash;
     }
 
     public Long getId() {

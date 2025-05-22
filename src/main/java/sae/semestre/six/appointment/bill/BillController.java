@@ -113,6 +113,19 @@ public class BillController {
         );
     }
 
+    @Operation(summary = "")
+    @GetMapping("/verify-integrity")
+    public SuccessfullResponseModel verifyIntegrity(
+            @Parameter(description = "Bill number") String billNumber
+    ) {
+        Bill bill = billService.getBillByNumber(billNumber);
+        boolean billValid = billService.verify(bill);
+        return new SuccessfullResponseModel(
+                billValid ? "This bill has full integrity." : "The integrity of this bill could not be verified.",
+                billValid
+        );
+    }
+
     public record RevenueResponse(double totalRevenue) {
     }
 

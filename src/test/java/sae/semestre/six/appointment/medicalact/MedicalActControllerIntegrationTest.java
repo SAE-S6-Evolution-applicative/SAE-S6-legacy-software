@@ -139,7 +139,7 @@ class MedicalActControllerIntegrationTest {
                         .contentType("application/json")
                         .content(requestBody))
                 // Then...
-                .andExpect(status().isOk())
+                .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.medicalAct.price").value(price))
                 .andExpect(jsonPath("$.medicalAct.name").value(name));
     }
