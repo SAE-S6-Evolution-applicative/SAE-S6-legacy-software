@@ -100,10 +100,11 @@ class AppointmentServiceTest {
         ScheduleRequestModel req = new ScheduleRequestModel(1L, 2L, dateTime);
 
         Appointment existing = mock(Appointment.class);
-        when(existing.getAppointmentDate()).thenReturn(dateTime.withMinute(0).withSecond(0).withNano(0));
+        when(existing.getAppointmentDate()).thenReturn(dateTime);
         when(doctorService.getDoctor(1L)).thenReturn(doctor);
         when(patientService.getPatient(2L)).thenReturn(patient);
         when(appointmentRepository.findAllByDoctor_Id(1L)).thenReturn(List.of(existing));
+        when(existing.hasTimeConflict(dateTime)).thenReturn(true);
 
         assertThrows(ScheduleAlreadyTakenException.class, () -> appointmentService.scheduleAppointment(req));
     }
