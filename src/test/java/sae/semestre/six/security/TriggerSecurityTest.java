@@ -109,14 +109,42 @@ public class TriggerSecurityTest {
 
         // When & Then
         Throwable throwable = assertThrows(GenericJDBCException.class, () -> {
-            entityManager.createQuery("update BillDetail bd set bd.id = 1000 where bd.id = " + billDetailId).executeUpdate();
+            entityManager.createQuery("update BillDetail bd set bd.bill.id = 1000 where bd.id = " + billDetailId).executeUpdate();
         });
-
         while (throwable.getCause() != null && !(throwable instanceof SQLException)) {
             throwable = throwable.getCause();
         }
-
         assertInstanceOf(SQLException.class, throwable);
-        assertEquals("A bill detail cannot be deleted", throwable.getMessage());
+        assertEquals("bill_id cannot be updated", throwable.getMessage());
+
+        // And When & Then
+        throwable = assertThrows(GenericJDBCException.class, () -> {
+            entityManager.createQuery("update BillDetail bd set bd.quantity = 1000 where bd.id = " + billDetailId).executeUpdate();
+        });
+        while (throwable.getCause() != null && !(throwable instanceof SQLException)) {
+            throwable = throwable.getCause();
+        }
+        assertInstanceOf(SQLException.class, throwable);
+        assertEquals("quantity cannot be updated", throwable.getMessage());
+
+        // And When & Then
+        throwable = assertThrows(GenericJDBCException.class, () -> {
+            entityManager.createQuery("update BillDetail bd set bd.priceMedicalAct = 1000 where bd.id = " + billDetailId).executeUpdate();
+        });
+        while (throwable.getCause() != null && !(throwable instanceof SQLException)) {
+            throwable = throwable.getCause();
+        }
+        assertInstanceOf(SQLException.class, throwable);
+        assertEquals("price_medical_act cannot be updated", throwable.getMessage());
+
+        // And When & Then
+        throwable = assertThrows(GenericJDBCException.class, () -> {
+            entityManager.createQuery("update BillDetail bd set bd.lineTotal = 1000 where bd.id = " + billDetailId).executeUpdate();
+        });
+        while (throwable.getCause() != null && !(throwable instanceof SQLException)) {
+            throwable = throwable.getCause();
+        }
+        assertInstanceOf(SQLException.class, throwable);
+        assertEquals("line_total cannot be updated", throwable.getMessage());
     }
 } 

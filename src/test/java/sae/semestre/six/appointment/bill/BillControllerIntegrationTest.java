@@ -299,15 +299,18 @@ class BillControllerIntegrationTest {
 
     @Test
     void testGetTotalRevenue() throws Exception {
+        double initialTotalRevenue = billService.getTotalRevenue();
         // When the calculation of revenue endpoint is called
         server.perform(get("/bills/revenue"))
                 // Then...
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.totalRevenue").value(0.0));
+                .andExpect(jsonPath("$.totalRevenue").value(0.0 + initialTotalRevenue));
     }
 
     @Test
     void testGetPendingBills() throws Exception {
+        int initialbillPendingCount = billRepository.findBillsByStatus(Bill.Status.PENDING).size();
+
         // Given 3 Bill where two bill are pending
         Bill bill1 = new Bill();
         bill1.setStatus(Bill.Status.PENDING);
@@ -327,7 +330,7 @@ class BillControllerIntegrationTest {
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$.pendingBills").isArray())
-                .andExpect(jsonPath("$.pendingBills.length()").value(2))
+                .andExpect(jsonPath("$.pendingBills.length()").value(initialbillPendingCount + 2))
                 .andExpect(jsonPath("$.pendingBills").value(hasItems(
                         bill1.getId().toString(),
                         bill3.getId().toString()
@@ -348,6 +351,7 @@ class BillControllerIntegrationTest {
 
     @Test
     void testTotalRevenueWithOneBill() throws Exception {
+        double initialTotalRevenue = billService.getTotalRevenue();
         // Given a Bill with a total amount of 20
         BillDetail billDetail = new BillDetail(new MedicalAct("ACT1", 10.0), 2);
         Bill bill = billRepository.save(new Bill().addBillDetail(billDetail));
@@ -358,7 +362,7 @@ class BillControllerIntegrationTest {
         server.perform(get("/bills/revenue"))
                 // Then the total revenue return is 20
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.totalRevenue").value(20.0));
+                .andExpect(jsonPath("$.totalRevenue").value(20.0 + initialTotalRevenue));
     }
 
     @Test

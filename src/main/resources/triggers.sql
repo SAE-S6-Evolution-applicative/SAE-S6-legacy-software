@@ -1,5 +1,6 @@
 CREATE TRIGGER prevent_bill_deletion
-    BEFORE DELETE ON bills
+    BEFORE DELETE
+    ON bills
     FOR EACH ROW
 BEGIN
     SIGNAL SQLSTATE '45000'
@@ -8,7 +9,8 @@ END;
 @@
 
 CREATE TRIGGER prevent_bill_update
-    BEFORE UPDATE ON bills
+    BEFORE UPDATE
+    ON bills
     FOR EACH ROW
 BEGIN
     IF NEW.total_amount != OLD.total_amount THEN
@@ -19,7 +21,8 @@ END;
 @@
 
 CREATE TRIGGER prevent_bill_detail_deletion
-    BEFORE DELETE ON bill_details
+    BEFORE DELETE
+    ON bill_details
     FOR EACH ROW
 BEGIN
     SIGNAL SQLSTATE '45000'
@@ -28,7 +31,8 @@ END;
 @@
 
 CREATE TRIGGER prevent_bill_details_update
-    BEFORE UPDATE ON bill_details
+    BEFORE UPDATE
+    ON bill_details
     FOR EACH ROW
 BEGIN
     IF NEW.bill_id != OLD.bill_id THEN
@@ -39,6 +43,11 @@ BEGIN
     IF NEW.quantity != OLD.quantity THEN
         SIGNAL SQLSTATE '45000'
             SET MESSAGE_TEXT = 'quantity cannot be updated';
+    END IF;
+
+    IF NEW.price_medical_act != OLD.price_medical_act THEN
+        SIGNAL SQLSTATE '45000'
+            SET MESSAGE_TEXT = 'price_medical_act cannot be updated';
     END IF;
 
     IF NEW.line_total != OLD.line_total THEN
