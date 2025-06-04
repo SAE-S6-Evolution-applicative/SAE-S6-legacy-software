@@ -13,6 +13,7 @@ import sae.semestre.six.appointment.bill.BillService;
 import sae.semestre.six.appointment.patient.Patient;
 import sae.semestre.six.appointment.patient.PatientService;
 import sae.semestre.six.appointment.prescription.PrescriptionController.PrescriptionRequest;
+import sae.semestre.six.exception.EntityNotFoundException;
 
 import java.time.LocalDate;
 import java.util.Collections;
@@ -98,10 +99,11 @@ class PrescriptionControllerIntegrationTest {
 
     @Test
     void addPrescriptionButPatientAbsent() throws Exception {
+        // Given a prescription with a wrong patient id
         Long nonExistentPatientId = 9999L;
         String notes = "Take with food";
 
-        when(patientService.getPatient(nonExistentPatientId)).thenThrow(new RuntimeException("Patient not found"));
+        when(patientService.getPatient(nonExistentPatientId)).thenThrow(new EntityNotFoundException("Patient not found"));
 
         String json = """
         {
@@ -114,8 +116,7 @@ class PrescriptionControllerIntegrationTest {
         server.perform(post("/prescriptions")
                         .contentType("application/json")
                         .content(json))
-                .andExpect(status().isOk())
-                .andExpect(MockMvcResultMatchers.content().string(containsString("Failed")));
+                .andExpect(status().isNotFound());
     }
 
     @Test

@@ -15,6 +15,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import sae.semestre.six.exception.EntityNotFoundException;
+import sae.semestre.six.exception.GlobalExceptionHandler;
 
 import java.util.List;
 
@@ -55,6 +57,9 @@ public class PrescriptionController {
         return prescriptionService.getTotalCost(prescriptionId);
     }
 
+    public record AddPrescriptionPatientNotFoundResponse(String message) {
+    }
+
     /**
      * Represents a request containing the necessary information to create a prescription.
      *
@@ -68,4 +73,4 @@ public class PrescriptionController {
      * - notes: Any additional information or instructions associated with the prescription.
      */
     record PrescriptionRequest(Long patientId, List<Long> medicineIds, String notes) {}
-} 
+}
