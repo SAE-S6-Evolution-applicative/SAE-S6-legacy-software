@@ -51,13 +51,14 @@ class BillRepositoryTest {
 
         // When a new medical act is added to the bill
         BillDetail billDetail100 = new BillDetail(new MedicalAct("ACT2", 100.0), 1);
+        BillDetail billDetail30_2 = new BillDetail(new MedicalAct("ACT1", 10.0), 3);
         Bill bill130 = billRepository.save(new Bill()
-                .addBillDetail(billDetail30)
+                .addBillDetail(billDetail30_2)
                 .addBillDetail(billDetail100)
         );
 
         // Then...
-        assertEquals(initialBillDetailCount + 2, billDetailRepository.count());
+        assertEquals(initialBillDetailCount + 3, billDetailRepository.count());
         assertNotEquals(bill30.getId(), bill130.getId());
 
         assertEquals(2, bill130.getBillDetails().size());
