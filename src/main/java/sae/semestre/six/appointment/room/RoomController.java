@@ -13,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import sae.semestre.six.appointment.Appointment;
 import sae.semestre.six.appointment.AppointmentRepository;
+import sae.semestre.six.common.SuccessfullResponseModel;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -22,63 +23,43 @@ import java.util.Map;
 @Tag(name = "Rooms", description = "Room management API")
 public class RoomController {
 
-    private final RoomRepository roomRepository;
-
-    private final AppointmentRepository appointmentRepository;
+    private final RoomService roomService;
 
     @Autowired
-    public RoomController(final AppointmentRepository appointmentRepository, final RoomRepository roomRepository) {
-        this.appointmentRepository = appointmentRepository;
-        this.roomRepository = roomRepository;
+    public RoomController(final RoomService roomService) {
+        this.roomService = roomService;
     }
 
     @Operation(summary = "Assign a room", description = "Assigns a room to an appointment")
     @ApiResponse(responseCode = "200", description = "Room assigned successfully")
     @ApiResponse(responseCode = "400", description = "Invalid data or room unavailable")
     @PutMapping("/{roomNumber}/appointments/{appointmentId}")
-    public String assignRoom(
+    public SuccessfullResponseModel assignRoom(
             @Parameter(description = "Appointment ID") @PathVariable Long appointmentId,
             @Parameter(description = "Room number") @PathVariable String roomNumber) {
-        try {
-            Room room = roomRepository.findByRoomNumber(roomNumber);
-            Appointment appointment = appointmentRepository.findById(appointmentId).orElseThrow(
-                    () -> new Exception()
-            );
-            
-            if (room.getType().equals("SURGERY") && 
-                !appointment.getDoctor().getSpecialization().equals("SURGEON")) {
-                return "Error: Only surgeons can use surgery rooms";
-            }
-            
-            if (room.getCurrentPatientCount() >= room.getCapacity()) {
-                return "Error: Room is at full capacity";
-            }
-            
-            room.setCurrentPatientCount(room.getCurrentPatientCount() + 1);
-            appointment.setRoomNumber(roomNumber);
-
-            roomRepository.save(room);
-            appointmentRepository.save(appointment);
-
-            return "Room assigned successfully";
-        } catch (Exception e) {
-            return "Error: " + e.getMessage();
-        }
+        roomService.assignRoom(appointmentId, roomNumber);
+        return new SuccessfullResponseModel("Correctly assigned room %s".formatted(roomNumber), true);
     }
     
     @Operation(summary = "Check room availability", description = "Retrieves room availability information")
     @ApiResponse(responseCode = "200", description = "Availability information")
     @GetMapping("/{roomNumber}/availability")
-    public Map<String, Object> getRoomAvailability(
+    public RoomAvailabilityResponse getRoomAvailability(
             @Parameter(description = "Room number") @PathVariable String roomNumber) {
-        Room room = roomRepository.findByRoomNumber(roomNumber);
-        Map<String, Object> result = new HashMap<>();
-
-        result.put("roomNumber", room.getRoomNumber());
-        result.put("capacity", room.getCapacity());
-        result.put("currentPatients", room.getCurrentPatientCount());
-        result.put("available", room.canAcceptPatient());
-
-        return result;
+        Room room = roomService.findByRoomNumber(roomNumber);
+        return new RoomAvailabilityResponse(room.getRoomNumber(), room.getCapacity(), room.getCurrentPatientCount(), room.canAcceptPatient());
     }
+
+    /**
+     * Response model for room availability.
+     *
+     * @param roomNumber the unique identifier of the room
+     * @param capacity the maximum number of patients the room can accommodate
+     * @param currentPatients the current number of patients in the room
+     * @param available true if the room can accept new patients, false otherwise
+     */
+    record RoomAvailabilityResponse(String roomNumber,
+                                    Integer capacity,
+                                    Integer currentPatients,
+                                    Boolean available) {}
 } 

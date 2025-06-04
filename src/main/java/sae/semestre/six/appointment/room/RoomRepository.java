@@ -7,6 +7,8 @@ package sae.semestre.six.appointment.room;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 
+import java.util.Optional;
+
 public interface RoomRepository extends JpaRepository<Room, Long> {
-    Room findByRoomNumber(String roomNumber);
+    Optional<Room> findByRoomNumber(String roomNumber);
 } 
