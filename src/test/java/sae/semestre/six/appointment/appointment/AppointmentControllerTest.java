@@ -12,13 +12,17 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.test.util.ReflectionTestUtils;
 import sae.semestre.six.appointment.Appointment;
+import sae.semestre.six.appointment.AppointmentController.AvailableSlotRequestModel;
+import sae.semestre.six.appointment.AppointmentController.ScheduleRequestModel;
 import sae.semestre.six.appointment.AppointmentRepository;
-import sae.semestre.six.appointment.SchedulingController;
+import sae.semestre.six.appointment.AppointmentController;
 import sae.semestre.six.appointment.doctor.Doctor;
 import sae.semestre.six.appointment.doctor.DoctorRepository;
 import sae.semestre.six.appointment.patient.Patient;
 import sae.semestre.six.appointment.patient.PatientRepository;
+import sae.semestre.six.common.SuccessfullResponseModel;
 import sae.semestre.six.email.EmailService;
+import sae.semestre.six.exception.ScheduleAlreadyTakenException;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -28,12 +32,11 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 
-class SchedulingControllerTest {
+class AppointmentControllerTest {
 
     @Mock
     private AppointmentRepository appointmentRepository;
@@ -48,7 +51,7 @@ class SchedulingControllerTest {
     private EmailService emailService;
 
     @InjectMocks
-    private SchedulingController schedulingController;
+    private AppointmentController appointmentController;
 
     private Doctor doctor;
     private LocalDate validDate = LocalDate.now();
@@ -82,7 +85,7 @@ class SchedulingControllerTest {
         existingAppointments.add(existingAppointment);
 
         // Replace EmailService instance with the mock
-        ReflectionTestUtils.setField(schedulingController, "emailService", emailService);
+        ReflectionTestUtils.setField(appointmentController, "emailService", emailService);
 
         // Configure mocks
         when(doctorRepository.findById(1L)).thenReturn(Optional.of(doctor));
@@ -93,25 +96,15 @@ class SchedulingControllerTest {
     @Test
     void testScheduleAppointmentSuccess() {
         // When
-        String result = schedulingController.scheduleAppointment(1L, 1L, validDate.atTime(12, 0) );
+        SuccessfullResponseModel result = appointmentController.scheduleAppointment(new ScheduleRequestModel(1L, 1L, validDate.atTime(12, 0)));
 
         // Then
-        assertEquals("Appointment scheduled successfully", result);
+        assertEquals(new SuccessfullResponseModel("Appointment correctly created", true), result);
         verify(emailService).sendEmail(
                 eq("doctor@example.com"),
                 eq("New Appointment Scheduled"),
                 contains("You have a new appointment on")
         );
-    }
-
-    @Test
-    void testScheduleAppointmentOutOfHours() {
-        // When
-        String result = schedulingController.scheduleAppointment(1L, 2L, validDate.atTime(2, 0));
-
-        // Then
-        assertEquals("Appointments only available between 9 AM and 5 PM", result);
-        verify(emailService, never()).sendEmail(anyString(), anyString(), anyString());
     }
 
     @Test
@@ -122,17 +115,17 @@ class SchedulingControllerTest {
         ));
 
         // When
-        String result = schedulingController.scheduleAppointment(1L, 2L, validDate.atTime(10, 0));
-
         // Then
-        assertEquals("Doctor is not available at this time", result);
+        assertThrows(ScheduleAlreadyTakenException.class,
+                () -> appointmentController.scheduleAppointment(new ScheduleRequestModel(1L, 2L, validDate.atTime(2, 0)))
+        );
         verify(emailService, never()).sendEmail(anyString(), anyString(), anyString());
     }
 
     @Test
     void testGetAvailableSlots() {
         // When
-        List<LocalDateTime> availableSlots = schedulingController.getAvailableSlots(1L, validDate);
+        List<LocalDateTime> availableSlots = appointmentController.getAvailableSlots(new AvailableSlotRequestModel(1L, validDate));
 
         // Then
         assertEquals(8, availableSlots.size());

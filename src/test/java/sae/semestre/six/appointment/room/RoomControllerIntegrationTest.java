@@ -5,6 +5,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.MockitoAnnotations;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
@@ -15,6 +17,7 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.transaction.annotation.Transactional;
 import sae.semestre.six.appointment.Appointment;
 import sae.semestre.six.appointment.AppointmentRepository;
+import sae.semestre.six.appointment.AppointmentService;
 import sae.semestre.six.appointment.doctor.Doctor;
 
 import java.util.Optional;
@@ -44,6 +47,10 @@ class RoomControllerIntegrationTest {
     private RoomController roomController;
 
     private AutoCloseable autoCloseable;
+    @Autowired
+    private RoomService roomService;
+    @Autowired
+    private AppointmentService appointmentService;
 
     @BeforeEach
     void setUp() {
@@ -74,8 +81,8 @@ class RoomControllerIntegrationTest {
         appointment.setId(1L);
         appointment.setDoctor(generalDoctor);
 
-        when(roomRepository.findByRoomNumber(room.getRoomNumber())).thenReturn(room);
-        when(appointmentRepository.findById(appointment.getId())).thenReturn(Optional.of(appointment));
+        when(roomService.findByRoomNumber(room.getRoomNumber())).thenReturn(room);
+        when(appointmentService.findAppointmentById(appointment.getId())).thenReturn(appointment);
 
         server.perform(put("/rooms/" + room.getRoomNumber() + "/appointments/" + appointment.getId()))
                 .andExpect(status().isOk())
@@ -100,8 +107,8 @@ class RoomControllerIntegrationTest {
         appointment.setId(1L);
         appointment.setDoctor(generalDoctor);
 
-        when(roomRepository.findByRoomNumber(room.getRoomNumber())).thenReturn(room);
-        when(appointmentRepository.findById(appointment.getId())).thenReturn(Optional.of(appointment));
+        when(roomService.findByRoomNumber(room.getRoomNumber())).thenReturn(room);
+        when(appointmentService.findAppointmentById(appointment.getId())).thenReturn(appointment);
 
         server.perform(put("/rooms/" + room.getRoomNumber() + "/appointments/" + appointment.getId()))
                 .andExpect(status().isOk())
@@ -123,8 +130,8 @@ class RoomControllerIntegrationTest {
         appointment.setId(1L);
         appointment.setDoctor(generalDoctor);
 
-        when(roomRepository.findByRoomNumber(room.getRoomNumber())).thenReturn(room);
-        when(appointmentRepository.findById(appointment.getId())).thenReturn(Optional.of(appointment));
+        when(roomService.findByRoomNumber(room.getRoomNumber())).thenReturn(room);
+        when(appointmentService.findAppointmentById(appointment.getId())).thenReturn(appointment);
 
         server.perform(put("/rooms/" + room.getRoomNumber() + "/appointments/" + appointment.getId()))
                 .andExpect(status().isOk())
@@ -162,7 +169,7 @@ class RoomControllerIntegrationTest {
         room.setCurrentPatientCount(0);
         room.setType("Consultation");
 
-        when(roomRepository.findByRoomNumber(room.getRoomNumber())).thenReturn(room);
+        when(roomService.findByRoomNumber(room.getRoomNumber())).thenReturn(room);
 
         server.perform(get("/rooms/" + room.getRoomNumber() + "/availability"))
                 .andExpect(status().isOk())

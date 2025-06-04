@@ -10,12 +10,30 @@ import sae.semestre.six.appointment.doctor.Doctor;
 import sae.semestre.six.appointment.patient.Patient;
 import sae.semestre.six.appointment.patient.history.PatientHistory;
 import sae.semestre.six.appointment.room.Room;
+import sae.semestre.six.exception.ScheduleAlreadyTakenException;
 
 import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "appointments")
 public class Appointment {
+
+    public static final int SCHEDULE_START_HOUR = 9;
+
+    public static final int SCHEDULE_STOP_HOUR = 17;
+
+    public Appointment() {}
+
+    public Appointment(Doctor doctor, Patient patient, LocalDateTime date) {
+        // Check if the appointment is within working hours
+        if (date.getHour() < SCHEDULE_START_HOUR || date.getHour() > SCHEDULE_STOP_HOUR) {
+            throw new ScheduleAlreadyTakenException("Appointments only available between 9 AM and 5 PM");
+        }
+        this.doctor = doctor;
+        this.patient = patient;
+        this.appointmentDate = date;
+    }
+
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -113,5 +131,9 @@ public class Appointment {
 
     public void setRoomNumber(String roomNumber) {
         this.roomNumber = roomNumber;
+    }
+
+    public boolean hasTimeConflict(LocalDateTime appointmentDate) {
+        return this.appointmentDate.equals(appointmentDate.withMinute(0).withSecond(0).withNano(0));
     }
 } 

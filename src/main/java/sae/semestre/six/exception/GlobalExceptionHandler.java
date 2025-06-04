@@ -43,6 +43,14 @@ public class GlobalExceptionHandler {
                 "The requested entity does not exist in the database.");
     }
 
+    @ExceptionHandler(ScheduleAlreadyTakenException.class)
+    @ResponseStatus(HttpStatus.CONFLICT)
+    public ProblemDetail handleScheduleAlreadyTaken(ScheduleAlreadyTakenException exception) {
+        LOG.error("Schedule conflict happened : {}", exception.getMessage());
+        return createProblemDetail(HttpStatus.CONFLICT, exception.getMessage(),
+                "The requested schedule has a conflict");
+    }
+
 
 
     /**
