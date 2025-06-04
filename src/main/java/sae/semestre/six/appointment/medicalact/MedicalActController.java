@@ -48,9 +48,16 @@ public class MedicalActController {
     public ResponseEntity<MedicalActResponse> createMedicalAct(
             @RequestBody MedicalActRequest medicalActRequest) {
         MedicalAct medicalAct = new MedicalAct(medicalActRequest.name(), medicalActRequest.price());
+        MedicalAct savedMedicalAct = medicalActRepository.save(medicalAct);
+        String location = ServletUriComponentsBuilder
+                .fromCurrentRequest()
+                .path("/{id}")
+                .buildAndExpand(savedMedicalAct.getId())
+                .toUriString();
         return ResponseEntity
                 .status(HttpStatus.CREATED)
-                .body(new MedicalActResponse(medicalActRepository.save(medicalAct)));
+                .header("Location", location)
+                .body(new MedicalActResponse(savedMedicalAct));
     }
 
     public record PricesResponse(List<MedicalAct> medicalActList) {
