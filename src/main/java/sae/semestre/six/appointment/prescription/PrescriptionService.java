@@ -50,13 +50,31 @@ public class PrescriptionService {
      */
     public void addPrescription(Long patientId, List<Long> medicineIds, String notes) {
         Patient patient = patientService.getPatient(patientId);
-        Prescription lastPrescription = findLastPrescription();
+
         List<Medicine> medicineList = medicineService.getByIds(medicineIds);
 
-        Prescription prescription = new Prescription(lastPrescription.extractNumericPartFromPrescriptionNumber(), patient, medicineList, notes);
+        Prescription prescription = new Prescription(getNumericPartFromLastPrescriptionNumber(), patient, medicineList, notes);
         prescriptionRepository.save(prescription);
 
         logger.info("{} - {} \n", LocalDate.now(), prescription.getPrescriptionNumber());
+    }
+
+    /**
+     * Extracts and returns the numeric part from the prescription number
+     * of the last created prescription. If no prescriptions exist, the
+     * return value defaults to 0.
+     *
+     * @return the numeric part of the last prescription number, or 0 if no prescriptions are found
+     */
+    private int getNumericPartFromLastPrescriptionNumber() {
+        int numericPartPrescriptionNumber = 0;
+        try {
+            Prescription lastPrescription = findLastPrescription();
+            numericPartPrescriptionNumber = lastPrescription.extractNumericPartFromPrescriptionNumber();
+        } catch (EntityNotFoundException e) {
+            // Do nothing
+        }
+        return numericPartPrescriptionNumber;
     }
 
     /**
@@ -65,7 +83,8 @@ public class PrescriptionService {
      *
      * @return the most recently created Prescription object, or*/
     public Prescription findLastPrescription() {
-        return prescriptionRepository.findLastPrescription().orElse(null);
+        return prescriptionRepository.findLastPrescription().orElseThrow(
+                () -> new EntityNotFoundException("Last prescription not found"));
     }
 
     /**
