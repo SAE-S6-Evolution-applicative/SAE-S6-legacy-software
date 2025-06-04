@@ -57,9 +57,6 @@ public class PrescriptionController {
         return prescriptionService.getTotalCost(prescriptionId);
     }
 
-    public record AddPrescriptionPatientNotFoundResponse(String message) {
-    }
-
     /**
      * Represents a request containing the necessary information to create a prescription.
      *
