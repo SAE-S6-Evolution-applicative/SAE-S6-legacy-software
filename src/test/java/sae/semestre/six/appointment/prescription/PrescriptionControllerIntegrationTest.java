@@ -11,6 +11,7 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import org.springframework.transaction.annotation.Transactional;
 import sae.semestre.six.appointment.bill.BillService;
 import sae.semestre.six.appointment.patient.Patient;
+import sae.semestre.six.appointment.patient.PatientRepository;
 import sae.semestre.six.appointment.patient.PatientService;
 import sae.semestre.six.appointment.prescription.PrescriptionController.PrescriptionRequest;
 import sae.semestre.six.exception.EntityNotFoundException;
@@ -52,6 +53,10 @@ class PrescriptionControllerIntegrationTest {
 
     @MockitoBean
     private MedicineService medicineService;
+    @MockitoSpyBean
+    private PatientRepository patientRepository;
+    @MockitoSpyBean
+    private MedicineRepository medicineRepository;
 
     private Patient createTestPatient() {
         Patient patient = new Patient();
@@ -68,7 +73,6 @@ class PrescriptionControllerIntegrationTest {
 
     @Test
     void addPrescription() throws Exception {
-        int counter = 1;
         Patient patient = createTestPatient();
         Medicine medicine = new Medicine("Paracétamol", 5.0);
         medicine.setId(1L);
@@ -132,5 +136,40 @@ class PrescriptionControllerIntegrationTest {
         server.perform(get("/prescriptions/" + patientId))
                 .andExpect(status().isOk())
                 .andExpect(MockMvcResultMatchers.content().string("[]")); // Assuming no prescriptions exist
+    }
+
+    @Test
+    void calculateCostTest() throws Exception {
+        // Given a prescription
+        Patient patient = new Patient();
+        patient.setFirstName("John");
+        patient.setLastName("Doe");
+        patient.setPatientNumber("P12345");
+        patient.setPhoneNumber("1234567890");
+        patient.setGender("Male");
+        patient.setDateOfBirth(LocalDate.now());
+        patient.setAddress("123 Main St");
+        patient = patientRepository.save(patient); // Persist patient correctly
+
+        Medicine medicine = new Medicine("Paracétamol", 5.0);
+        medicine = medicineRepository.save(medicine); // Persist medicine
+
+        Medicine medicine2 = new Medicine("Anxiolitics", 15.0);
+        medicine2 = medicineRepository.save(medicine2); // Persist second medicine
+
+        List<Medicine> medicines = List.of(medicine, medicine2);
+
+        String notes = "Take with food";
+        Prescription prescription = new Prescription(1, patient, medicines, notes);
+
+        // Persist the prescription
+        prescription = prescriptionRepository.save(prescription);
+
+        // When the total cost of the prescription is calculated
+        double expectedCost = (5.0 + 15.0) * 1.2;
+
+        server.perform(get("/prescriptions/" + prescription.getId() + "/cost"))
+                .andExpect(status().isOk())
+                .andExpect(MockMvcResultMatchers.content().string(containsString(Double.toString(expectedCost))));
     }
 }
