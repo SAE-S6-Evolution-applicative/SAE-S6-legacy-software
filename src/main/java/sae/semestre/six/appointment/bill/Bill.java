@@ -29,9 +29,6 @@ public class Bill {
     private static final double REDUCTION_THRESHOLD = 500.0;
     private static final double REDUCTION_PERCENTAGE = 0.9;
 
-    private static final Logger log = LoggerFactory.getLogger(Bill.class);
-
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;

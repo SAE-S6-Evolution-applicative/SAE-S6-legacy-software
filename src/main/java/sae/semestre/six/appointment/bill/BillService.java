@@ -24,7 +24,6 @@ import java.util.List;
 @Service
 public class BillService {
 
-    private static final Logger log = LoggerFactory.getLogger(BillService.class);
     private final BillRepository billRepository;
     private final FileHandler fileHandler;
 

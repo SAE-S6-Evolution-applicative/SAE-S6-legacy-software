@@ -16,17 +16,14 @@ class BillRepositoryTest {
 
     private BillRepository billRepository;
     private BillDetailRepository billDetailRepository;
-    private MedicalActRepository medicalActRepository;
 
     @Autowired
     public BillRepositoryTest(
             BillRepository billRepository,
-            BillDetailRepository billDetailRepository,
-            MedicalActRepository medicalActRepository
+            BillDetailRepository billDetailRepository
     ) {
         this.billRepository = billRepository;
         this.billDetailRepository = billDetailRepository;
-        this.medicalActRepository = medicalActRepository;
     }
 
     @Test
@@ -51,9 +48,9 @@ class BillRepositoryTest {
 
         // When a new medical act is added to the bill
         BillDetail billDetail100 = new BillDetail(new MedicalAct("ACT2", 100.0), 1);
-        BillDetail billDetail30_2 = new BillDetail(new MedicalAct("ACT1", 10.0), 3);
+        BillDetail billDetail30n2 = new BillDetail(new MedicalAct("ACT1", 10.0), 3);
         Bill bill130 = billRepository.save(new Bill()
-                .addBillDetail(billDetail30_2)
+                .addBillDetail(billDetail30n2)
                 .addBillDetail(billDetail100)
         );
 

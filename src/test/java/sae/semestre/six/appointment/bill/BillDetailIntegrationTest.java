@@ -15,7 +15,7 @@ import sae.semestre.six.appointment.medicalact.MedicalActRepository;
 import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
-public class BillDetailIntegrationTest {
+class BillDetailIntegrationTest {
 
     @Autowired
     private BillDetailRepository billDetailRepository;

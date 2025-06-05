@@ -35,4 +35,9 @@ public class HashUtils {
             throw new SecurityException("Impossible de générer le hash de sécurité", e);
         }
     }
+
+    private HashUtils() {
+        // Private constructor to prevent instantiation
+        // This class is intended
+    }
 }

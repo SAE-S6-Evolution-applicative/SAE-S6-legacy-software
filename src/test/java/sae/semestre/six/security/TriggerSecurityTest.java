@@ -1,6 +1,7 @@
 package sae.semestre.six.security;
 
 import jakarta.persistence.EntityManager;
+import jakarta.persistence.Query;
 import org.hibernate.exception.GenericJDBCException;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,7 +19,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @Transactional
-public class TriggerSecurityTest {
+class TriggerSecurityTest {
 
     @Autowired
     private BillRepository billRepository;
@@ -30,14 +31,13 @@ public class TriggerSecurityTest {
     private EntityManager entityManager;
 
     @Test
-    public void testPreventBillDeletion() {
+    void testPreventBillDeletion() {
         // Given
         Bill bill = billRepository.save(new Bill());
 
         // When & Then
-        Throwable throwable = assertThrows(GenericJDBCException.class, () -> {
-            entityManager.createQuery("delete from Bill b where b.id = " + bill.getId()).executeUpdate();
-        });
+        Query deleteQuery = entityManager.createQuery("delete from Bill b where b.id = " + bill.getId());
+        Throwable throwable = assertThrows(GenericJDBCException.class, deleteQuery::executeUpdate);
 
         while (throwable.getCause() != null && !(throwable instanceof SQLException)) {
             throwable = throwable.getCause();
@@ -48,7 +48,7 @@ public class TriggerSecurityTest {
     }
 
     @Test
-    public void testPreventBillTotalAmountUpdate() {
+    void testPreventBillTotalAmountUpdate() {
         // Given
         Bill bill = new Bill();
         bill.setTotalAmount(10.0);
@@ -56,9 +56,8 @@ public class TriggerSecurityTest {
         final Long billId = bill.getId();
 
         // When & Then
-        Throwable throwable = assertThrows(GenericJDBCException.class, () -> {
-            entityManager.createQuery("update Bill b set b.totalAmount = 1000 where b.id = " + billId).executeUpdate();
-        });
+        Query updateTotalAmount = entityManager.createQuery("update Bill b set b.totalAmount = 1000 where b.id = " + billId);
+        Throwable throwable = assertThrows(GenericJDBCException.class, updateTotalAmount::executeUpdate);
 
         while (throwable.getCause() != null && !(throwable instanceof SQLException)) {
             throwable = throwable.getCause();
@@ -69,7 +68,7 @@ public class TriggerSecurityTest {
     }
 
     @Test
-    public void testPreventBillDetailDeletion() {
+    void testPreventBillDetailDeletion() {
         // Given
         MedicalAct medicalAct = new MedicalAct("Medical Act", 100.0);
         Bill bill = new Bill();
@@ -81,9 +80,8 @@ public class TriggerSecurityTest {
         Long billDetailId = billDetail.getId();
 
         // When & Then
-        Throwable throwable = assertThrows(GenericJDBCException.class, () -> {
-            entityManager.createQuery("delete from BillDetail b where b.id = " + billDetailId).executeUpdate();
-        });
+        Query deleteBillDetail = entityManager.createQuery("delete from BillDetail b where b.id = " + billDetailId);
+        Throwable throwable = assertThrows(GenericJDBCException.class, deleteBillDetail::executeUpdate);
 
         while (throwable.getCause() != null && !(throwable instanceof SQLException)) {
             throwable = throwable.getCause();
@@ -94,7 +92,7 @@ public class TriggerSecurityTest {
     }
 
     @Test
-    public void testPreventBillDetailUpdate() {
+    void testPreventBillDetailUpdate() {
         // Given
         MedicalAct medicalAct = new MedicalAct("Medical Act", 100.0);
         Bill bill = new Bill();
@@ -107,9 +105,8 @@ public class TriggerSecurityTest {
         Long billDetailId = billDetail.getId();
 
         // When & Then
-        Throwable throwable = assertThrows(GenericJDBCException.class, () -> {
-            entityManager.createQuery("update BillDetail bd set bd.bill.id = 1000 where bd.id = " + billDetailId).executeUpdate();
-        });
+        Query updateBillId = entityManager.createQuery("update BillDetail bd set bd.bill.id = 1000 where bd.id = " + billDetailId);
+        Throwable throwable = assertThrows(GenericJDBCException.class, updateBillId::executeUpdate);
         while (throwable.getCause() != null && !(throwable instanceof SQLException)) {
             throwable = throwable.getCause();
         }
@@ -117,9 +114,8 @@ public class TriggerSecurityTest {
         assertEquals("bill_id cannot be updated", throwable.getMessage());
 
         // And When & Then
-        throwable = assertThrows(GenericJDBCException.class, () -> {
-            entityManager.createQuery("update BillDetail bd set bd.quantity = 1000 where bd.id = " + billDetailId).executeUpdate();
-        });
+        Query updateQuantity = entityManager.createQuery("update BillDetail bd set bd.quantity = 1000 where bd.id = " + billDetailId);
+        throwable = assertThrows(GenericJDBCException.class, updateQuantity::executeUpdate);
         while (throwable.getCause() != null && !(throwable instanceof SQLException)) {
             throwable = throwable.getCause();
         }
@@ -127,9 +123,8 @@ public class TriggerSecurityTest {
         assertEquals("quantity cannot be updated", throwable.getMessage());
 
         // And When & Then
-        throwable = assertThrows(GenericJDBCException.class, () -> {
-            entityManager.createQuery("update BillDetail bd set bd.priceMedicalAct = 1000 where bd.id = " + billDetailId).executeUpdate();
-        });
+        Query updateMedicalActPrice = entityManager.createQuery("update BillDetail bd set bd.priceMedicalAct = 1000 where bd.id = " + billDetailId);
+        throwable = assertThrows(GenericJDBCException.class, updateMedicalActPrice::executeUpdate);
         while (throwable.getCause() != null && !(throwable instanceof SQLException)) {
             throwable = throwable.getCause();
         }
@@ -137,9 +132,8 @@ public class TriggerSecurityTest {
         assertEquals("price_medical_act cannot be updated", throwable.getMessage());
 
         // And When & Then
-        throwable = assertThrows(GenericJDBCException.class, () -> {
-            entityManager.createQuery("update BillDetail bd set bd.lineTotal = 1000 where bd.id = " + billDetailId).executeUpdate();
-        });
+        Query updateLineTotal = entityManager.createQuery("update BillDetail bd set bd.lineTotal = 1000 where bd.id = " + billDetailId);
+        throwable = assertThrows(GenericJDBCException.class, updateLineTotal::executeUpdate);
         while (throwable.getCause() != null && !(throwable instanceof SQLException)) {
             throwable = throwable.getCause();
         }
