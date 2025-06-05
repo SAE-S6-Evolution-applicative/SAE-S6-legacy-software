@@ -9,10 +9,40 @@ import jakarta.persistence.*;
 import sae.semestre.six.appointment.patient.Patient;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name = "prescriptions")
 public class Prescription {
+
+    public static final double TVA_PERCENTAGE = 1.2;
+
+    /**
+     * Creates a new prescription with the specified parameters.
+     *
+     * @param previousPrescriptionNumber the previous prescription number used to generate the new prescription number
+     * @param patient the patient associated with the prescription
+     * @param medicines the list of medicines prescribed
+     * @param notes additional notes regarding the prescription
+     */
+    public Prescription(int previousPrescriptionNumber, Patient patient, List<Medicine> medicines, String notes) {
+        this.prescriptionNumber = "RX" + previousPrescriptionNumber;
+        this.patient = patient;
+        this.medicines = medicines != null ? medicines : new ArrayList<>();
+        // Make bidirectional relation with each medicine
+        if (medicines != null) {
+            for (Medicine medicine : medicines) {
+                medicine.setPrescription(this);
+            }
+        }
+        this.notes = notes;
+        this.totalCost = calculateTotalCostTTC();
+    }
+
+    public Prescription() {
+        this.medicines = new ArrayList<>();
+    }
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -25,8 +55,27 @@ public class Prescription {
     @JoinColumn(name = "patient_id")
     private Patient patient;
 
-    @Column(name = "medicines")
-    private String medicines;
+    @OneToMany(mappedBy = "prescription", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Medicine> medicines = new ArrayList<>();
+
+    public void addMedicine(Medicine medicine) {
+        if (this.medicines == null) {
+            this.medicines = new ArrayList<>();
+        }
+        this.medicines.add(medicine);
+        // Remember to recalculate costs as the medicines list change
+        this.totalCost = calculateTotalCostTTC();
+        medicine.setPrescription(this);
+    }
+
+    public void removeMedicine(Medicine medicine) {
+        if (this.medicines != null) {
+            this.medicines.remove(medicine);
+            // Remember to recalculate costs as the medicines list change
+            this.totalCost = calculateTotalCostTTC();
+            medicine.setPrescription(null);
+            }
+    }
 
     @Column(name = "notes")
     private String notes;
@@ -71,12 +120,8 @@ public class Prescription {
         this.patient = patient;
     }
 
-    public String getMedicines() {
+    public List<Medicine> getMedicines() {
         return medicines;
-    }
-
-    public void setMedicines(String medicines) {
-        this.medicines = medicines;
     }
 
     public String getNotes() {
@@ -131,5 +176,39 @@ public class Prescription {
     @PreUpdate
     public void preUpdate() {
         lastModified = LocalDateTime.now();
+    }
+
+    /**
+     * Extracts the numeric part from a prescription number string.
+     *
+     * @return The numeric part as an integer, or 0 if no numeric part is found
+     */
+    public int extractNumericPartFromPrescriptionNumber() {
+        if (prescriptionNumber == null || prescriptionNumber.isEmpty()) {
+            return 0;
+        }
+
+        String numericPart = prescriptionNumber.replaceAll("[^0-9]", "");
+
+        // Convert to integer, default to 0 if no digits were found
+        try {
+            return Integer.parseInt(numericPart);
+        } catch (NumberFormatException e) {
+            return 0;
+        }
+    }
+
+    /**
+     * Calculates the total cost including tax (TTC) for all medicines in the prescription.
+     * The total is computed as the sum of the prices of all medicines multiplied by the
+     * TVA_PERCENTAGE constant.
+     *
+     * @return The total cost including tax (TTC) as a double.
+     */
+    private double calculateTotalCostTTC() {
+        if (medicines == null || medicines.isEmpty()) {
+            return 0.0;
+        }
+        return medicines.stream().mapToDouble(Medicine::getUnitPrice).sum() * TVA_PERCENTAGE;
     }
 } 

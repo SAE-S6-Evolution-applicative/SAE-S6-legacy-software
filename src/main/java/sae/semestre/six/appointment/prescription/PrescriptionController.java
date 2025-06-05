@@ -12,135 +12,74 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import sae.semestre.six.appointment.patient.Patient;
-import sae.semestre.six.appointment.patient.PatientRepository;
+import sae.semestre.six.exception.EntityNotFoundException;
+import sae.semestre.six.exception.GlobalExceptionHandler;
 
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 @RestController
 @RequestMapping("/prescriptions")
 @Tag(name = "Prescriptions", description = "Prescription management API")
 public class PrescriptionController {
-
-
-    private static final Logger logger = LoggerFactory.getLogger(PrescriptionController.class);
-
-    private static final Map<String, List<String>> patientPrescriptions = new HashMap<>();
-    private static final Map<String, Integer> medicineInventory = new HashMap<>();
-
-    private static final Map<String, Double> medicinePrices = new HashMap<String, Double>() {{
-        put("PARACETAMOL", 5.0);
-        put("ANTIBIOTICS", 25.0);
-        put("VITAMINS", 15.0);
-    }};
-    private static int prescriptionCounter = 0;
-
-    private final PatientRepository patientRepository;
-
-    private final PrescriptionRepository prescriptionRepository;
+    
+    private final PrescriptionService prescriptionService;
 
     @Autowired
-    public PrescriptionController(
-            final PatientRepository patientRepository,
-            final PrescriptionRepository prescriptionRepository
-    ) {
-        this.patientRepository = patientRepository;
-        this.prescriptionRepository = prescriptionRepository;
+    public PrescriptionController(final PrescriptionService prescriptionService) {
+        this.prescriptionService = prescriptionService;
     }
 
     @Operation(summary = "Add a prescription", description = "Creates a new prescription for a patient")
-    @ApiResponse(responseCode = "200", description = "Prescription created successfully")
+    @ApiResponse(responseCode = "201", description = "Prescription created successfully")
     @ApiResponse(responseCode = "400", description = "Invalid data")
     @PostMapping
-    public String addPrescription(
-            @Parameter(description = "Patient ID") @RequestParam String patientId,
-            @Parameter(description = "List of medicines") @RequestParam String[] medicines,
-            @Parameter(description = "Additional notes") @RequestParam String notes) {
-        try {
-            prescriptionCounter++;
-            String prescriptionId = "RX" + prescriptionCounter;
-
-            Prescription prescription = new Prescription();
-            prescription.setPrescriptionNumber(prescriptionId);
-
-            Patient patient = patientRepository.findById(Long.parseLong(patientId)).orElseThrow(
-                    () -> new RuntimeException("Patient not found")
-            );
-            prescription.setPatient(patient);
-
-            prescription.setMedicines(String.join(",", medicines));
-            prescription.setNotes(notes);
-
-            double cost = calculateCost(prescriptionId);
-            prescription.setTotalCost(cost);
-
-
-            prescriptionRepository.save(prescription);
-
-            logger.info("Prescription created: {}, cost: {}", prescriptionId, cost);
-
-            List<String> currentPrescriptions = patientPrescriptions.getOrDefault(patientId, new ArrayList<>());
-            currentPrescriptions.add(prescriptionId);
-            patientPrescriptions.put(patientId, currentPrescriptions);
-
-            for (String medicine : medicines) {
-                int current = medicineInventory.getOrDefault(medicine, 0);
-                medicineInventory.put(medicine, current - 1);
-            }
-
-            return "Prescription " + prescriptionId + " created and billed";
-        } catch (Exception e) {
-            e.printStackTrace();
-            return "Failed: " + e;
-        }
+    public ResponseEntity<Void> addPrescription(@RequestBody PrescriptionRequest request) {
+        prescriptionService.addPrescription(request.patientId(), request.medicineIds(), request.notes());
+        return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
     @Operation(summary = "Get patient prescriptions", description = "Retrieves all prescriptions for a patient")
     @ApiResponse(responseCode = "200", description = "List of prescriptions")
-    @GetMapping("/patient/{patientId}")
-    public List<String> getPatientPrescriptions(
-            @Parameter(description = "Patient ID") @PathVariable String patientId) {
-        return patientPrescriptions.getOrDefault(patientId, new ArrayList<>());
-    }
-
-    @Operation(summary = "Get medicine inventory", description = "Retrieves the current medicine inventory status")
-    @ApiResponse(responseCode = "200", description = "Inventory status")
-    @GetMapping("/medicines/inventory")
-    public Map<String, Integer> getInventory() {
-        return medicineInventory;
-    }
-
-    @Operation(summary = "Refill medicine", description = "Adds quantities to the medicine inventory")
-    @ApiResponse(responseCode = "200", description = "Refill completed")
-    @PatchMapping("/medicines/refill")
-    public String refillMedicine(
-            @Parameter(description = "Medicine name") @RequestParam String medicine,
-            @Parameter(description = "Quantity to add") @RequestParam int quantity) {
-        medicineInventory.put(medicine,
-                medicineInventory.getOrDefault(medicine, 0) + quantity);
-        return "Refilled " + medicine;
+    @GetMapping("/{patientId}")
+    public List<PrescriptionResponse> getPatientPrescriptions(
+            @Parameter(description = "Patient ID") @PathVariable Long patientId) {
+        List<Prescription> prescriptions = prescriptionService.findAllPrescriptionsByPatientId(patientId);
+        return prescriptions.stream().map(prescription -> new PrescriptionResponse(
+                prescription.getId(),
+                prescription.getPrescriptionNumber(),
+                prescription.getNotes(),
+                prescription.getMedicines().stream().map(
+                        medicine -> new MedicineResponse(
+                                medicine.getId(),
+                                medicine.getName(),
+                                medicine.getUnitPrice()
+                        )
+                ).toList()
+        )).toList();
     }
 
     @Operation(summary = "Calculate prescription cost", description = "Calculates the total cost of a prescription")
     @ApiResponse(responseCode = "200", description = "Cost calculated")
     @GetMapping("/{prescriptionId}/cost")
     public double calculateCost(
-            @Parameter(description = "Prescription ID") @PathVariable String prescriptionId) {
-        return medicinePrices.values().stream()
-                .mapToDouble(Double::doubleValue)
-                .sum() * 1.2;
+            @Parameter(description = "Prescription ID") @PathVariable Long prescriptionId) {
+        return prescriptionService.getTotalCost(prescriptionId);
     }
 
-    @Operation(summary = "Clear all data", description = "Clears all prescription data")
-    @ApiResponse(responseCode = "200", description = "Data cleared")
-    @DeleteMapping
-    public void clearAllData() {
-        patientPrescriptions.clear();
-        medicineInventory.clear();
-        prescriptionCounter = 0;
-    }
-} 
+    /**
+     * Represents a request containing the necessary information to create a prescription.
+     *
+     * This record is used within the prescription management system to encapsulate the
+     * details required to create a new prescription, including the patient ID, the list
+     * of medicine IDs to be prescribed, and any additional notes.
+     *
+     * Fields:
+     * - patientId: The unique identifier of the patient for whom the prescription is created.
+     * - medicineIds: A list of unique identifiers for the medicines being prescribed.
+     * - notes: Any additional information or instructions associated with the prescription.
+     */
+    record PrescriptionRequest(Long patientId, List<Long> medicineIds, String notes) {}
+}

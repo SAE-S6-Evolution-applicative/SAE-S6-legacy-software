@@ -17,6 +17,7 @@ import sae.semestre.six.appointment.Appointment;
 import sae.semestre.six.appointment.bill.Bill;
 import sae.semestre.six.appointment.doctor.Doctor;
 import sae.semestre.six.appointment.patient.Patient;
+import sae.semestre.six.appointment.prescription.Medicine;
 import sae.semestre.six.appointment.prescription.Prescription;
 
 import java.time.LocalDateTime;
@@ -131,8 +132,11 @@ class PatientHistoryRepositoryImplTest {
         appointments.add(appointment);
         ReflectionTestUtils.setField(history, "appointments", appointments);
 
+        Medicine medicine = new Medicine("Paracétamol", 5.0);
+        Medicine medicine2 = new Medicine("Axiolitics", 15.0);
+
         Prescription prescription = new Prescription();
-        ReflectionTestUtils.setField(prescription, "medicines", "Test medication");
+        ReflectionTestUtils.setField(prescription, "medicines", List.of(medicine, medicine2));
         entityManager.persist(prescription);
         Set<Prescription> prescriptions = (Set<Prescription>) ReflectionTestUtils.getField(history, "prescriptions");
         prescriptions.add(prescription);

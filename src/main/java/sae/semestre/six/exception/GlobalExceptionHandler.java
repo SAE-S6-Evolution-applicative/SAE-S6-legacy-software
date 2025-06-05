@@ -3,7 +3,7 @@
  * IUT de Rodez, no author rights
  */
 
-package sae.semestre.six;
+package sae.semestre.six.exception;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -26,6 +26,32 @@ public class GlobalExceptionHandler {
         LOG.error("Stack trace: ", exception);
         return createProblemDetail(HttpStatus.INTERNAL_SERVER_ERROR, exception.getMessage(), "Unknown internal server error.");
     }
+
+    @ExceptionHandler(IllegalArgumentException.class)
+    @ResponseStatus(HttpStatus.UNAUTHORIZED)
+    public ProblemDetail handleUnauthorizeException(IllegalArgumentException exception) {
+        LOG.error("Illegal Argument Exception: {}", exception.getMessage());
+        LOG.error("Stack trace: ", exception);
+        return createProblemDetail(HttpStatus.UNAUTHORIZED, exception.getMessage(), "Bad request, all arguments must be provided.");
+    }
+
+    @ExceptionHandler(EntityNotFoundException.class)
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    public ProblemDetail handleEntityNotFoundException(EntityNotFoundException exception) {
+        LOG.error("Entity not found: {}", exception.getMessage());
+        return createProblemDetail(HttpStatus.NOT_FOUND, exception.getMessage(),
+                "The requested entity does not exist in the database.");
+    }
+
+    @ExceptionHandler(ScheduleAlreadyTakenException.class)
+    @ResponseStatus(HttpStatus.CONFLICT)
+    public ProblemDetail handleScheduleAlreadyTaken(ScheduleAlreadyTakenException exception) {
+        LOG.error("Schedule conflict happened : {}", exception.getMessage());
+        return createProblemDetail(HttpStatus.CONFLICT, exception.getMessage(),
+                "The requested schedule has a conflict");
+    }
+
+
 
     /**
      * Create a ProblemDetail object with the status, message and description.

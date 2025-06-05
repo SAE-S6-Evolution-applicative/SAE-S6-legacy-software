@@ -35,4 +35,57 @@ public class PatientHistoryService {
         Specification<PatientHistory> spec = PatientHistorySpecification.searchByKeywordAndDateRange(keyword, start, end);
         return patientHistoryRepository.findAll(spec);
     }
+
+    /**
+     * Retrieves all patient history records associated with the specified patient ID.
+     *
+     * @param patientId The unique identifier of the patient whose history records are to be retrieved.
+     *                  Must not be null.
+     * @return A list of {@link PatientHistory} objects associated with the given patient ID.
+     *         Returns an empty list if no history records are found for the patient.
+     */
+    public List<PatientHistory> findAllByPatientId(Long patientId) {
+        if (patientId == null) {
+            throw new IllegalArgumentException("Patient ID cannot be null");
+        }
+
+        return patientHistoryRepository.findAllByPatient_Id(patientId);
+    }
+
+    /**
+     * Generates a summary of a patient's medical history, including the total number of visits
+     * and the cumulative billed amount.
+     *
+     * @param patientId The unique identifier of the patient whose summary is to be retrieved.
+     *                  Must not be null.
+     * @return A {@link PatientSummaryResponse} object containing the total number of visits
+     *         and the cumulative billed amount for the specified patient.
+     * @throws IllegalArgumentException if the provided patientId is null.
+     */
+    public PatientSummaryResponse getPatientSummary(Long patientId) {
+        if (patientId == null) {
+            throw new IllegalArgumentException("Patient ID cannot be null");
+        }
+
+        List<PatientHistory> patientHistories = findAllByPatientId(patientId);
+        int visitCount = patientHistories.size();
+        double totalBilledAmount = calculateTotalBilledAmount(patientHistories);
+
+        return new PatientSummaryResponse(visitCount, totalBilledAmount);
+    }
+
+    /**
+     * Calculates the total billed amount for a list of patient history records.
+     *
+     * @param histories The list of patient history records. Each record may contain associated
+     *                  bills with their respective amounts.
+     *                  Must not be null.
+     * @return The cumulative total billed amount across all provided patient history records.
+     *         If the list is empty, returns 0.0.
+     */
+    private double calculateTotalBilledAmount(List<PatientHistory> histories) {
+        return histories.stream()
+                .mapToDouble(PatientHistory::getTotalBilledAmount)
+                .sum();
+    }
 }
