@@ -9,8 +9,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import sae.semestre.six.appointment.bill.Bill;
-import sae.semestre.six.appointment.bill.BillDetail;
 import sae.semestre.six.appointment.bill.BillDetailService;
 
 import java.util.Arrays;

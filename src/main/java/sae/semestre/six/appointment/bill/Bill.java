@@ -9,15 +9,11 @@ package sae.semestre.six.appointment.bill;
 import jakarta.persistence.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import sae.semestre.six.FileHandler;
-import sae.semestre.six.HashUtils;
 import sae.semestre.six.appointment.doctor.Doctor;
 import sae.semestre.six.appointment.medicalact.MedicalAct;
 import sae.semestre.six.appointment.patient.Patient;
 import sae.semestre.six.appointment.patient.history.PatientHistory;
 
-import java.io.File;
-import java.nio.file.Files;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.HashSet;
