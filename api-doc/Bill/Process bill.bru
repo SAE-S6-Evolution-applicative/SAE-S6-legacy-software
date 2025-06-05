@@ -1,0 +1,17 @@
+meta {
+  name: Process bill
+  type: http
+  seq: 1
+}
+
+post {
+  url: http://localhost:8045/bills?patientId=1&doctorId=1&medicalActId=4
+  body: none
+  auth: inherit
+}
+
+params:query {
+  patientId: 1
+  doctorId: 1
+  medicalActId: 4
+}
