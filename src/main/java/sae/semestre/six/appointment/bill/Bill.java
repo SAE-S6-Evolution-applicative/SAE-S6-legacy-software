@@ -7,8 +7,6 @@ package sae.semestre.six.appointment.bill;
 
 
 import jakarta.persistence.*;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import sae.semestre.six.appointment.doctor.Doctor;
 import sae.semestre.six.appointment.medicalact.MedicalAct;
 import sae.semestre.six.appointment.patient.Patient;
