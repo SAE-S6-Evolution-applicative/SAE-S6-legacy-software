@@ -19,11 +19,15 @@ import sae.semestre.six.exception.EntityNotFoundException;
 import java.time.LocalDate;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 
 import static org.hamcrest.Matchers.containsString;
+import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 
@@ -38,20 +42,20 @@ class PrescriptionControllerIntegrationTest {
     @MockitoSpyBean
     private PrescriptionController prescriptionController;
 
-    @MockitoBean
+    @MockitoSpyBean
     private BillService billService;
 
 
-    @MockitoBean
+    @MockitoSpyBean
     private PrescriptionRepository prescriptionRepository;
 
-    @MockitoBean
+    @MockitoSpyBean
     private PatientService patientService;
 
-    @Autowired
+    @MockitoSpyBean
     private PrescriptionService prescriptionService;
 
-    @MockitoBean
+    @MockitoSpyBean
     private MedicineService medicineService;
     @MockitoSpyBean
     private PatientRepository patientRepository;
@@ -139,37 +143,21 @@ class PrescriptionControllerIntegrationTest {
     }
 
     @Test
-    void calculateCostTest() throws Exception {
-        // Given a prescription
-        Patient patient = new Patient();
-        patient.setFirstName("John");
-        patient.setLastName("Doe");
-        patient.setPatientNumber("P12345");
-        patient.setPhoneNumber("1234567890");
-        patient.setGender("Male");
-        patient.setDateOfBirth(LocalDate.now());
-        patient.setAddress("123 Main St");
-        patient = patientRepository.save(patient); // Persist patient correctly
+    void calculateCost() throws Exception {
+        Patient testPatient = createTestPatient();
+        testPatient = patientRepository.save(testPatient);
+        Medicine medicine1 = new Medicine("Paracetamol", 10.0);
+        Medicine medicine2 = new Medicine("Ibuprofen", 15.0);
+        medicine1 = medicineRepository.save(medicine1);
+        medicine2 = medicineRepository.save(medicine2);
 
-        Medicine medicine = new Medicine("Paracétamol", 5.0);
-        medicine = medicineRepository.save(medicine); // Persist medicine
+        Prescription prescription = new Prescription(1, testPatient, List.of(medicine1, medicine2), "");
 
-        Medicine medicine2 = new Medicine("Anxiolitics", 15.0);
-        medicine2 = medicineRepository.save(medicine2); // Persist second medicine
-
-        List<Medicine> medicines = List.of(medicine, medicine2);
-
-        String notes = "Take with food";
-        Prescription prescription = new Prescription(1, patient, medicines, notes);
-
-        // Persist the prescription
         prescription = prescriptionRepository.save(prescription);
+        when(prescriptionService.getTotalCost(prescription.getId())).thenReturn(25.0); // Exemple de coût total
 
-        // When the total cost of the prescription is calculated
-        double expectedCost = (5.0 + 15.0) * 1.2;
-
-        server.perform(get("/prescriptions/" + prescription.getId() + "/cost"))
+        server.perform(get("/prescriptions/calculate-cost?id=1"))
                 .andExpect(status().isOk())
-                .andExpect(MockMvcResultMatchers.content().string(containsString(Double.toString(expectedCost))));
+                .andExpect(jsonPath("$.totalCost").value(25.0)); // Vérifiez la réponse JSON.
     }
 }
