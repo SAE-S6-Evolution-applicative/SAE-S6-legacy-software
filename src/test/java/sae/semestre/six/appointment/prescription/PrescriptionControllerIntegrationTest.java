@@ -1,35 +1,28 @@
+/*
+ * PrescriptionControllerIntegrationTest.java                                 05 juin 2025
+ * IUT de Rodez, no author rights
+ */
+
 package sae.semestre.six.appointment.prescription;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
-import org.springframework.test.context.bean.override.mockito.MockitoSpyBean;
+import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import org.springframework.transaction.annotation.Transactional;
-import sae.semestre.six.appointment.bill.BillService;
 import sae.semestre.six.appointment.patient.Patient;
 import sae.semestre.six.appointment.patient.PatientRepository;
-import sae.semestre.six.appointment.patient.PatientService;
-import sae.semestre.six.appointment.prescription.PrescriptionController.PrescriptionRequest;
-import sae.semestre.six.exception.EntityNotFoundException;
 
 import java.time.LocalDate;
-import java.util.Collections;
 import java.util.List;
-import java.util.Optional;
 
-import static org.hamcrest.Matchers.containsString;
-import static org.mockito.ArgumentMatchers.*;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @Transactional
@@ -37,34 +30,23 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 class PrescriptionControllerIntegrationTest {
 
     @Autowired
-    private MockMvc server;
+    private MockMvc mockMvc;
 
-    @MockitoSpyBean
-    private PrescriptionController prescriptionController;
-
-    @MockitoSpyBean
-    private BillService billService;
-
-
-    @MockitoSpyBean
-    private PrescriptionRepository prescriptionRepository;
-
-    @MockitoSpyBean
-    private PatientService patientService;
-
-    @MockitoSpyBean
-    private PrescriptionService prescriptionService;
-
-    @MockitoSpyBean
-    private MedicineService medicineService;
-    @MockitoSpyBean
+    @Autowired
     private PatientRepository patientRepository;
-    @MockitoSpyBean
+
+    @Autowired
     private MedicineRepository medicineRepository;
 
-    private Patient createTestPatient() {
-        Patient patient = new Patient();
-        patient.setId(1L);
+    @Autowired
+    private PrescriptionRepository prescriptionRepository;
+
+    private Patient patient;
+    private Medicine med1, med2;
+
+    @BeforeEach
+    void setUp() {
+        patient = new Patient();
         patient.setFirstName("John");
         patient.setLastName("Doe");
         patient.setPatientNumber("P12345");
@@ -72,92 +54,68 @@ class PrescriptionControllerIntegrationTest {
         patient.setGender("Male");
         patient.setDateOfBirth(LocalDate.now());
         patient.setAddress("123 Main St");
-        return patient;
+        patient = patientRepository.save(patient);
+
+        med1 = new Medicine("Paracetamol", 10.0);
+        med2 = new Medicine("Ibuprofen", 15.0);
+        med1 = medicineRepository.save(med1);
+        med2 = medicineRepository.save(med2);
     }
 
     @Test
     void addPrescription() throws Exception {
-        Patient patient = createTestPatient();
-        Medicine medicine = new Medicine("Paracétamol", 5.0);
-        medicine.setId(1L);
-        Medicine medicine2 = new Medicine("Anxiolitics", 15.0);
-        medicine2.setId(2L);
-
-        String notes = "Take with food";
-
-        when(patientService.getPatient(1L)).thenReturn(patient);
-        when(medicineService.getByIds(List.of(1L, 2L))).thenReturn(List.of(medicine, medicine2));
-
         String json = """
         {
           "patientId": %d,
-          "medicineIds": [1, 2],
-          "notes": "%s"
+          "medicineIds": [%d, %d],
+          "notes": "Take with food"
         }
-        """.formatted(patient.getId(), notes);
+        """.formatted(patient.getId(), med1.getId(), med2.getId());
 
-        server.perform(post("/prescriptions")
-                        .contentType("application/json")
+        mockMvc.perform(post("/prescriptions")
+                        .contentType(MediaType.APPLICATION_JSON)
                         .content(json))
                 .andExpect(status().isCreated());
 
-        verify(patientService).getPatient(patient.getId());
-        verify(prescriptionRepository).save(any(Prescription.class));
+        List<Prescription> prescriptions = prescriptionRepository.findAll();
+        assertThat(prescriptions).isNotEmpty();
+        assertThat(prescriptions.get(0).getPatient().getId()).isEqualTo(patient.getId());
     }
 
     @Test
     void addPrescriptionButPatientAbsent() throws Exception {
-        // Given a prescription with a wrong patient id
-        Long nonExistentPatientId = 9999L;
-        String notes = "Take with food";
-
-        when(patientService.getPatient(nonExistentPatientId)).thenThrow(new EntityNotFoundException("Patient not found"));
-
         String json = """
         {
-          "patientId": %d,
-          "medicineIds": [1, 2],
-          "notes": "%s"
+          "patientId": 9999,
+          "medicineIds": [%d, %d],
+          "notes": "Take with food"
         }
-        """.formatted(nonExistentPatientId, notes);
+        """.formatted(med1.getId(), med2.getId());
 
-        server.perform(post("/prescriptions")
-                        .contentType("application/json")
+        mockMvc.perform(post("/prescriptions")
+                        .contentType(MediaType.APPLICATION_JSON)
                         .content(json))
                 .andExpect(status().isNotFound());
     }
 
     @Test
     void getPatientPrescriptions() throws Exception {
-        // Arrange
-        Long patientId = 1L;
-        Patient patient = createTestPatient();
+        Prescription prescription = new Prescription(1, patient, List.of(med1, med2), "notes");
+        prescriptionRepository.save(prescription);
 
-        when(patientService.getPatient(patientId)).thenReturn(patient);
-        when(prescriptionService.findAllPrescriptionsByPatientId(patientId)).thenReturn(Collections.emptyList());
-
-        // Act
-        server.perform(get("/prescriptions/" + patientId))
+        mockMvc.perform(get("/prescriptions/" + patient.getId()))
                 .andExpect(status().isOk())
-                .andExpect(MockMvcResultMatchers.content().string("[]")); // Assuming no prescriptions exist
+                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$[0].id").value(prescription.getId()));
     }
 
     @Test
     void calculateCost() throws Exception {
-        Patient testPatient = createTestPatient();
-        testPatient = patientRepository.save(testPatient);
-        Medicine medicine1 = new Medicine("Paracetamol", 10.0);
-        Medicine medicine2 = new Medicine("Ibuprofen", 15.0);
-        medicine1 = medicineRepository.save(medicine1);
-        medicine2 = medicineRepository.save(medicine2);
-
-        Prescription prescription = new Prescription(1, testPatient, List.of(medicine1, medicine2), "");
-
+        Prescription prescription = new Prescription(1, patient, List.of(med1, med2), "");
         prescription = prescriptionRepository.save(prescription);
-        when(prescriptionService.getTotalCost(prescription.getId())).thenReturn(25.0); // Exemple de coût total
 
-        server.perform(get("/prescriptions/calculate-cost?id=1"))
+        mockMvc.perform(get("/prescriptions/" + prescription.getId() + "/cost"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.totalCost").value(25.0)); // Vérifiez la réponse JSON.
+                .andExpect(content().string(String.valueOf((med1.getUnitPrice() + med2.getUnitPrice()) * 1.2)));
     }
 }

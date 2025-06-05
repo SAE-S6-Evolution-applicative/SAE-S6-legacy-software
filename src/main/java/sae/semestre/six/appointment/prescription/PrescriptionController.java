@@ -33,7 +33,7 @@ public class PrescriptionController {
     }
 
     @Operation(summary = "Add a prescription", description = "Creates a new prescription for a patient")
-    @ApiResponse(responseCode = "200", description = "Prescription created successfully")
+    @ApiResponse(responseCode = "201", description = "Prescription created successfully")
     @ApiResponse(responseCode = "400", description = "Invalid data")
     @PostMapping
     public ResponseEntity<Void> addPrescription(@RequestBody PrescriptionRequest request) {
@@ -44,9 +44,21 @@ public class PrescriptionController {
     @Operation(summary = "Get patient prescriptions", description = "Retrieves all prescriptions for a patient")
     @ApiResponse(responseCode = "200", description = "List of prescriptions")
     @GetMapping("/{patientId}")
-    public List<Prescription> getPatientPrescriptions(
+    public List<PrescriptionResponse> getPatientPrescriptions(
             @Parameter(description = "Patient ID") @PathVariable Long patientId) {
-        return prescriptionService.findAllPrescriptionsByPatientId(patientId);
+        List<Prescription> prescriptions = prescriptionService.findAllPrescriptionsByPatientId(patientId);
+        return prescriptions.stream().map(prescription -> new PrescriptionResponse(
+                prescription.getId(),
+                prescription.getPrescriptionNumber(),
+                prescription.getNotes(),
+                prescription.getMedicines().stream().map(
+                        medicine -> new MedicineResponse(
+                                medicine.getId(),
+                                medicine.getName(),
+                                medicine.getUnitPrice()
+                        )
+                ).toList()
+        )).toList();
     }
 
     @Operation(summary = "Calculate prescription cost", description = "Calculates the total cost of a prescription")

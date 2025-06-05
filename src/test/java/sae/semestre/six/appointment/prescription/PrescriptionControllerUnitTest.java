@@ -10,7 +10,7 @@ import java.util.List;
 import static org.junit.Assert.*;
 
 @SpringBootTest
-public class PrescriptionControllerTest {
+public class PrescriptionControllerUnitTest {
 
     @Autowired
     private PrescriptionController prescriptionController;
@@ -21,7 +21,7 @@ public class PrescriptionControllerTest {
         prescriptionController.addPrescription(prescriptionRequest);
 
         // Supposons que getPatientPrescriptions attend un Long, pas un String
-        List<Prescription> prescriptions = prescriptionController.getPatientPrescriptions(1L);
+        List<PrescriptionResponse> prescriptions = prescriptionController.getPatientPrescriptions(1L);
         assertNotNull(prescriptions);
         assertFalse(prescriptions.isEmpty());
         assertTrue(prescriptions.getFirst().getPrescriptionNumber().startsWith("RX"));
@@ -29,7 +29,7 @@ public class PrescriptionControllerTest {
 
     @Test
     public void testGetPatientPrescriptionsReturnsEmptyList() {
-        List<Prescription> prescriptions = prescriptionController.getPatientPrescriptions(999L);
+        List<PrescriptionResponse> prescriptions = prescriptionController.getPatientPrescriptions(999L);
         assertNotNull(prescriptions);
         assertTrue(prescriptions.isEmpty());
     }
@@ -39,9 +39,9 @@ public class PrescriptionControllerTest {
         PrescriptionRequest prescriptionRequest = new PrescriptionRequest(1L, List.of(1L,2L,3L),"Notes prescription");
         prescriptionController.addPrescription(prescriptionRequest);
 
-        List<Prescription> prescriptions = prescriptionController.getPatientPrescriptions(2L);
+        List<PrescriptionResponse> prescriptions = prescriptionController.getPatientPrescriptions(2L);
         assertFalse(prescriptions.isEmpty());
-        Prescription prescription = prescriptions.getFirst();
+        PrescriptionResponse prescription = prescriptions.getFirst();
         double cost = prescriptionController.calculateCost(prescription.getId());
         assertTrue(cost >= 0);
     }
