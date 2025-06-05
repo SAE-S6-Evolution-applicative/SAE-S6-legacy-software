@@ -1,0 +1,16 @@
+meta {
+  name: Update price
+  type: http
+  seq: 2
+}
+
+put {
+  url: http://localhost:8045/medicalAct/?idMedicalAct=2&price=200
+  body: none
+  auth: inherit
+}
+
+params:query {
+  idMedicalAct: 2
+  price: 200
+}

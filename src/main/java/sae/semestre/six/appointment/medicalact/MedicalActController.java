@@ -7,6 +7,8 @@ package sae.semestre.six.appointment.medicalact;
 
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import sae.semestre.six.common.SuccessfullResponseModel;
 
@@ -43,10 +45,12 @@ public class MedicalActController {
     }
 
     @PostMapping
-    public MedicalActResponse createMedicalAct(
+    public ResponseEntity<MedicalActResponse> createMedicalAct(
             @RequestBody MedicalActRequest medicalActRequest) {
         MedicalAct medicalAct = new MedicalAct(medicalActRequest.name(), medicalActRequest.price());
-        return new MedicalActResponse(medicalActRepository.save(medicalAct));
+        return ResponseEntity
+                .status(HttpStatus.CREATED)
+                .body(new MedicalActResponse(medicalActRepository.save(medicalAct)));
     }
 
     public record PricesResponse(List<MedicalAct> medicalActList) {

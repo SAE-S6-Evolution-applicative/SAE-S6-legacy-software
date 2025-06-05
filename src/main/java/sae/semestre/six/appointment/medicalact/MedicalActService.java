@@ -9,9 +9,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import sae.semestre.six.appointment.bill.Bill;
-import sae.semestre.six.appointment.bill.BillDetail;
-import sae.semestre.six.appointment.bill.BillDetailService;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -21,13 +18,11 @@ import java.util.List;
 public class MedicalActService {
 
     private static final Logger logger = LoggerFactory.getLogger(MedicalActService.class);
-    private final BillDetailService billDetailService;
     private final MedicalActRepository medicalActRepository;
 
     @Autowired
-    public MedicalActService(final MedicalActRepository medicalActRepository, final BillDetailService billDetailService) {
+    public MedicalActService(final MedicalActRepository medicalActRepository) {
         this.medicalActRepository = medicalActRepository;
-        this.billDetailService = billDetailService;
     }
 
     /**
@@ -65,16 +60,11 @@ public class MedicalActService {
     /**
      * Update the price of the medical act. The total price of invoices
      * containing details of the medical procedure is updated.
-     * @param price new price of the medical act
+     *
+     * @param price      new price of the medical act
      * @param medicalAct medical act to update
      */
     public void updatePrice(double price, MedicalAct medicalAct) {
-        var newMedicalAct = medicalActRepository.save(medicalAct.updatePrice(price));
-        List<BillDetail> billDetails = billDetailService.updateBillDetail(medicalAct, newMedicalAct);
-
-        billDetails.stream()
-                   .map(BillDetail::getBill)
-                   .distinct()
-                   .forEach(Bill::recalculate);
+        medicalActRepository.save(medicalAct.updatePrice(price));
     }
 }

@@ -13,11 +13,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
-import sae.semestre.six.appointment.bill.BillService;
 import sae.semestre.six.appointment.patient.Patient;
 import sae.semestre.six.appointment.patient.PatientRepository;
 
-import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -41,19 +39,15 @@ public class PrescriptionController {
     }};
     private static int prescriptionCounter = 0;
 
-    private final BillService billService;
-
     private final PatientRepository patientRepository;
 
     private final PrescriptionRepository prescriptionRepository;
 
     @Autowired
     public PrescriptionController(
-            final BillService billService,
             final PatientRepository patientRepository,
             final PrescriptionRepository prescriptionRepository
     ) {
-        this.billService = billService;
         this.patientRepository = patientRepository;
         this.prescriptionRepository = prescriptionRepository;
     }
@@ -93,14 +87,6 @@ public class PrescriptionController {
             currentPrescriptions.add(prescriptionId);
             patientPrescriptions.put(patientId, currentPrescriptions);
 
-
-            billService.processBill(
-                    patientId,
-                    "SYSTEM",
-                    new String[]{"PRESCRIPTION_" + prescriptionId}
-            );
-
-
             for (String medicine : medicines) {
                 int current = medicineInventory.getOrDefault(medicine, 0);
                 medicineInventory.put(medicine, current - 1);
@@ -134,8 +120,8 @@ public class PrescriptionController {
     public String refillMedicine(
             @Parameter(description = "Medicine name") @RequestParam String medicine,
             @Parameter(description = "Quantity to add") @RequestParam int quantity) {
-        medicineInventory.put(medicine, 
-            medicineInventory.getOrDefault(medicine, 0) + quantity);
+        medicineInventory.put(medicine,
+                medicineInventory.getOrDefault(medicine, 0) + quantity);
         return "Refilled " + medicine;
     }
 
@@ -148,7 +134,7 @@ public class PrescriptionController {
                 .mapToDouble(Double::doubleValue)
                 .sum() * 1.2;
     }
-    
+
     @Operation(summary = "Clear all data", description = "Clears all prescription data")
     @ApiResponse(responseCode = "200", description = "Data cleared")
     @DeleteMapping

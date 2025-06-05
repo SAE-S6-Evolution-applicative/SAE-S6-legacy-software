@@ -5,7 +5,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
 import sae.semestre.six.appointment.medicalact.MedicalAct;
-import sae.semestre.six.appointment.medicalact.MedicalActRepository;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
@@ -16,25 +15,27 @@ class BillRepositoryTest {
 
     private BillRepository billRepository;
     private BillDetailRepository billDetailRepository;
-    private MedicalActRepository medicalActRepository;
 
     @Autowired
     public BillRepositoryTest(
             BillRepository billRepository,
-            BillDetailRepository billDetailRepository,
-            MedicalActRepository medicalActRepository
+            BillDetailRepository billDetailRepository
     ) {
         this.billRepository = billRepository;
         this.billDetailRepository = billDetailRepository;
-        this.medicalActRepository = medicalActRepository;
     }
 
     @Test
     void test() {
+        Double initialRevenue = billRepository.findTotalRevenue();
+        if (initialRevenue == null) {
+            initialRevenue = 0.0;
+        }
+        long initialBillDetailCount = billDetailRepository.count();
         // Given a bill with a medical act in their details
-        MedicalAct medicalAct = medicalActRepository.save(new MedicalAct("ACT1", 10.0));
-        Bill bill30 = billRepository.save(new Bill());
-        BillDetail billDetail30 = billDetailRepository.save(new BillDetail(bill30, medicalAct, 3));
+        Bill bill30 = new Bill();
+        BillDetail billDetail30 = new BillDetail(new MedicalAct("ACT1", 10.0), 3);
+
 
         // When the bill is saved
         bill30 = billRepository.save(bill30.addBillDetail(billDetail30));
@@ -42,24 +43,22 @@ class BillRepositoryTest {
         // Then the bill should be saved with the correct details
         assertEquals(1, bill30.getBillDetails().size());
         assertEquals(30, bill30.getTotalAmount());
-        assertEquals(30, billRepository.findTotalRevenue());
+        assertEquals(initialRevenue + 30, billRepository.findTotalRevenue());
 
         // When a new medical act is added to the bill
-        medicalAct = medicalActRepository.save(new MedicalAct("ACT2", 100.0));
-        Bill bill130 = billRepository.save(new Bill());
-        BillDetail billDetail100 = billDetailRepository.save(new BillDetail(bill130, medicalAct, 1));
-
-        bill130 = billRepository.save(
-                bill130.addBillDetail(billDetail30)
-                        .addBillDetail(billDetail100)
+        BillDetail billDetail100 = new BillDetail(new MedicalAct("ACT2", 100.0), 1);
+        BillDetail billDetail30n2 = new BillDetail(new MedicalAct("ACT1", 10.0), 3);
+        Bill bill130 = billRepository.save(new Bill()
+                .addBillDetail(billDetail30n2)
+                .addBillDetail(billDetail100)
         );
 
         // Then...
-        assertEquals(2, billDetailRepository.count());
+        assertEquals(initialBillDetailCount + 3, billDetailRepository.count());
         assertNotEquals(bill30.getId(), bill130.getId());
 
         assertEquals(2, bill130.getBillDetails().size());
         assertEquals(130, bill130.getTotalAmount());
-        assertEquals(160, billRepository.findTotalRevenue());
+        assertEquals(initialRevenue + 160, billRepository.findTotalRevenue());
     }
 }

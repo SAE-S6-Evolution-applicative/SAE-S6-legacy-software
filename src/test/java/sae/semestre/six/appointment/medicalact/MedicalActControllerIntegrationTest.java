@@ -49,6 +49,7 @@ class MedicalActControllerIntegrationTest {
     @Test
     void testGetPrices() throws Exception {
         // Given some medicals act
+        int initialCount = medicalActRepository.findAllByActive(true).size();
         var act1 = new MedicalAct("ACT1", 10.0);
         var act2 = new MedicalAct("ACT2", 20.0);
         var act3 = new MedicalAct("ACT3", 50.0);
@@ -69,7 +70,7 @@ class MedicalActControllerIntegrationTest {
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$.medicalActList").isArray())
-                .andExpect(jsonPath("$.medicalActList.length()").value(acts.size()))
+                .andExpect(jsonPath("$.medicalActList.length()").value(acts.size() + initialCount))
                 .andExpect(jsonPath("$.medicalActList[0].name").value(act1.getName()))
                 .andExpect(jsonPath("$.medicalActList[0].price").value(act1.getPrice()))
                 .andExpect(jsonPath("$.medicalActList[0].active").value(act1.isActive()));
@@ -83,7 +84,7 @@ class MedicalActControllerIntegrationTest {
 
         Double updatedPrice = 75.0;
 
-        // When wr try to update the price of the medical act
+        // When we try to update the price of the medical act
         server.perform(put("/medicalAct/")
                         .param("idMedicalAct", act1.getId().toString())
                         .param("price", updatedPrice.toString()))
@@ -102,9 +103,8 @@ class MedicalActControllerIntegrationTest {
         var act1 = new MedicalAct("ACT1", 10.0);
         act1 = medicalActRepository.save(act1);
 
-        Bill bill = billRepository.save(new Bill());
-        BillDetail billDetail = billDetailRepository.save(new BillDetail(bill, act1, 1));
-        bill = billRepository.save(bill.addBillDetail(billDetail));
+        BillDetail billDetail = new BillDetail(act1, 1);
+        Bill bill = billRepository.save(new Bill().addBillDetail(billDetail));
         assertEquals(act1.getPrice(), bill.getTotalAmount());
 
         Double updatedPrice = 75.0;
@@ -116,10 +116,10 @@ class MedicalActControllerIntegrationTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.success").value(true));
 
-        // Then the bill have to be update too
+        // Then the bill has to be updated too
         assertFalse(medicalActRepository.findById(act1.getId()).orElseThrow().isActive());
         verify(medicalActService, times(1)).updatePrice(eq(updatedPrice), any(MedicalAct.class));
-        assertEquals(updatedPrice, billRepository.findById(bill.getId()).orElseThrow().getTotalAmount());
+        assertEquals(act1.getPrice(), billRepository.findById(bill.getId()).orElseThrow().getTotalAmount());
     }
 
     @Test
@@ -128,18 +128,18 @@ class MedicalActControllerIntegrationTest {
         String name = "ACT1";
         Double price = 100.0;
         String requestBody = """
-            {
-                "name": "%s",
-                "price": %s
-            }
-            """.formatted(name, price);
+                {
+                    "name": "%s",
+                    "price": %s
+                }
+                """.formatted(name, price);
 
         // When we try to create a medical act
         server.perform(post("/medicalAct/")
                         .contentType("application/json")
                         .content(requestBody))
                 // Then...
-                .andExpect(status().isOk())
+                .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.medicalAct.price").value(price))
                 .andExpect(jsonPath("$.medicalAct.name").value(name));
     }

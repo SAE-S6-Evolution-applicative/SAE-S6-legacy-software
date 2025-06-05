@@ -4,6 +4,8 @@ services:
     container_name: hospital_db
     env_file:
       - ./../.env # Loads environment variables from the .env file
+    command:
+      - --log_bin_trust_function_creators=1
     ports:
       - "7878:3306"
   mailHog:
