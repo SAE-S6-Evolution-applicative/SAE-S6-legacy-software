@@ -13,20 +13,19 @@ import org.springframework.http.MediaType;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import sae.semestre.six.appointment.AppointmentController;
-import sae.semestre.six.appointment.AppointmentService;
-import sae.semestre.six.appointment.AppointmentController.ScheduleRequestModel;
 import sae.semestre.six.appointment.AppointmentController.AvailableSlotRequestModel;
-import sae.semestre.six.common.SuccessfullResponseModel;
+import sae.semestre.six.appointment.AppointmentController.ScheduleRequestModel;
+import sae.semestre.six.appointment.AppointmentService;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Collections;
 
 import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(AppointmentController.class)
 class AppointmentControllerIntegrationTest {
@@ -36,11 +35,6 @@ class AppointmentControllerIntegrationTest {
 
     @MockitoBean
     private AppointmentService appointmentService;
-
-    @BeforeEach
-    void setUp() {
-        // Configuration des mocks si besoin
-    }
 
     @Test
     void testScheduleAppointmentEndpoint() throws Exception {

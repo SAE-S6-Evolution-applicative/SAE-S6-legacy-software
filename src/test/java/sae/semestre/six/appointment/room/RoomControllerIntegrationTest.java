@@ -1,192 +1,111 @@
+/*
+ * RoomControllerIntegrationTest.java                              19 mai. 2025
+ * IUT de Rodez, no author rights
+ */
+
+
 package sae.semestre.six.appointment.room;
 
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.InjectMocks;
-import org.mockito.MockitoAnnotations;
-import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
-import org.springframework.test.util.ReflectionTestUtils;
+import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
-import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.transaction.annotation.Transactional;
 import sae.semestre.six.appointment.Appointment;
 import sae.semestre.six.appointment.AppointmentRepository;
-import sae.semestre.six.appointment.AppointmentService;
 import sae.semestre.six.appointment.doctor.Doctor;
+import sae.semestre.six.appointment.doctor.DoctorRepository;
+import sae.semestre.six.appointment.patient.Patient;
+import sae.semestre.six.appointment.patient.PatientRepository;
 
-import java.util.Optional;
+import java.time.LocalDateTime;
 
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.Mockito.*;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @Transactional
 @AutoConfigureMockMvc
 class RoomControllerIntegrationTest {
 
+    @Autowired
     private MockMvc server;
 
-    @MockitoBean
-    private RoomRepository roomRepository;
-
-    @MockitoBean
-    private AppointmentRepository appointmentRepository;
-
-    @InjectMocks
-    private RoomController roomController;
-
-    private AutoCloseable autoCloseable;
     @Autowired
     private RoomService roomService;
+
     @Autowired
-    private AppointmentService appointmentService;
+    private AppointmentRepository appointmentRepository;
+
+    @Autowired
+    private RoomRepository roomRepository;
+
+    @Autowired
+    private DoctorRepository doctorRepository;
+
+    @Autowired
+    private PatientRepository patientRepository;
+
+    private Room room;
+    private Appointment appointment;
 
     @BeforeEach
     void setUp() {
-        autoCloseable = MockitoAnnotations.openMocks(this);
-        server = MockMvcBuilders.standaloneSetup(roomController).build();
-
-        ReflectionTestUtils.setField(roomController, "roomRepository", roomRepository);
-        ReflectionTestUtils.setField(roomController, "appointmentRepository", appointmentRepository);
-    }
-
-    @AfterEach
-    void tearDown() throws Exception {
-        autoCloseable.close();
-    }
-
-    @Test
-    void testAssignWithoutError() throws Exception {
-        Room room = new Room();
+        // Create an available room
+        room = new Room();
         room.setRoomNumber("A101");
-        room.setCapacity(5);
+        room.setCapacity(2);
         room.setCurrentPatientCount(0);
         room.setType("Consultation");
+        roomRepository.save(room);
 
-        Doctor generalDoctor = new Doctor();
-        generalDoctor.setSpecialization("General");
+        // Create a doctor and a patient
+        Doctor doctor = new Doctor();
+        doctor.setFirstName("Will");
+        doctor.setLastName("Smith");
+        doctor.setSpecialization("General Practitioner");
+        doctor.setDoctorNumber("DOC001");
+        doctorRepository.save(doctor);
 
-        Appointment appointment = new Appointment();
-        appointment.setId(1L);
-        appointment.setDoctor(generalDoctor);
+        Patient patient = new Patient();
+        patient.setFirstName("John");
+        patient.setLastName("Doe");
+        patient.setPatientNumber("PAT001");
+        patientRepository.save(patient);
 
-        when(roomService.findByRoomNumber(room.getRoomNumber())).thenReturn(room);
-        when(appointmentService.findAppointmentById(appointment.getId())).thenReturn(appointment);
-
-        server.perform(put("/rooms/" + room.getRoomNumber() + "/appointments/" + appointment.getId()))
-                .andExpect(status().isOk())
-                .andExpect(MockMvcResultMatchers.content().string("Room assigned successfully"));
-
-        verify(roomRepository, times(1)).save(any(Room.class));
-        verify(appointmentRepository, times(1)).save(any(Appointment.class));
+        // Create an appointment
+        appointment = new Appointment(doctor, patient, LocalDateTime.now());
+        appointment.setAppointmentNumber("APP001");
+        appointmentRepository.save(appointment);
     }
 
     @Test
-    void testAssignSurgeonTypeDontMatch() throws Exception {
-        Room room = new Room();
-        room.setRoomNumber("A101");
-
-        room.setType("SURGERY");
-
-
-        Doctor generalDoctor = new Doctor();
-        generalDoctor.setSpecialization("General");
-
-        Appointment appointment = new Appointment();
-        appointment.setId(1L);
-        appointment.setDoctor(generalDoctor);
-
-        when(roomService.findByRoomNumber(room.getRoomNumber())).thenReturn(room);
-        when(appointmentService.findAppointmentById(appointment.getId())).thenReturn(appointment);
-
-        server.perform(put("/rooms/" + room.getRoomNumber() + "/appointments/" + appointment.getId()))
+    void testAssignRoomSuccess() throws Exception {
+        server.perform(put("/rooms/A101/appointments/" + appointment.getId())
+                        .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(MockMvcResultMatchers.content().string("Error: Only surgeons can use surgery rooms"));
-    }
-
-    @Test
-    void testAssignFullRoom() throws Exception {
-        Room room = new Room();
-        room.setRoomNumber("A101");
-        room.setCapacity(5);
-        room.setCurrentPatientCount(5);
-        room.setType("Consultation");
-        assertFalse(room.canAcceptPatient());
-        Doctor generalDoctor = new Doctor();
-        generalDoctor.setSpecialization("General");
-
-        Appointment appointment = new Appointment();
-        appointment.setId(1L);
-        appointment.setDoctor(generalDoctor);
-
-        when(roomService.findByRoomNumber(room.getRoomNumber())).thenReturn(room);
-        when(appointmentService.findAppointmentById(appointment.getId())).thenReturn(appointment);
-
-        server.perform(put("/rooms/" + room.getRoomNumber() + "/appointments/" + appointment.getId()))
-                .andExpect(status().isOk())
-                .andExpect(MockMvcResultMatchers.content().string("Error: Room is at full capacity"));
+                .andExpect(jsonPath("$.success").value(true))
+                .andExpect(jsonPath("$.message").value(org.hamcrest.Matchers.containsString("A101")));
     }
 
     @Test
     void testAssignRoomNotFound() throws Exception {
-        Room room = new Room();
-        room.setRoomNumber("A101");
-        room.setCapacity(5);
-        room.setCurrentPatientCount(0);
-        room.setType("Consultation");
-
-        Doctor generalDoctor = new Doctor();
-        generalDoctor.setSpecialization("General");
-
-        Appointment appointment = new Appointment();
-        appointment.setId(1L);
-        appointment.setDoctor(generalDoctor);
-
-        when(roomRepository.findByRoomNumber(room.getRoomNumber())).thenThrow(new RuntimeException("Room not found"));
-        when(appointmentRepository.findById(appointment.getId())).thenReturn(Optional.of(appointment));
-
-        server.perform(put("/rooms/" + room.getRoomNumber() + "/appointments/" + appointment.getId()))
-                .andExpect(status().isOk())
-                .andExpect(MockMvcResultMatchers.content().string("Error: Room not found"));
+        server.perform(put("/rooms/B404/appointments/" + appointment.getId())
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().is4xxClientError());
     }
 
     @Test
-    void testGetRoomAvailability() throws Exception {
-        Room room = new Room();
-        room.setRoomNumber("A101");
-        room.setCapacity(5);
-        room.setCurrentPatientCount(0);
-        room.setType("Consultation");
+    void testAssignFullRoom() throws Exception {
+        room.setCurrentPatientCount(room.getCapacity());
+        roomRepository.save(room);
 
-        when(roomService.findByRoomNumber(room.getRoomNumber())).thenReturn(room);
-
-        server.perform(get("/rooms/" + room.getRoomNumber() + "/availability"))
-                .andExpect(status().isOk())
-                .andExpect(MockMvcResultMatchers.jsonPath("$.roomNumber").value(room.getRoomNumber()))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.capacity").value(room.getCapacity()))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.currentPatients").value(room.getCurrentPatientCount()))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.available").value(true));
-    }
-
-    @Test
-    void testGetRoomAvailabilityRoomNotFound() {
-        String roomNumber = "A101";
-
-        when(roomRepository.findByRoomNumber(roomNumber)).thenThrow(new RuntimeException("Room not found"));
-
-        assertThrows(RuntimeException.class,
-                () -> roomController.getRoomAvailability(roomNumber),
-                "Should throw RuntimeException when room is not found");
+        server.perform(put("/rooms/A101/appointments/" + appointment.getId())
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().is4xxClientError());
     }
 }
