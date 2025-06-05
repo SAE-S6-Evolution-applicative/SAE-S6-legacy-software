@@ -7,6 +7,7 @@ package sae.semestre.six.appointment.doctor;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import sae.semestre.six.exception.EntityNotFoundException;
 
 @Service
 public class DoctorService {
@@ -20,7 +21,7 @@ public class DoctorService {
 
     public Doctor getDoctor(Long doctorId) {
         return doctorRepository.findById(doctorId).orElseThrow(
-                () -> new RuntimeException("Doctor not found")
+                () -> new EntityNotFoundException("Doctor not found with ID " + doctorId)
         );
     }
 }
