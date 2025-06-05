@@ -12,7 +12,7 @@ import sae.semestre.six.appointment.medicalact.MedicalAct;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 
-public class BillHashTest {
+class BillHashTest {
 
     @Test
     void testBillHash() {
