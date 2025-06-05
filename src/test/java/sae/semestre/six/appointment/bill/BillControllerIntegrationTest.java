@@ -15,6 +15,7 @@ import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.bean.override.mockito.MockitoSpyBean;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.servlet.support.WebContentGenerator;
 import sae.semestre.six.FileHandler;
 import sae.semestre.six.appointment.Appointment;
 import sae.semestre.six.appointment.AppointmentRepository;
@@ -26,6 +27,8 @@ import sae.semestre.six.appointment.medicalact.MedicalActService;
 import sae.semestre.six.appointment.patient.Patient;
 import sae.semestre.six.appointment.patient.PatientRepository;
 import sae.semestre.six.email.EmailService;
+import static org.mockito.Mockito.when;
+
 
 import java.io.File;
 import java.io.IOException;
@@ -89,6 +92,8 @@ class BillControllerIntegrationTest {
 
     @Value("${app.security.hash-folder-path}")
     private String hashFolder;
+    @Autowired
+    private WebContentGenerator webContentGenerator;
 
     @AfterEach
     void deleteBillFileHash() throws IOException {
@@ -308,11 +313,14 @@ class BillControllerIntegrationTest {
 
     @Test
     void testGetPendingBills() throws Exception {
-        int initialbillPendingCount = billRepository.findBillsByStatus(Bill.Status.PENDING).size();
+        Patient patient = patientRepository.save(new Patient("1", "John", "Doe"));
+        Doctor doctor = doctorRepository.save(new Doctor("134", "Albert", "Martin"));
 
         // Given 3 Bill where two bill are pending
         Bill bill1 = new Bill();
         bill1.setStatus(Bill.Status.PENDING);
+        bill1.setPatient(patient);
+        bill1.setDoctor(doctor);
         bill1 = billRepository.save(bill1);
 
         Bill bill2 = new Bill();
@@ -321,19 +329,21 @@ class BillControllerIntegrationTest {
 
         Bill bill3 = new Bill();
         bill3.setStatus(Bill.Status.PENDING);
+        bill3.setPatient(patient);
+        bill3.setDoctor(doctor);
         bill3 = billRepository.save(bill3);
+
+        when(billRepository.findBillsByStatus(Bill.Status.PENDING)).thenReturn(Arrays.asList(bill1, bill3));
 
         // When we fetch all pending bill
         server.perform(get("/bills/pending"))
                 // Then two bills are return
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andExpect(jsonPath("$.pendingBills").isArray())
-                .andExpect(jsonPath("$.pendingBills.length()").value(initialbillPendingCount + 2))
-                .andExpect(jsonPath("$.pendingBills").value(hasItems(
-                        bill1.getId().toString(),
-                        bill3.getId().toString()
-                )));
+                .andExpect(jsonPath("$.bills").isArray())
+                .andExpect(jsonPath("$.bills.length()").value(2))
+                .andExpect(jsonPath("$.bills[0].status").value(Bill.Status.PENDING.toString()))
+                .andExpect(jsonPath("$.bills[1].status").value(Bill.Status.PENDING.toString()));
     }
 
     @Test

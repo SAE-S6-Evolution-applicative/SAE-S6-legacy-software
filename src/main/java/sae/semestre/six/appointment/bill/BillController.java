@@ -13,6 +13,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+import sae.semestre.six.appointment.bill.dto.BillResponse;
 import sae.semestre.six.appointment.doctor.Doctor;
 import sae.semestre.six.appointment.doctor.DoctorService;
 import sae.semestre.six.appointment.medicalact.MedicalAct;
@@ -104,12 +105,9 @@ public class BillController {
     @Operation(summary = "Get pending bills", description = "Retrieves the list of pending bills")
     @ApiResponse(responseCode = "200", description = "List of pending bills")
     @GetMapping("/pending")
-    public PendingBillResponse getPendingBills() {
-        return new PendingBillResponse(
-                billService.findPendingBills().stream()
-                        .map(Bill::getId)
-                        .map(Objects::toString)
-                        .toList()
+    public BillsResponse getPendingBills() {
+        return BillsResponse.fromBillList(
+                billService.findPendingBills()
         );
     }
 
@@ -132,6 +130,14 @@ public class BillController {
     public record InsuranceCoverageResponse(double amount) {
     }
 
-    public record PendingBillResponse(List<String> pendingBills) {
+    public record BillsResponse(List<BillResponse> bills) {
+        public static BillsResponse fromBillList(List<Bill> billsList) {
+            return new BillsResponse(
+                    billsList.stream()
+                            .map(BillResponse::new)
+                            .filter(Objects::nonNull)
+                            .toList()
+            );
+        }
     }
 } 
