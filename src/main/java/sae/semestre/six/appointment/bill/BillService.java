@@ -5,8 +5,6 @@
 
 package sae.semestre.six.appointment.bill;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -67,7 +65,7 @@ public class BillService {
 
         String hashed = HashUtils.hashString(bill.getInfoToHash());
         Path path = getFileName(bill);
-        fileHandler.writeHashToFile(hashed, path.toUri().getPath());
+        fileHandler.writeToFile(hashed, path.toUri().getPath());
         bill.setHash(hashed);
 
         return billRepository.save(bill);

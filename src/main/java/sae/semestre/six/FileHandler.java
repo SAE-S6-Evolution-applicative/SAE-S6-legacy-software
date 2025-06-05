@@ -10,12 +10,23 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
+/**
+ * FileHandler is a utility class for handling file operations such as writing content to a file
+ * and reading content from a file.
+ */
 @Component
 public class FileHandler {
 
     private static final Logger log = LoggerFactory.getLogger(FileHandler.class);
 
-    public void writeHashToFile(String contentToWrite, String pathName) {
+    /**
+     * Writes the given content to a file at the specified path.
+     * If the parent directory does not exist, it will be created.
+     *
+     * @param contentToWrite the content to write to the file
+     * @param pathName       the path where the file will be created
+     */
+    public void writeToFile(String contentToWrite, String pathName) {
         File billHashFile = new File(pathName);
 
         File parentDir = billHashFile.getParentFile();
@@ -34,6 +45,13 @@ public class FileHandler {
         }
     }
 
+    /**
+     * Reads the content of a file at the specified path.
+     *
+     * @param path the path to the file
+     * @return the content of the file as a String
+     * @throws RuntimeException if the file cannot be read
+     */
     public String readFile(Path path) {
         try {
             return Files.readString(path);

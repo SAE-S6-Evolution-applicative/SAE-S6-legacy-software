@@ -12,10 +12,20 @@ import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
+/**
+ * Utility class for hashing strings.
+ */
 public class HashUtils {
 
     private static final Logger logger = LoggerFactory.getLogger(HashUtils.class);
 
+    /**
+     * Hashes a given string using SHA-256 algorithm.
+     *
+     * @param data the string to hash
+     * @return the hexadecimal representation of the hash
+     * @throws SecurityException if the hashing algorithm is not available
+     */
     public static String hashString(String data) {
         try {
             MessageDigest digest = MessageDigest.getInstance("SHA-256");
@@ -36,8 +46,9 @@ public class HashUtils {
         }
     }
 
+    /**
+     * Private constructor to prevent instantiation.
+     */
     private HashUtils() {
-        // Private constructor to prevent instantiation
-        // This class is intended
     }
 }
