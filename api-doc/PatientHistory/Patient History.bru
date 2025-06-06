@@ -1,0 +1,15 @@
+meta {
+  name: Patient History
+  type: http
+  seq: 2
+}
+
+get {
+  url: http://localhost:8045/patients/history/:patientid/summary
+  body: none
+  auth: inherit
+}
+
+params:path {
+  patientid: 1
+}

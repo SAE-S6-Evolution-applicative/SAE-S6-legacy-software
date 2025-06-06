@@ -24,7 +24,7 @@ public class Appointment {
 
     public Appointment() {}
 
-    public Appointment(Doctor doctor, Patient patient, LocalDateTime date) {
+    public Appointment(Doctor doctor, Patient patient, LocalDateTime date, int appointmentNumber) {
         // Check if the appointment is within working hours
         if (date.getHour() < SCHEDULE_START_HOUR || date.getHour() > SCHEDULE_STOP_HOUR) {
             throw new ScheduleAlreadyTakenException("Appointments only available between 9 AM and 5 PM");
@@ -32,6 +32,7 @@ public class Appointment {
         this.doctor = doctor;
         this.patient = patient;
         this.appointmentDate = date;
+        this.appointmentNumber = "RDV" + appointmentNumber;
     }
 
 
@@ -136,4 +137,24 @@ public class Appointment {
     public boolean hasTimeConflict(LocalDateTime appointmentDate) {
         return this.appointmentDate.equals(appointmentDate.withMinute(0).withSecond(0).withNano(0));
     }
-} 
+
+    /**
+     * Extracts the numeric part from the appointment number.
+     * The appointment number is expected to contain a mix of letters and numbers.
+     * This method removes all non-numeric characters and returns the numeric part as an integer.
+     *
+     * @return the numeric part of the appointment number as an integer
+     */
+    public int extractNumericPartFromAppointmentNumber() {
+        if (appointmentNumber == null || appointmentNumber.isEmpty()) {
+            return 0;
+        }
+        String numericPart = appointmentNumber.replaceAll("[^0-9]", "");
+
+        try {
+            return Integer.parseInt(numericPart);
+        } catch (NumberFormatException e) {
+            return 0;
+        }
+    }
+}

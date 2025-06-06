@@ -1,0 +1,16 @@
+meta {
+  name: Assign Room
+  type: http
+  seq: 1
+}
+
+put {
+  url: http://localhost:8045/rooms/:roomumber/appointments/:appointmentId
+  body: none
+  auth: inherit
+}
+
+params:path {
+  appointmentId: 4
+  roomumber: A202
+}

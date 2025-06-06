@@ -17,6 +17,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 
+import static java.util.stream.Collectors.toList;
+
 @RestController
 @RequestMapping("/medicines")
 @Tag(name = "Medicine", description = "Medicine management API")
@@ -33,15 +35,27 @@ public class MedicineController {
     @ApiResponse(responseCode = "200", description = "Medicine found successfully")
     @ApiResponse(responseCode = "404", description = "Medicine not found")
     @GetMapping("/{id}")
-    public Medicine getMedicineById(
+    public MedicineResponse getMedicineById(
             @Parameter(description = "Medicine ID") @PathVariable Long id) {
-        return medicineService.getMedicineById(id);
+        return new MedicineResponse(medicineService.getMedicineById(id));
     }
 
     @Operation(summary = "Get all medicines", description = "Retrieves a list of all available medicines")
     @ApiResponse(responseCode = "200", description = "List of medicines retrieved successfully")
     @GetMapping
-    public List<Medicine> getAllMedicines() {
-        return medicineService.getAllMedicines();
+    public List<MedicineResponse> getAllMedicines() {
+        return medicineService.getAllMedicines().stream()
+                .map(MedicineResponse::new)
+                .toList();
+    }
+
+    public record MedicineResponse(
+            Long id,
+            String name,
+            double unitPrice
+    ) {
+        public MedicineResponse(Medicine medicine) {
+            this(medicine.getId(), medicine.getName(), medicine.getUnitPrice());
+        }
     }
 }

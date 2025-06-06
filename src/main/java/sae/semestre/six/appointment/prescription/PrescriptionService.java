@@ -44,16 +44,16 @@ public class PrescriptionService {
      * most recent prescription for numbering purposes, and saves the prescription.
      * Additionally, it triggers the billing process associated with the created prescription.
      *
-     * @param patientId the ID of the patient for whom the prescription is being created
+     * @param patientId   the ID of the patient for whom the prescription is being created
      * @param medicineIds the list of medicine IDs to be included in the prescription
-     * @param notes additional information or instructions related to the prescription
+     * @param notes       additional information or instructions related to the prescription
      */
     public void addPrescription(Long patientId, List<Long> medicineIds, String notes) {
         Patient patient = patientService.getPatient(patientId);
 
         List<Medicine> medicineList = medicineService.getByIds(medicineIds);
 
-        Prescription prescription = new Prescription(getNumericPartFromLastPrescriptionNumber(), patient, medicineList, notes);
+        Prescription prescription = new Prescription(getNumericPartFromLastPrescriptionNumber() + 1, patient, medicineList, notes);
         prescriptionRepository.save(prescription);
 
         logger.info("{} - {} \n", LocalDate.now(), prescription.getPrescriptionNumber());
@@ -81,7 +81,8 @@ public class PrescriptionService {
      * Retrieves the most recent prescription based on its creation date.
      * If no prescriptions are found, returns null.
      *
-     * @return the most recently created Prescription object, or*/
+     * @return the most recently created Prescription object, or
+     */
     public Prescription findLastPrescription() {
         return prescriptionRepository.findLastPrescription().orElseThrow(
                 () -> new EntityNotFoundException("Last prescription not found"));

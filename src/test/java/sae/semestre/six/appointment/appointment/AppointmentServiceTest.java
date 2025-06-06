@@ -11,6 +11,7 @@ import org.mockito.MockitoAnnotations;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
+import org.springframework.test.context.bean.override.mockito.MockitoSpyBean;
 import org.springframework.transaction.annotation.Transactional;
 import sae.semestre.six.appointment.Appointment;
 import sae.semestre.six.appointment.AppointmentController.AvailableSlotRequestModel;
@@ -44,7 +45,7 @@ class AppointmentServiceTest {
     private DoctorService doctorService;
     @MockitoBean
     private PatientService patientService;
-    @MockitoBean
+    @MockitoSpyBean
     private EmailService emailService;
 
     @Autowired
@@ -81,8 +82,8 @@ class AppointmentServiceTest {
         LocalDateTime dateTime = LocalDateTime.of(2025, 5, 22, 10, 0);
         ScheduleRequestModel req = new ScheduleRequestModel(1L, 2L, dateTime);
 
-        when(doctorService.getDoctor(1L)).thenReturn(doctor);
-        when(patientService.getPatient(2L)).thenReturn(patient);
+        when(doctorService.getDoctor(eq(req.doctorId()))).thenReturn(doctor);
+        when(patientService.getPatient(eq(req.patientId()))).thenReturn(patient);
         when(appointmentRepository.findAllByDoctor_Id(1L)).thenReturn(Collections.emptyList());
 
         boolean result = appointmentService.scheduleAppointment(req);
@@ -101,8 +102,8 @@ class AppointmentServiceTest {
 
         Appointment existing = mock(Appointment.class);
         when(existing.getAppointmentDate()).thenReturn(dateTime);
-        when(doctorService.getDoctor(1L)).thenReturn(doctor);
-        when(patientService.getPatient(2L)).thenReturn(patient);
+        when(doctorService.getDoctor(eq(req.doctorId()))).thenReturn(doctor);
+        when(patientService.getPatient(eq(req.patientId()))).thenReturn(patient);
         when(appointmentRepository.findAllByDoctor_Id(1L)).thenReturn(List.of(existing));
         when(existing.hasTimeConflict(dateTime)).thenReturn(true);
 

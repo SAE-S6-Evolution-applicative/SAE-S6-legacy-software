@@ -1,0 +1,15 @@
+meta {
+  name: Calculate Insurance
+  type: http
+  seq: 4
+}
+
+get {
+  url: http://localhost:8045/bills/insurance-coverage?amount=10
+  body: none
+  auth: inherit
+}
+
+params:query {
+  amount: 10
+}

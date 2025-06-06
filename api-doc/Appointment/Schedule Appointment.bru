@@ -1,0 +1,23 @@
+meta {
+  name: Schedule Appointment
+  type: http
+  seq: 1
+}
+
+post {
+  url: http://localhost:8045/appointments
+  body: json
+  auth: inherit
+}
+
+headers {
+  Content-Type: application/json
+}
+
+body:json {
+  {
+    "doctorId": 1,
+    "patientId": 1,
+    "appointmentDateTime": "2025-06-06T09:00:00"
+  }
+}

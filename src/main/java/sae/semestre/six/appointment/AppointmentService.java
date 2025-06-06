@@ -78,7 +78,7 @@ public class AppointmentService {
      * @param scheduleRequestModel the request model containing doctor ID, patient ID, and appointment date/time
      * @return {@code true} if the appointment was successfully scheduled
      * @throws ScheduleAlreadyTakenException if the doctor already has an appointment at the requested time
-     * @throws EntityNotFoundException if the doctor or patient does not exist
+     * @throws EntityNotFoundException       if the doctor or patient does not exist
      */
     public boolean scheduleAppointment(ScheduleRequestModel scheduleRequestModel) {
         Doctor doctor = doctorService.getDoctor(scheduleRequestModel.doctorId());
@@ -96,7 +96,7 @@ public class AppointmentService {
         }
 
         // schedule appointment
-        Appointment appointment = new Appointment(doctor, patient, appointmentTime);
+        Appointment appointment = new Appointment(doctor, patient, appointmentTime, getNumericPartFromLastAppointmentNumber() + 1);
         appointmentRepository.save(appointment);
         logger.info("{} - Appointment {} created\n", LocalDate.now(), appointment.getId());
 
@@ -113,7 +113,7 @@ public class AppointmentService {
     /**
      * Checks if there is a scheduling conflict for the doctor at the given appointment date and time.
      *
-     * @param doctorAppointments the list of existing appointments for the doctor
+     * @param doctorAppointments  the list of existing appointments for the doctor
      * @param appointmentDateTime the date and time to check for a conflict
      * @return true if there is a conflict (the doctor already has an appointment at this time), false otherwise
      */
@@ -158,4 +158,29 @@ public class AppointmentService {
 
         return finalSlots;
     }
+
+    /**
+     * Extracts and returns the numeric part from the prescription number
+     * of the last created prescription. If no prescriptions exist, the
+     * return value defaults to 0.
+     *
+     * @return the numeric part of the last prescription number, or 0 if no prescriptions are found
+     */
+    private int getNumericPartFromLastAppointmentNumber() {
+        int numericPartAppointmentNumber = 0;
+        try {
+            Appointment lastAppointment = findLastAppointment();
+            numericPartAppointmentNumber = lastAppointment.extractNumericPartFromAppointmentNumber();
+        } catch (EntityNotFoundException e) {
+            // Do nothing
+        }
+        return numericPartAppointmentNumber;
+    }
+
+    private Appointment findLastAppointment() {
+        return appointmentRepository.findLastAppointment().orElseThrow(
+                () -> new EntityNotFoundException("Last appointment not found"));
+    }
+
+
 }

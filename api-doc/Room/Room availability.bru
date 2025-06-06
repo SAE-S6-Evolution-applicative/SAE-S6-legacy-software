@@ -1,0 +1,15 @@
+meta {
+  name: Room availability
+  type: http
+  seq: 2
+}
+
+get {
+  url: http://localhost:8045/rooms/:roomNumber/availability
+  body: none
+  auth: inherit
+}
+
+params:path {
+  roomNumber: A202
+}

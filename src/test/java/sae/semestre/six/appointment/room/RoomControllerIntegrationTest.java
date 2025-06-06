@@ -78,7 +78,7 @@ class RoomControllerIntegrationTest {
         patientRepository.save(patient);
 
         // Create an appointment
-        appointment = new Appointment(doctor, patient, LocalDateTime.now());
+        appointment = new Appointment(doctor, patient, LocalDateTime.now(), 1);
         appointment.setAppointmentNumber("APP001");
         appointmentRepository.save(appointment);
     }

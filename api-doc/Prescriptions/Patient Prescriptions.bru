@@ -1,0 +1,15 @@
+meta {
+  name: Patient Prescriptions
+  type: http
+  seq: 2
+}
+
+get {
+  url: http://localhost:8045/prescriptions/:patientId
+  body: none
+  auth: inherit
+}
+
+params:path {
+  patientId: 1
+}

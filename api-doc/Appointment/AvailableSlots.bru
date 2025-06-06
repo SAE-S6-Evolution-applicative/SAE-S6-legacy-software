@@ -1,0 +1,22 @@
+meta {
+  name: AvailableSlots
+  type: http
+  seq: 2
+}
+
+get {
+  url: http://localhost:8045/appointments/available-slots
+  body: json
+  auth: inherit
+}
+
+headers {
+  Content-Type: application/json
+}
+
+body:json {
+  {
+    "doctorId": 1,
+    "date": "2025-06-06T00:00"
+  }
+}
